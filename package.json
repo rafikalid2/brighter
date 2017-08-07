@@ -1,0 +1,25 @@
+{
+  "name": "brighter",
+  "version": "0.1.0",
+  "author": "BRSOLAB.com",
+  "license": "UNLICENSED",
+  "private": true,
+  "description": "css & javascript framework",
+  "main": "index.js",
+  "scripts": {
+    "test": "gulp"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rafikalid2/brighter.git"
+  },
+  "keywords": [
+    "css",
+    "style",
+    "framework"
+  ],
+  "bugs": {
+    "url": "https://github.com/rafikalid2/brighter/issues"
+  },
+  "homepage": "https://github.com/rafikalid2/brighter#readme"
+}

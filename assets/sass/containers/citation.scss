@@ -1,0 +1,9 @@
+cite{
+	color		: $default;
+	font-size	: 80%;
+	line-height	: 1.42857143;
+
+	&:before{
+		content: '\2014 \00A0';
+	}
+}

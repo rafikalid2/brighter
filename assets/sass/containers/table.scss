@@ -1,0 +1,22 @@
+table{
+	.table{
+		width			: 100%;
+		border-collapse	: collapse;
+
+		td, th{
+			border	: 1px solid $border-color;
+		}
+	}
+
+	&.table-striped{
+		tr:nth-child(even){
+			background: $default;
+		}
+	}
+
+	&.table-hover{
+		tr:hover{
+			background: lighten($default, 10%);
+		}
+	}
+}
