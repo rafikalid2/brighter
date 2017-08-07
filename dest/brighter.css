@@ -1,0 +1,220 @@
+a {
+  text-decoration: none;
+  cursor: pointer; }
+
+html, body {
+  height: 100%;
+  padding: 0;
+  margin: 0; }
+
+body {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 12px;
+  line-height: 1.42857143; }
+
+.cursor-text {
+  cursor: text; }
+
+.cursor-pointer {
+  cursor: pointer; }
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  padding: 0; }
+
+h1 {
+  font-size: 36px; }
+
+h2 {
+  font-size: 30px; }
+
+h3 {
+  font-size: 24px; }
+
+h4 {
+  font-size: 18px; }
+
+h5 {
+  font-size: 14px; }
+
+h6 {
+  font-size: 12px; }
+
+input, .select {
+  -webkit-touch-callout: initial;
+  -webkit-user-select: initial;
+  -khtml-user-select: initial;
+  -moz-user-select: element;
+  -ms-user-select: initial;
+  user-select: initial; }
+
+.no-select, body, input[type="text"]:disabled,
+input[type="password"]:disabled,
+input[type="email"]:disabled,
+input[type="phone"]:disabled,
+textarea:disabled,
+select:disabled {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: default; }
+
+body, input, textarea {
+  box-sizing: border-box; }
+
+.text-left {
+  text-align: left; }
+
+.text-center {
+  text-align: center; }
+
+.text-right {
+  text-align: right; }
+
+.text-justify {
+  text-align: justify; }
+
+.text-nowrap {
+  white-space: nowrap; }
+
+.text-lowercase {
+  text-transform: lowercase; }
+
+.text-uppercase {
+  text-transform: uppercase; }
+
+.text-capitalize {
+  text-transform: capitalize; }
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="phone"],
+textarea,
+select {
+  padding: 6px 12px;
+  line-height: 1.42857143;
+  color: #555;
+  border: 1px #ddd solid;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 1px rgba(221, 221, 221, 0.5);
+  transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s; }
+  input[type="text"]:focus,
+  input[type="password"]:focus,
+  input[type="email"]:focus,
+  input[type="phone"]:focus,
+  textarea:focus,
+  select:focus {
+    border-color: #66afe9;
+    box-shadow: inset 0 1px 1px #aaaaaa, 0 0 8px rgba(102, 175, 233, 0.6);
+    color: black;
+    outline: none; }
+  input[type="text"]:disabled,
+  input[type="password"]:disabled,
+  input[type="email"]:disabled,
+  input[type="phone"]:disabled,
+  textarea:disabled,
+  select:disabled {
+    cursor: default;
+    background: #f7f7f7;
+    color: GrayText; }
+
+.btn, [class^="btn-"], [class*=" btn-"] {
+  display: inline-block;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  padding: 6px 12px;
+  border-radius: 2px;
+  color: white;
+  border: 1px #e6e6e6 solid;
+  margin: 5px;
+  touch-action: manipulation;
+  cursor: pointer; }
+
+.btn {
+  color: #4d4d4d; }
+  .btn-default {
+    background: #e6e6e6;
+    border-color: #cdcdcd;
+    color: #4d4d4d; }
+  .btn-primary {
+    background: #428bca;
+    border-color: #3071a9; }
+  .btn-sucess {
+    background: #3C6F18;
+    border-color: #25450f; }
+  .btn-info {
+    background: #62d0f1;
+    border-color: #33c2ed; }
+  .btn-warning {
+    background: #FFB61E;
+    border-color: #ea9e00; }
+  .btn-danger {
+    background: #E5343D;
+    border-color: #cc1a23; }
+
+blockquote {
+  padding: 10px 20px;
+  margin: 0 0 0 20px;
+  border-left: 5px solid; }
+
+/**
+ * tricks:
+ * 		add classes: text-default, text-sucess, ... to set text colors and border color
+ */
+cite {
+  color: #e6e6e6;
+  font-size: 80%;
+  line-height: 1.42857143; }
+  cite:before {
+    content: '\2014 \00A0'; }
+
+/*
+<dl>
+  <dt>...</dt>
+  <dd>...</dd>
+</dl>
+ */
+table .table {
+  width: 100%;
+  border-collapse: collapse; }
+  table .table td, table .table th {
+    border: 1px solid #ddd; }
+
+table.table-striped tr:nth-child(even) {
+  background: #e6e6e6; }
+
+table.table-hover tr:hover {
+  background: white; }
+
+.default, .default input, .default textarea, .default select {
+  color: #e6e6e6;
+  border-color: #e6e6e6; }
+
+.primary, .primary input, .primary textarea, .primary select {
+  color: #428bca;
+  border-color: #428bca; }
+
+.sucess, .sucess input, .sucess textarea, .sucess select {
+  color: #3C6F18;
+  border-color: #3C6F18; }
+
+.info, .info input, .info textarea, .info select {
+  color: #62d0f1;
+  border-color: #62d0f1; }
+
+.warning, .warning input, .warning textarea, .warning select {
+  color: #FFB61E;
+  border-color: #FFB61E; }
+
+.danger, .danger input, .danger textarea, .danger select {
+  color: #E5343D;
+  border-color: #E5343D; }
+
+.block {
+  display: block;
+  width: 100%; }
