@@ -1,22 +1,38 @@
-table{
-	.table{
-		width			: 100%;
-		border-collapse	: collapse;
+.table, [class^="table-"], [class*=" table-"]{
+	width			: 100%;
+	border-collapse	: collapse;
 
-		td, th{
-			border	: 1px solid $border-color;
+	thead{
+		border-bottom: 2px solid $border-color;
+	}
+
+	td, th{
+		padding	: 5px;
+	}
+}
+.table{
+	tr{
+		border-bottom: 1px solid $border-color;
+	}
+
+
+	&-bordered{
+		td,th{
+			border: 1px solid $border-color;
 		}
 	}
 
-	&.table-striped{
-		tr:nth-child(even){
-			background: $default;
+	&-striped{
+		tr:nth-child(odd){
+			background: lighten($default, 5%);
 		}
 	}
 
-	&.table-hover{
-		tr:hover{
-			background: lighten($default, 10%);
+	&-hover{
+		tbody{
+			tr:hover{
+				background: lighten($default, 2%);
+			}
 		}
 	}
 }

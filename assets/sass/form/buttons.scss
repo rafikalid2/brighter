@@ -4,7 +4,7 @@
 	white-space		: nowrap;
 	vertical-align	: middle;
 	padding			: 6px 12px;
-	// border-radius	: 2px;
+	// border-radius	: $default-border-radius;
 	color			: white;
 	border			: 1px $default solid;
 	margin			: 5px;
@@ -13,8 +13,23 @@
 	// -webkit-appearance	: button;
 	// -moz-appearance 	: button;
 	
-	&:active{
+	&:not(.disabled):active{
 		box-shadow: -1px 2px 10px 3px rgba(0, 0, 0, 0.3) inset;
+	}
+
+	&.disabled, &:disabled{
+		cursor		: default;
+		background	: lighten($border-color, 10%)!important;
+		color		: GrayText;
+	}
+
+	&[class^="icon-"],&[class*=" icon-"]{
+		padding-left: 0;
+
+		&:before{
+			// margin-right: 1em;
+			padding: 0 5px;
+		}
 	}
 }
 
@@ -32,15 +47,23 @@
 }
 
 .btn{
-	&, &-default{
+	border-color: darken($default, 10%);
+	color		: $input-color;
+	background	: none;
+
+	&:hover{
+		@include _btn($default);
+	}
+
+	&-default{
 		@include btn($default);
 		color	: $input-color;
 	}
 	&-primary{
 		@include btn($primary);
 	}
-	&-sucess{
-		@include btn($sucess);
+	&-success{
+		@include btn($success);
 	}
 	&-info{
 		@include btn($info);

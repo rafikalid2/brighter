@@ -1,0 +1,9 @@
+.title{
+	display	: inline-block;
+	width	: 150px;
+
+	&:after{
+		float: right;
+		content:':';
+	}
+}

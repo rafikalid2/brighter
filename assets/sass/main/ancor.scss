@@ -1,4 +1,12 @@
-a{
-	text-decoration: none;
-	cursor: pointer;
+a, .link{
+	text-decoration	: none;
+	cursor			: pointer;
+
+	color			: $link-color;
+	transition		: color .5s ease;
+
+	&:hover{
+		color:$link-hover;
+		transition: none;
+	}
 }

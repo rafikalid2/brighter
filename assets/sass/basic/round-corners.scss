@@ -1,0 +1,9 @@
+
+.round{
+	&-ellipse{
+		border-radius: 50%;
+	}
+	&-corner{
+		border-radius: 2em; 
+	}
+}
