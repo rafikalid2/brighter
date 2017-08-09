@@ -1,5 +1,6 @@
 .panel{
 	border: 1px $border-color solid;
+	margin-bottom: 10px;
 
 	&-heading{
 		background-color: white;
@@ -14,5 +15,37 @@
 		border-top	: 1px $border-color solid;
 		background	: lighten($border-color, 10%);
 		padding		: 5px;
+	}
+
+	@mixin panel-type($color){
+		@extend .panel;
+		border-color: $color;
+
+		.panel-heading{
+			background	: $color;
+			color		: white;
+		}
+	}
+
+	&-default{
+		@include panel-type($default);
+		.panel-heading{
+			color: black;
+		}
+	}
+	&-primary{
+		@include panel-type($primary);
+	}
+	&-success{
+		@include panel-type($success);
+	}
+	&-info{
+		@include panel-type($info);
+	}
+	&-warning{
+		@include panel-type($warning);
+	}
+	&-danger{
+		@include panel-type($danger);
 	}
 }
