@@ -1,0 +1,65 @@
+%progress{
+	margin-bottom	: 10px;
+	background		: fade-in(lighten($border-color,8%), .3);
+	border-radius	: 4px;
+	color			: white;
+}
+
+.progress{
+	@extend %progress;
+
+}
+
+.progress-level{
+	padding		: 2.5px 5px;
+	background	: $default;
+	border-radius: 4px;
+	position	: relative;
+
+	.badge, .badge-round{
+		background	: inherit;
+		position	: absolute;
+		right		: 0;
+		top			: -1.3em;
+	}
+
+	// &[data-title]{
+	// 	&:after{
+
+	// 	}
+	// }
+}
+
+.progress-striped{
+	@extend %progress;
+	.progress-level{
+		background-image:-webkit-linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
+		background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
+		background-size: 50px 50px;
+	}
+
+	&.active{
+		.progress-level{
+			-webkit-animation: progress-anim 1s linear infinite;
+			animation		: progress-anim 1s linear infinite;
+		}
+	}
+}
+
+@-webkit-keyframes progress-anim {
+    0% {
+       background-position: 0 50px;
+    }
+    100% {
+       background-position: 0 0;
+    }
+}
+
+@keyframes progress-anim {
+    0% {
+       background-position: 0 50px;
+    }
+    100% {
+       background-position: 0 0;
+    }
+}

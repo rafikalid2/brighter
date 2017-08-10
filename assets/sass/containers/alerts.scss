@@ -1,0 +1,29 @@
+.alert, [class^="alert-"], [class*=" alert-"]{
+	padding			: 5px;
+	margin-bottom	: 10px;
+}
+
+@mixin alertColor($color) {
+	color	: darken($color, 40%);
+	background: lighten($color, 12%);
+	border	: 1px solid darken($color, 10%);
+}
+
+.alert-default{
+	@include alertColor($default);
+}
+.alert-primary{
+	@include alertColor($primary);
+}
+.alert-success{
+	@include alertColor($success);
+}
+.alert-info{
+	@include alertColor($info);
+}
+.alert-warning{
+	@include alertColor($warning);
+}
+.alert-danger{
+	@include alertColor($danger);
+}

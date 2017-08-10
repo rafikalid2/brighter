@@ -1,6 +1,10 @@
-.panel{
+%panel{
 	border: 1px $border-color solid;
 	margin-bottom: 10px;
+}
+
+.panel{
+	@extend %panel;
 
 	&-heading{
 		background-color: white;
@@ -18,11 +22,11 @@
 	}
 
 	@mixin panel-type($color){
-		@extend .panel;
+		@extend %panel;
 		border-color: $color;
 
 		.panel-heading{
-			background	: $color;
+			background	: $color linear-gradient(to top, $color, lighten($color, 10%));
 			color		: white;
 		}
 	}
