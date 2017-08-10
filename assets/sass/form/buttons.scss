@@ -67,7 +67,7 @@
 .btn{
 	border-color: darken($default, 10%);
 	color		: $input-color;
-	background	: none;
+	background	: white;
 
 	&:hover{
 		@include _btn($default);
@@ -98,7 +98,8 @@
 // button group
 .btns-group{
 	display			: inline-block;
-	vertical-align	:middle;
+	vertical-align	: middle;
+	position		: relative;
 	@extend .clear-fix;
 
 	.btn,[class^="btn-"],[class*=" btn-"]{
@@ -115,6 +116,10 @@
 			border-top-right-radius: $btn-radius;
 			border-bottom-right-radius: $btn-radius;
 		}
+	}
+
+	.btns-group{
+		float: left;
 	}
 }
 
