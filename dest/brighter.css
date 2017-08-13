@@ -683,7 +683,8 @@ code {
   border: 1px #ddd solid;
   background: #f7f7f7;
   white-space: pre-wrap;
-  tab-size: 4; }
+  tab-size: 4;
+  margin-bottom: 10px; }
 
 @font-face {
   font-family: 'fontello';

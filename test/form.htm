@@ -8,7 +8,13 @@
 		body{
 			margin:10px;
 		}
+		code i{
+			color:GrayText
+		}
 	</style>
+
+	<script type="text/javascript" src="../dest/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript" src="../dest/brighter.js"></script>
 </head>
 <body>
 
@@ -721,7 +727,139 @@ to fit all available width, add class "block":
 	</div>
 </form>
 
+<hr>
 
+<h1>Validation</h1>
+add attr "data-validation"
+
+<code><span style="color:GrayText">// Email validation</span>
+&lt;input type="text" data-validation="email"&gt;
+<span style="color:GrayText">// or</span>
+&lt;input type="text" data-validation="/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z0-9]{2,}$/"&gt;
+
+<span style="color:GrayText">// length validation</span>
+&lt;input type="text" data-validation="/^.{5,10}$/"&gt;
+
+<span style="color:GrayText">// validation via url (last on the pipe)</span>
+&lt;input type="text" data-url-validation="/url/to/service?q=$q"&gt;
+</code>
+
+Prevent chars:
+<code><span style="color:GrayText">// white list:</span>
+&lt;input type="text" data-chars="a-zA-Z0-9"&gt;
+
+<span style="color:GrayText">// black list:</span>
+&lt;input type="text" data-chars="^a-zA-Z0-9"&gt;
+</code>
+
+<h1>Auto-complete:</h1>
+
+<code>&lt;input
+	type="text"
+	data-autocomplete-url	= "/url/to/service?q=$q"	<span style="color:GrayText">// url to service, "$" will be replaced by the token</span>
+	data-item-render		= "~.lst-render"			<span style="color:GrayText">// CSS selector, could be absolote or relative to current element</span>
+	data-selected-render	= "~.selected-render"		<span style="color:GrayText">// CSS selector, could be absolote or relative to current element</span>
+	data-add-new			= "false"					<span style="color:GrayText">// user can add new item or must choose an existing one</span>
+	data-multiple			= "false"					<span style="color:GrayText">// user could have multiple choises, default to "false"</span>
+	&gt;
+</code>
+
+<code>&lt;select
+	data-autocomplete-url	= "/url/to/service?q=$q"	<span style="color:GrayText">// url to service, "$" will be replaced by the token</span>
+	data-item-render		= "~.lst-render"			<span style="color:GrayText">// CSS selector, could be absolote or relative to current element</span>
+	data-selected-render	= "~.selected-render"		<span style="color:GrayText">// CSS selector, could be absolote or relative to current element</span>
+	data-add-new			= "false"					<span style="color:GrayText">// user can add new item or must choose an existing one</span>
+	data-multiple			= "false"					<span style="color:GrayText">// user could have multiple choises, default to "false"</span>
+	&gt;
+	&lt;/select&gt;
+</code>
+
+<code>&lt;select
+	data-autocomplete
+	data-add-new			= "false"					<span style="color:GrayText">// user can add new item or must choose an existing one</span>
+	multiple 											<span style="color:GrayText">// user could have multiple choises, default to "false"</span>
+	&gt;
+		&lt;option value="#1"&gt; item 1 &lt;/option&gt;
+		&lt;option value="#2"&gt; item 2 &lt;/option&gt;
+		&lt;option value="#3"&gt; item 3 &lt;/option&gt;
+		&lt;option value="#4"&gt; item 4 &lt;/option&gt;
+	&lt;/select&gt;
+</code>
+
+<code>$('div, span, select, input[type=text]')	<span style="color:GrayText">// empty container or a "select" or "text" input</span>
+.autocomplete(
+	data	: ['value 1', 'value 2', ...],	<span style="color:GrayText">// list of values</span>
+	data	: [{}, {}, ...],				<span style="color:GrayText">// list of object values</span>
+	data	: '/url/to/service?q=$q', 		<span style="color:GrayText">// url to service, "$q" will be replaced with token</span>
+	data	: function(query, callBack){	<span style="color:GrayText">// got query and look for results manualy</span>
+		<i>// operations</i>
+		callBack(results);					<span style="color:GrayText">// list of results</span>
+	},
+
+	value	: 'selected value',
+	value	: ['selected value 1', 'selected value 2', ...], <i>// in case of multiple choises</i>
+	value	: {	<i>// selected object</i>
+		<i>// object attributes</i>
+
+		_hold	: true <i>// could not remove this value</i>
+		_class	: 'info', 'danger', ... or '#color' <i>// set a color for this value on rendering</i>
+	},
+	value	: [{}, {}, ...]
+
+	AddNew	: true | false,
+	AddNew	: function(newValue){
+		<i>// operations</i>
+		return true | false <i>// if new value is accepted or not</i>
+	}
+
+	multiple: true | false,
+
+	itemRender: '#selector',
+	itemRender: function(item){
+		<i>// operations</i>
+		return $RenderedItem		<span style="color:GrayText">// HTML or jQuery representation of the item</span>
+	},
+
+	selectedRender	: '#selector',
+	selectedRender	: function(item){
+		<i>// operations</i>
+		return $RenderedItem		<span style="color:GrayText">// HTML or jQuery representation of the item</span>
+	},
+
+	validation	: function(selectedItemsList){
+		<i>// operations</i>
+	},
+
+	sort		: function(item1, item2){ <i>// sort result list</i>
+		<i>// sort logic</i>
+	}
+)
+<span style="color:GrayText">// Events: This is the jQuery alternative of the element</span>
+	.on('select', function(selectedObject){})
+	.on('change', function(selectedValue){})
+	.on('addNew', function(selectedValue){})	<span style="color:GrayText">// new item added</span>
+
+	.on('keypress', function(event){})
+	.on('keydown', function(event){})
+	.on('keyup', function(event){})
+
+	.on('focus', function(event){})
+	.on('blur', function(event){})
+</code>
+
+Default data format:
+<code>{
+	data	: [
+		{
+			id		: '',	<i>// element unique id, could be number or text</i>
+			title	: '',	<i>// displayed name</i>
+			img		: '/url/to/representative-image.png',	<i>// optional</i>
+		}
+		<i>// ... </i>
+	]
+}
+	
+</code>
 
 
 

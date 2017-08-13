@@ -1,7 +1,9 @@
 'use strict';
 
-var gulp = require('gulp');
-var sass = require('gulp-sass');
+var gulp 	= require('gulp');
+var sass 	= require('gulp-sass');
+var minify 	= require('gulp-minify');
+var concat 	= require('gulp-concat');
 
 gulp.task('styles', function() {
     gulp.src('assets/sass/brighter.scss')
@@ -17,8 +19,28 @@ gulp.task('styles-prod', function() {
         .pipe(gulp.dest('./dest/'));
 });
 
+
+// javascript
+	gulp.task('js', ()=>{
+		gulp.src('assets/js/**/*.js')
+			.pipe(concat('brighter.js', {newLine: ';'}))
+			.pipe(gulp.dest('./dest/'));
+	});
+	gulp.task('js-prod', ()=>{
+		gulp.src('assets/js/**/*.js')
+			.pipe(minify({
+		        ext:{
+		            src:'-debug.js',
+		            min:'.min.js'
+		        },
+		        // exclude: ['tasks'],
+		        // ignoreFiles: ['.combo.js', '-min.js']
+		    }))
+			.pipe(gulp.dest('./dest/'));
+	});
+
 //Watch task
-gulp.task('default',function() {
-    gulp
-    	.watch('assets/sass/**/*.scss',['styles']);
+gulp.task('default',['styles', 'js'], function() {
+    gulp.watch('assets/sass/**/*.scss',['styles']);
+    gulp.watch('assets/js/**/*.js', ['js']);
 });

@@ -4,5 +4,6 @@ code{
 	border		: 1px $border-color solid;
 	background	: lighten($border-color, 10%);
 	white-space	: pre-wrap;
-	tab-size: 4;
+	tab-size	: 4;
+	margin-bottom: 10px;
 }
