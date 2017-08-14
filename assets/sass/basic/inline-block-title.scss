@@ -1,9 +1,10 @@
 .title{
-	display	: inline-block;
-	width	: 150px;
+	display			: inline-block;
+	width			: 150px;
+	vertical-align	: top;
 
 	&:after{
-		float: right;
-		content:':';
+		float	: right;
+		content	: ': ';
 	}
 }

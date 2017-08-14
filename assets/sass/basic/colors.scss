@@ -1,15 +1,29 @@
 
-.default	{color: $default;	border-color: $default}
-.primary	{color: $primary;	border-color: $primary}
-.success	{color: $success;	border-color: $success}
-.info		{color: $info;		border-color: $info}
-.warning	{color: $warning;	border-color: $warning}
-.danger		{color: $danger;	border-color: $danger}
+%default	{color: darken($default, 50%);	border-color: darken($default, 30%)}
+%primary	{color: $primary;	border-color: $primary}
+%success	{color: $success;	border-color: $success}
+%info		{color: $info;		border-color: $info}
+%warning	{color: $warning;	border-color: $warning}
+%danger		{color: $danger;	border-color: $danger}
+
+%bg-default	{background-color: $default;}
+%bg-primary	{background-color: $primary;}
+%bg-success	{background-color: $success;}
+%bg-info	{background-color: $info;}
+%bg-warning	{background-color: $warning;}
+%bg-danger	{background-color: $danger;}
 
 
-.bg-default	{background-color: $default;}
-.bg-primary	{background-color: $primary;}
-.bg-success	{background-color: $success;}
-.bg-info	{background-color: $info;}
-.bg-warning	{background-color: $warning;}
-.bg-danger	{background-color: $danger;}
+.default{ @extend %default; }
+.primary{ @extend %primary; }
+.success{ @extend %success; }
+.info{ @extend %info; }
+.warning{ @extend %warning; }
+.danger{ @extend %danger; }
+
+.bg-default{ @extend %bg-default; }
+.bg-primary{ @extend %bg-primary; }
+.bg-success{ @extend %bg-success; }
+.bg-info{ @extend %bg-info; }
+.bg-warning{ @extend %bg-warning; }
+.bg-danger{ @extend %bg-danger; }

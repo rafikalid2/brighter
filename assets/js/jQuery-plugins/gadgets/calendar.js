@@ -1,35 +1,4 @@
-'use strict';;/**
- * Console logger
- */
-(function($){
-	$.logger	= {
-		debug		: function(){console.debug.apply(console, arguments);},
-		info		: function(){console.info.apply(console, arguments);},
-		warn		: function(){console.warn.apply(console, arguments);},
-		error		: function(){console.error.apply(console, arguments);},
-		fatalError	: function(){console.error.apply(console, arguments);}
-	};
-
-})(jQuery);;jQuery.createElement	= function(tagName, attributes, children){
-	var e = document.createElement(tagName);
-	if(attributes){
-		for(var i in attributes){
-			e.setAttribute(i, attributes[i]);
-		}
-	}
-	if(children){
-		if(typeof children == 'string'){
-			var txt	= document.createTextNode(children);
-			e.appendChild(txt);
-		}else if(Array.isArray(children)){
-			for(var i = 0; i < children.length; ++i)
-				e.appendChild(children[i]);
-		}else{
-			e.appendChild(children);
-		}
-	}
-	return e;
-};;/**
+/**
  * Calendar
  */
 (function($){
@@ -101,25 +70,4 @@
 		// add to container
 			this.append(container);
 	}
-})(jQuery);;(function(){
-	// change jQuery DOM fx
-		
-	// init body
-		_initDOM($(document.body));
-	// init
-		function _initDOM($container){
-			// calendar
-				_initDOMFilter($container, '[data-calendar]:empty', 'calendar');
-		}
-
-		function _initDOMFilter($container, selector, jQueryFx){
-			try{
-				if($container.filter(selector).length)
-					$container[jQueryFx]();
-				else
-					$container.find(selector)[jQueryFx]();
-			}catch(e){
-				$.logger.fatalError(e);
-			}
-		}
-})();
+})(jQuery);

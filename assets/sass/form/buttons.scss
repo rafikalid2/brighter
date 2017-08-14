@@ -100,59 +100,60 @@
 
 
 // button group
-.btns-group{
-	display			: inline-block;
-	vertical-align	: middle;
-	position		: relative;
-	@extend .clear-fix;
+.btns{
+	//horizontal group
+	&-group{
+		display			: inline-block;
+		vertical-align	: middle;
+		position		: relative;
+		@extend %clearfix;
 
-	.btn,[class^="btn-"],[class*=" btn-"],
-	input
-	{
-		float: left;
-		margin: 0 0 0 -1px;
-		border-radius: 0;
+		.btn,[class^="btn-"],[class*=" btn-"],
+		input
+		{
+			float: left;
+			margin: 0 0 0 -1px;
+			border-radius: 0;
 
-		&:first-child{
-			border-top-left-radius: $btn-radius;
-			border-bottom-left-radius: $btn-radius;
+			&:first-child{
+				border-top-left-radius: $btn-radius;
+				border-bottom-left-radius: $btn-radius;
+			}
+
+			&:last-child{
+				border-top-right-radius: $btn-radius;
+				border-bottom-right-radius: $btn-radius;
+			}
 		}
 
-		&:last-child{
-			border-top-right-radius: $btn-radius;
-			border-bottom-right-radius: $btn-radius;
-		}
-	}
-
-	.btns-group{
-		float: left;
-	}
-}
-
-// vertical btn group
-.btns-group-vertical{
-	margin-bottom: 10px;
-	display: inline-block;
-
-	.btn,[class^="btn-"],[class*=" btn-"]{
-		display: block;
-		margin: -1px 0 0 0;
-		border-radius: 0;
-		
-		&:first-child{
-			border-top-left-radius: $btn-radius;
-			border-top-right-radius: $btn-radius;
-		}
-
-		&:last-child{
-			border-bottom-left-radius: $btn-radius;
-			border-bottom-right-radius: $btn-radius;
+		.btns-group{
+			float: left;
 		}
 	}
-}
 
-// bascule
-	.btns-toggle{
+	// vertical btn group
+	&-group-vertical{
+		margin-bottom: 10px;
+		display: inline-block;
+
+		.btn,[class^="btn-"],[class*=" btn-"]{
+			display: block;
+			margin: -1px 0 0 0;
+			border-radius: 0;
+			
+			&:first-child{
+				border-top-left-radius: $btn-radius;
+				border-top-right-radius: $btn-radius;
+			}
+
+			&:last-child{
+				border-bottom-left-radius: $btn-radius;
+				border-bottom-right-radius: $btn-radius;
+			}
+		}
+	}
+	// bascule
+	&-toggle{
 		input[type="checkbox"], input[type="radio"]{
 			display: none;
 		}
@@ -161,5 +162,6 @@
 				@extend %btn-active;
 			}
 		}
-		
 	}
+}
+

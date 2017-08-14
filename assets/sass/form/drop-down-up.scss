@@ -96,18 +96,6 @@
 				}
 			}
 		}
-		.drop-close, .drop-close-blur{
-			display		: none;
-			position	: fixed;
-			width		: 100vw;
-			height		: 100vh;
-			top			: 0;
-			left		: 0;
-			z-index		: 900; 
-		}
-		.drop-close-blur{
-			background	: rgba(0,0,0,0.5);
-		}
 	}
 	label.drop-up{
 		input[type="checkbox"]{
@@ -157,3 +145,25 @@
 		}
 	}
 }
+
+// @media (max-width: 576px){
+// 	label.drop-down, label.drop-up{
+// 		ul{
+			
+// 		}
+// 	}
+// }
+// 
+// drop down
+	.drop-close, .drop-close-blur{
+		display		: none;
+		position	: fixed;
+		width		: 100vw;
+		height		: 100vh;
+		top			: 0;
+		left		: 0;
+		z-index		: 900; 
+	}
+	.drop-close-blur{
+		background	: rgba(0,0,0,0.5);
+	}

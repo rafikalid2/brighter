@@ -1,0 +1,7 @@
+// used for loading components such as calendar and others
+%component-loading{
+	&:before{
+		content	: 'loading...';
+		color	: GrayText;
+	}
+}

@@ -1,4 +1,4 @@
-.select{
+%select{
 	-webkit-touch-callout: initial;
     -webkit-user-select: initial;
     -khtml-user-select: initial;
@@ -7,7 +7,7 @@
     user-select: initial;
 }
 
-.no-select{
+%no-select{
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
@@ -16,3 +16,7 @@
 	user-select: none;
 	cursor: default;
 }
+
+.select{ @extend %select; }
+
+.no-select{ @extend %no-select; }

@@ -1,0 +1,14 @@
+.input-date{
+	position: relative;
+	display	: inline-block;
+
+	input{
+		&:focus{
+			position	: relative;
+			z-index		: 900;
+			&~.input-popup{
+				display: block;
+			}
+		}
+	}
+}

@@ -14,7 +14,6 @@
 	</style>
 
 	<script type="text/javascript" src="../dest/jquery-3.2.1.min.js"></script>
-	<script type="text/javascript" src="../dest/brighter.js"></script>
 </head>
 <body>
 
@@ -107,6 +106,97 @@ to fit all available width, add class "block":
 		<b>title : </b>.danger
 		<input value="lorem" class="block" type="text" name="">
 	</label>
+</form>
+
+<form>
+	<label class="input-group">
+		<span class="icon-attention-circled"></span>
+		<input type="text" name="">
+		<small class="text-comment block">This a comment</small>
+	</label>
+	<label class="input-group">
+		<input type="text" name="">
+		<span class="icon-attention-circled"></span>
+		<small class="text-comment block">This a comment</small>
+	</label>
+</form>
+
+
+<form>
+	<div>
+		<span class="title">default</span>
+		<label class="input-group default">
+			<input type="text" value="lorem epsum" name="">
+			<!-- <span class="icon"></span> -->
+			<span class="default">This is the default message</span>
+			<span class="primary">This is the primary message</span>
+			<span class="info">This is the info message</span>
+			<span class="warning">This is the warning message</span>
+			<span class="success">This is the success message</span>
+			<span class="danger">This is the danger message</span>
+			<small class="text-comment block">This a comment</small>
+		</label>
+	</div>
+
+	<div>
+		<span class="title">primary</span>
+		<label class="input-group primary">
+			<!-- <span class="icon"></span> -->
+			<input type="text" value="lorem epsum" name="">
+			<span class="primary">This is the primary message</span>
+			<small class="text-comment block">This a comment</small>
+		</label>
+	</div>
+
+	<div>
+		<span class="title">info</span>
+		<label class="input-group info">
+			<span class="icon"></span>
+			<input type="text" value="lorem epsum" name="">
+			<span class="info">This is the info message</span>
+			<small class="text-comment block">This a comment</small>
+		</label>
+	</div>
+
+	<div>
+		<span class="title">warning</span>
+		<label class="input-group warning">
+			<span class="icon"></span>
+			<input type="text" value="lorem epsum" name="">
+			<span class="warning">This is the warning message</span>
+			<small class="text-comment block">This a comment</small>
+		</label>
+	</div>
+
+	<div>
+		<span class="title">success</span>
+		<label class="input-group success">
+			<span class="icon"></span>
+			<input type="text" value="lorem epsum" name="">
+			<span class="success">This is the success message</span>
+			<small class="text-comment block">This a comment</small>
+		</label>
+	</div>
+
+	<div>
+		<span class="title">danger</span>
+		<label class="input-group danger">
+			<span class="icon"></span>
+			<input type="text" value="lorem epsum" name="">
+			<span class="danger">This is the danger message</span>
+			<small class="text-comment block">This a comment</small>
+		</label>
+	</div>
+
+	<div>
+		<span class="title">danger</span>
+		<label class="input-group danger">
+			<span class="icon"></span>
+			<input type="text" value="lorem epsum" name="">
+			<span class="danger block">This is the danger message as block</span>
+			<small class="text-comment block">This a comment</small>
+		</label>
+	</div>
 </form>
 
 <h1>Buttons</h1>
@@ -801,8 +891,8 @@ Prevent chars:
 	value	: {	<i>// selected object</i>
 		<i>// object attributes</i>
 
-		_hold	: true <i>// could not remove this value</i>
-		_class	: 'info', 'danger', ... or '#color' <i>// set a color for this value on rendering</i>
+		_readonly	: true <i>// could not remove this value</i>
+		_class		: 'info', 'danger', ... or '#color' <i>// set a color for this value on rendering</i>
 	},
 	value	: [{}, {}, ...]
 
@@ -862,8 +952,128 @@ Default data format:
 </code>
 
 
+<h1>Date picker</h1>
+<code>&lt;input
+	type="text"
+	value=""
+	data-datepicker="date"
+	&gt;
+</code>
+
+<code>
+	&lt;label class="input-group"&gt;
+		&lt;input
+			type		= "date"
+			name		= ""
+			value		= "2017-06-01"
+			min			= "2016-04-01"
+			max			= "2018-06-30"
+
+			data-format	= "yyyy"				<i>// years only</i>
+			data-format	= "MM"					<i>// months only</i>
+			data-format	= "dd"					<i>// days only</i>
+
+			data-format	= "hh:mm:ss"			<i>// time</i>
+			data-format	= "hh:mm"				<i>// time</i>
+			data-format	= "hh"					<i>// time</i>
+			data-format	= "mm"					<i>// time</i>
+			data-format	= "ss"					<i>// time</i>
+
+			data-format	= "yyyy/MM"				<i>// years and months only</i>
+			data-format	= "yyyy/MM/dd"			<i>// date only</i>
+			data-format	= "MM/dd"				<i>// months and days</i>
+
+			data-format	= "yyyy/MM/ddThh:mm"	<i>// date time</i>
+
+			readonly		= "false"			<i>// if we can change this value</i>
+			data-today		= "true"			<i>// Enable today button</i>
+			data-level		= "years|months|days|hours"&gt; <i>// visible level</i>
+	&lt;/label&gt;
+</code>
+
+<label class="input-group">
+	<div class="input-date">
+		<input type="text" name="">
+		<span class="icon-calendar"></span>
+		<div class="input-popup date-container">
+			<div class="nowrap text-center">
+				<span class="btn icon-left-open-big pull-left"></span>
+				<span class="btn icon-right-open-big pull-right"></span>
+				<span>22 janvier 2016</span>
+			</div>
+			<!-- dates  -->
+				<div>
+					<span class="btn">2010</span><span class="btn">2011</span><span class="btn">2012</span><span class="btn">2013</span><span class="btn">2014</span><span class="btn">2015</span><span class="btn">2016</span><span class="btn">2017</span><span class="btn">2018</span><span class="btn">2019</span><span class="btn">2020</span>
+				</div>
+		</div>
+	</div>
+</label>
+
+
+
+
+
+<h1>Simple calendar</h1>
+
+<code>
+	&lt;div
+		data-calendar	= "basic"
+		value			= "2017-06-01"
+		data-min		= "2016-04-01"
+		data-max		= "2018-06-30"
+		data-readonly	= "false"		<i>// if we can change this value</i>
+		data-today		= "true"		<i>// Enable today button</i>
+		data-level		= "years|months|days" <i>// visible level</i>
+
+		data-format	= "yyyy"				<i>// years only</i>
+		data-format	= "MM"					<i>// months only</i>
+		data-format	= "dd"					<i>// days only</i>
+
+		data-format	= "hh:mm:ss"			<i>// time</i>
+		data-format	= "hh:mm"				<i>// time</i>
+		data-format	= "hh"					<i>// time</i>
+		data-format	= "mm"					<i>// time</i>
+		data-format	= "ss"					<i>// time</i>
+
+		data-format	= "yyyy/MM"				<i>// years and months only</i>
+		data-format	= "yyyy/MM/dd"			<i>// date only</i>
+		data-format	= "MM/dd"				<i>// months and days</i>
+
+		data-format	= "yyyy/MM/ddThh:mm"	<i>// date time</i>
+		&gt;
+	&lt;/div&gt;
+</code>
+
+<!-- date container -->
+	<div
+		data-calendar	= "basic"
+		value			= "2017-06-01"
+		data-min		= "2016-04-01"
+		data-max		= "2018-06-30"
+		data-readonly	= "false"
+		data-today		= "true"
+		data-level		= "years"
+		data-format		= "yyyy/MM/ddThh:mm"
+		></div>
+
+	<br><br>
+	<!-- <div class="date-container text-center">
+		<div class="nowrap clearfix">
+			<span class="btn pull-left"><span class="icon-left-open-big"></span></span>
+			<span class="btn pull-right"><span class="icon-right-open-big"></span></span>
+			<span class="btn">22 janvier 2016</span>
+		</div>
+		<!-*- dates  -*->
+			<div>
+				<span class="btn">2010</span><span class="btn">2011</span><span class="btn">2012</span><span class="btn">2013</span><span class="btn">2014</span><span class="btn">2015</span><span class="btn">2016</span><span class="btn">2017</span><span class="btn">2018</span><span class="btn">2019</span><span class="btn">2020</span><span class="btn">2021</span>
+			</div>
+	</div> -->
+
+
 
 <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 
+<!-- brighter js -->
+	<script type="text/javascript" src="../dest/brighter.js"></script>
 </body>
 </html>

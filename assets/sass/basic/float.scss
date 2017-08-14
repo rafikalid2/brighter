@@ -1,6 +1,12 @@
-.clear-fix{
+%clearfix{
 	&:after{
-		content: '';
-		display: table;
+		content	: '';
+		display	: table;
+		clear	: both;
 	}
 }
+
+.clearfix{ @extend %clearfix; }
+
+.pull-left{ float: left; }
+.pull-right{ float: right; }

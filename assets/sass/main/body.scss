@@ -10,5 +10,5 @@ body{
 	line-height: 1.42857143;
 	// background	: transparent!important;
 
-	@extend .no-select;
+	@extend %no-select;
 }

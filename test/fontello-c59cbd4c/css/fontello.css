@@ -1,11 +1,11 @@
 @font-face {
   font-family: 'fontello';
-  src: url('../font/fontello.eot?77215204');
-  src: url('../font/fontello.eot?77215204#iefix') format('embedded-opentype'),
-       url('../font/fontello.woff2?77215204') format('woff2'),
-       url('../font/fontello.woff?77215204') format('woff'),
-       url('../font/fontello.ttf?77215204') format('truetype'),
-       url('../font/fontello.svg?77215204#fontello') format('svg');
+  src: url('../font/fontello.eot?4013935');
+  src: url('../font/fontello.eot?4013935#iefix') format('embedded-opentype'),
+       url('../font/fontello.woff2?4013935') format('woff2'),
+       url('../font/fontello.woff?4013935') format('woff'),
+       url('../font/fontello.ttf?4013935') format('truetype'),
+       url('../font/fontello.svg?4013935#fontello') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -15,7 +15,7 @@
 @media screen and (-webkit-min-device-pixel-ratio:0) {
   @font-face {
     font-family: 'fontello';
-    src: url('../font/fontello.svg?77215204#fontello') format('svg');
+    src: url('../font/fontello.svg?4013935#fontello') format('svg');
   }
 }
 */
@@ -55,13 +55,13 @@
   /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
 }
  
-.icon-plus-circled:before { content: '\e800'; } /* '' */
-.icon-plus:before { content: '\e801'; } /* '' */
-.icon-cancel-squared:before { content: '\e802'; } /* '' */
-.icon-cancel-circled:before { content: '\e803'; } /* '' */
-.icon-plus-squared:before { content: '\e804'; } /* '' */
-.icon-help:before { content: '\e805'; } /* '' */
-.icon-info:before { content: '\e806'; } /* '' */
+.icon-calendar:before { content: '\e800'; } /* '' */
+.icon-plus-circled:before { content: '\e801'; } /* '' */
+.icon-plus:before { content: '\e802'; } /* '' */
+.icon-cancel-squared:before { content: '\e803'; } /* '' */
+.icon-cancel-circled:before { content: '\e804'; } /* '' */
+.icon-plus-squared:before { content: '\e805'; } /* '' */
+.icon-help:before { content: '\e806'; } /* '' */
 .icon-help-circled:before { content: '\e807'; } /* '' */
 .icon-download:before { content: '\e808'; } /* '' */
 .icon-home:before { content: '\e809'; } /* '' */
@@ -75,13 +75,13 @@
 .icon-forward-1:before { content: '\e811'; } /* '' */
 .icon-forward:before { content: '\e812'; } /* '' */
 .icon-quote:before { content: '\e813'; } /* '' */
-.icon-code-1:before { content: '\e814'; } /* '' */
-.icon-export:before { content: '\e815'; } /* '' */
-.icon-edit:before { content: '\e816'; } /* '' */
-.icon-pencil:before { content: '\e817'; } /* '' */
-.icon-chat:before { content: '\e818'; } /* '' */
-.icon-comment:before { content: '\e819'; } /* '' */
-.icon-bell:before { content: '\e81a'; } /* '' */
+.icon-info:before { content: '\e814'; } /* '' */
+.icon-code-1:before { content: '\e815'; } /* '' */
+.icon-export:before { content: '\e816'; } /* '' */
+.icon-edit:before { content: '\e817'; } /* '' */
+.icon-pencil:before { content: '\e818'; } /* '' */
+.icon-chat:before { content: '\e819'; } /* '' */
+.icon-comment:before { content: '\e81a'; } /* '' */
 .icon-attention:before { content: '\e81b'; } /* '' */
 .icon-attention-circled:before { content: '\e81c'; } /* '' */
 .icon-location:before { content: '\e81d'; } /* '' */
@@ -131,7 +131,7 @@
 .icon-fire:before { content: '\e849'; } /* '' */
 .icon-gift:before { content: '\e84a'; } /* '' */
 .icon-asterisk:before { content: '\e84b'; } /* '' */
-.icon-check:before { content: '\e84c'; } /* '' */
+.icon-bell:before { content: '\e84c'; } /* '' */
 .icon-tint:before { content: '\e84d'; } /* '' */
 .icon-adjust:before { content: '\e84e'; } /* '' */
 .icon-book:before { content: '\e84f'; } /* '' */
@@ -200,6 +200,7 @@
 .icon-block:before { content: '\e88e'; } /* '' */
 .icon-italic-1:before { content: '\e88f'; } /* '' */
 .icon-fontsize:before { content: '\e890'; } /* '' */
+.icon-check:before { content: '\e891'; } /* '' */
 .icon-move:before { content: '\f047'; } /* '' */
 .icon-link-ext:before { content: '\f08e'; } /* '' */
 .icon-check-empty:before { content: '\f096'; } /* '' */

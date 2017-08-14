@@ -4,6 +4,7 @@ var gulp 	= require('gulp');
 var sass 	= require('gulp-sass');
 var minify 	= require('gulp-minify');
 var concat 	= require('gulp-concat');
+var order	= require('gulp-order');
 
 gulp.task('styles', function() {
     gulp.src('assets/sass/brighter.scss')
@@ -23,6 +24,11 @@ gulp.task('styles-prod', function() {
 // javascript
 	gulp.task('js', ()=>{
 		gulp.src('assets/js/**/*.js')
+			.pipe(order([
+				'params.js',
+				'jQuery-plugins/**/*.js',
+				'initializer.js'
+			]))
 			.pipe(concat('brighter.js', {newLine: ';'}))
 			.pipe(gulp.dest('./dest/'));
 	});
