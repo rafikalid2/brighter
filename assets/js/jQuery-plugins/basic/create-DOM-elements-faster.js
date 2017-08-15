@@ -1,20 +1,50 @@
-jQuery.createElement	= function(tagName, attributes, children){
-	var e = document.createElement(tagName);
-	if(attributes){
-		for(var i in attributes){
-			e.setAttribute(i, attributes[i]);
-		}
+/**
+ * native HTML element builder
+ * to be used when creating lot of elements
+ * 100 time faster than jQuery alternative
+ */
+(function($){
+	$.createElement	= function(tagName){
+		return new DOMElementBuilder(tagName);
+	};
+
+	function DOMElementBuilder(tagName){
+		this.ele	= document.createElement(tagName);
+		return this;
 	}
-	if(children){
-		if(typeof children == 'string'){
-			var txt	= document.createTextNode(children);
-			e.appendChild(txt);
-		}else if(Array.isArray(children)){
-			for(var i = 0; i < children.length; ++i)
-				e.appendChild(children[i]);
-		}else{
-			e.appendChild(children);
+
+	$.extend(DOMElementBuilder.prototype, {
+		attr	: function(attrName, attrValue){
+			this.ele.setAttribute(attrName, attrValue);
+			return this;
+		},
+		text	: function(value){
+			var txt	= document.createTextNode(value);
+			this.ele.appendChild(txt);
+			return this;
+		},
+		append	: function(child){
+			this.ele.appendChild(child);
+			return this;
+		},
+		insertBefore : function(element){
+			this.ele.insertBefore(element);
+			return this;
+		},
+		on		: function(type, listener){
+			if(this.ele.addEventListener)
+				this.ele.addEventListener(type, listener, false);
+			else if(this.ele.attachEvent) // ie
+				this.ele.attachEvent(type, listener);
+			else
+				throw new Error('Could not attach event.');
+			return this;
+		},
+		build	: function(){
+			return this.ele;
+		},
+		get		: function(){
+			return this.ele;
 		}
-	}
-	return e;
-};
+	});
+})(jQuery);

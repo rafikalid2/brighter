@@ -12,3 +12,23 @@
 		border: none;
 	}
 }
+
+.calendar{
+	&-months{
+		white-space: normal;
+
+		.btn{
+			width	: 67px;
+			padding	: 6px 0;
+		}
+	}
+
+	&-days{
+		text-align: center;
+
+		b, .btn{
+			display	: inline-block;
+			width	: 34px;
+		}
+	}
+}

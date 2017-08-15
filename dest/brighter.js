@@ -10,26 +10,56 @@
 		fatalError	: function(){console.error.apply(console, arguments);}
 	};
 
-})(jQuery);;jQuery.createElement	= function(tagName, attributes, children){
-	var e = document.createElement(tagName);
-	if(attributes){
-		for(var i in attributes){
-			e.setAttribute(i, attributes[i]);
-		}
+})(jQuery);;/**
+ * native HTML element builder
+ * to be used when creating lot of elements
+ * 100 time faster than jQuery alternative
+ */
+(function($){
+	$.createElement	= function(tagName){
+		return new DOMElementBuilder(tagName);
+	};
+
+	function DOMElementBuilder(tagName){
+		this.ele	= document.createElement(tagName);
+		return this;
 	}
-	if(children){
-		if(typeof children == 'string'){
-			var txt	= document.createTextNode(children);
-			e.appendChild(txt);
-		}else if(Array.isArray(children)){
-			for(var i = 0; i < children.length; ++i)
-				e.appendChild(children[i]);
-		}else{
-			e.appendChild(children);
+
+	$.extend(DOMElementBuilder.prototype, {
+		attr	: function(attrName, attrValue){
+			this.ele.setAttribute(attrName, attrValue);
+			return this;
+		},
+		text	: function(value){
+			var txt	= document.createTextNode(value);
+			this.ele.appendChild(txt);
+			return this;
+		},
+		append	: function(child){
+			this.ele.appendChild(child);
+			return this;
+		},
+		insertBefore : function(element){
+			this.ele.insertBefore(element);
+			return this;
+		},
+		on		: function(type, listener){
+			if(this.ele.addEventListener)
+				this.ele.addEventListener(type, listener, false);
+			else if(this.ele.attachEvent) // ie
+				this.ele.attachEvent(type, listener);
+			else
+				throw new Error('Could not attach event.');
+			return this;
+		},
+		build	: function(){
+			return this.ele;
+		},
+		get		: function(){
+			return this.ele;
 		}
-	}
-	return e;
-};;/**
+	});
+})(jQuery);;/**
  * Calendar
  */
 (function($){
@@ -42,65 +72,176 @@
 		format		: 'dd/MM/YYYY'
 	};
 
-	//i18n
-		var i18nToday	= 'today';
+	//basic calendar
+		var YEAR_ROW_COUNT			= 4; // count of years in the year panel
+		var YEAR_PER_ROW			= 4;
+		var CURRENT_YEAR_POSITION	= Math.round(YEAR_ROW_COUNT * YEAR_PER_ROW / 2);
 
-	$.fn.calendar	= function(options){console.log('--- calendar')
-		return this.each(function(){
-			if(!this.firstChild){
-				//init options
-					var fOptions = {};
-					for(var i in _defaultOptions){
-						fOptions[i]	= this.getAttribute(i) || this.getAttribute('data-' + i) || options[i] || _defaultOptions[i];
-					}
-				//create element
-					_initBasicCalendar.call(this, fOptions);
-			}else{
-				$.logger.warn('Calendar: ignore du container is not empty.');
-			}
+	//i18n
+		var i18nToday		= 'Today';
+		var i18nMonths		= ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+		var i18nMonthsAbbr	= ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+		var i18nDaysOfWeek	= ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+		var i18nDaysFull	= ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+
+	$.fn.calendar	= function(options){
+		return this.empty().each(function(){
+			//init options
+				var fOptions = {};
+				for(var i in _defaultOptions){
+					fOptions[i]	= this.getAttribute(i) || this.getAttribute('data-' + i) || options[i] || _defaultOptions[i];
+				}
+			//create element
+				new BasicCalendar(this, fOptions);
 		});
 	};
 
+/////////////////////////////// basic calendar ///////////////////////////////
+	function BasicCalendar(container, options){
+		this.options	= options;
+		this.container	= container;
+
+		//date
+			var currentDate = new Date();
+		// init calendard
+			this._init();
+		// add years
+			// this._createYears(currentDate.getFullYear() - CURRENT_YEAR_POSITION);
+			// var fragment = this._createMonths();
+			var fragment	= this._createDays(2017, 7);
+			this.contentDiv.appendChild(fragment);
+	}
+
+	$.extend(BasicCalendar.prototype,{
+		_init		: _initBasicCalendar,
+
+		_createYears	: _basicCalendarCreateYears,
+		_createMonths	: _basicCalendarCreateMonths,
+		_createDays		: _basicCalendarCreateDays,
+	});
+
 	// create calendar
-	function _initBasicCalendar(options){
-		var container	= _doc.createDocumentFragment();
-		// top
-			var header	= $.createElement('div',{
-				'class'	: 'nowrap text-center'
-			});
-			container.appendChild(header);
+	function _initBasicCalendar(){
+		var options	= this.options;
+		var container	= document.createDocumentFragment();
+		// head
+			var headerBuilder	= $.createElement('div').attr('class','nowrap text-center clearfix');
+			container.append(headerBuilder.get());
+
 			// left button
-				var leftButton			= $.createElement('span',{
-					'class'	: 'btn pull-left'
-				},$.createElement('span',{
-					'class'	: 'icon-left-open-big'
-				}));
-				header.appendChild(leftButton);
+				var leftButtonBuilder	= $.createElement('span')
+					.attr('class', 'btn pull-left')
+					.append(
+						$.createElement('span')
+							.attr('class', 'icon-left-open-big')
+							.get()
+					);
+				headerBuilder.append(leftButtonBuilder.get());
+
 			// middle button
-				var middleButton		= $.createElement('span',{
-					'class'	: 'btn'
-				});
-				header.appendChild(middleButton);
+				var middleButton		= $.createElement('span').attr('class','btn');
+				headerBuilder.append(middleButton.get());
 			//right button
-				var rightButton			= $.createElement('span',{
-					'class'	: 'btn pull-right'
-				},$.createElement('span',{
-					'class'	: 'icon-right-open-big'
-				}));
-				header.appendChild(rightButton);
+				var rightButton			= $.createElement('span')
+					.attr('class','btn pull-right')
+					.append(
+						$.createElement('span')
+							.attr('class', 'icon-right-open-big')
+							.get()
+					);
+				headerBuilder.append(rightButton.get());
 		// middle (content)
-			var contentContainer	= $.createElement('div');
-			container.appendChild(contentContainer);
+			var contentDiv	= $.createElement('div').attr('class', 'nowrap').get();
+			container.appendChild(contentDiv);
+			this.contentDiv	= contentDiv;
+
 		// today button
 			if(options.today){
-				var todayBtn		= $.createElement('span',{
-					'class'	: 'btn block'
-				}, i18nToday);
-				container.appendChild(todayBtn);
+				container.append(
+					$.createElement('span')
+						.attr('class', 'btn block')
+						.text(i18nToday)
+						.get()
+				);
 			}
 		// add to container
-			this.append(container);
+			this.container.append(container);
 	}
+
+	function _basicCalendarCreateYears(startYear){
+		var fragment	= document.createDocumentFragment();
+		var currentYear	= startYear;
+		for(var i = 0; i < YEAR_ROW_COUNT; ++i){
+			var row	= $.createElement('div');
+			for(var j =0; j < YEAR_PER_ROW; ++j){
+				row.append(
+					$.createElement('span')
+						.attr('class', 'btn')
+						.text(currentYear++)
+						.get()
+				);
+			}
+			fragment.appendChild(row.get());
+		}
+		return fragment;
+	}
+
+	function _basicCalendarCreateMonths(){
+		var container	= $.createElement('div')
+				.attr('class', 'calendar-months');
+		for(var i=0; i < i18nMonths.length; ++i){
+			container.append(
+				$.createElement('span')
+					.attr('class', 'btn')
+					.text(i18nMonths[i])
+					.get()
+			);
+		}
+		return container.get();
+	}
+
+	function _basicCalendarCreateDays(year, month){
+		var container	= $.createElement('div').attr('class', 'calendar-days');
+		//add day header
+			var headerRow = $.createElement('div').attr('class', 'nowrap');
+			for(var i = 0; i < i18nDaysOfWeek.length; ++i){
+				headerRow.append(
+					$.createElement('b')
+						.text(i18nDaysOfWeek[i])
+						.get()
+				);
+			}
+			container.append(headerRow.get());
+		// add dates
+			var currentDate	= new Date(year, month, 1);
+		// get next month
+			var nextMonth	= currentDate.getMonth() + 1;
+			if(nextMonth == 12)
+				nextMonth = 0;
+		// start date of week
+			if(currentDate.getDay() > 0)
+				currentDate.setDate(-currentDate.getDay());
+		//show dates
+			while(currentDate.getMonth() != nextMonth){
+				var row 	= $.createElement('div').attr('class', 'nowrap');
+				var cDate	= currentDate.getDate();
+				for(var i = 0; i < 7; ++i){
+					row.append(
+						$.createElement('span')
+							.attr('class', 'btn')
+							.text(cDate)
+							.get()
+					);
+					currentDate.setDate(cDate + 1);
+				}
+				container.append(row.get());
+			}
+		// end
+			return container.get();
+	}
+
 })(jQuery);;(function(){
 	// change jQuery DOM fx
 		
