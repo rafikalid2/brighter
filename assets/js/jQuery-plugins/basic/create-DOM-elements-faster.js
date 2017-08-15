@@ -18,7 +18,19 @@
 			this.ele.setAttribute(attrName, attrValue);
 			return this;
 		},
+		addClass: function(className){
+			this.ele.classList.add(className);
+			return this;
+		},
+		removeClass: function(className){
+			this.ele.classList.remove(className);
+			return this;
+		},
 		text	: function(value){
+			this.ele.text(txt);
+			return this;
+		},
+		appendText: function(value){
 			var txt	= document.createTextNode(value);
 			this.ele.appendChild(txt);
 			return this;
@@ -27,8 +39,16 @@
 			this.ele.appendChild(child);
 			return this;
 		},
+		appendTo: function(parent){
+			parent.appendChild(this.ele);
+			return this;
+		},
 		insertBefore : function(element){
 			this.ele.insertBefore(element);
+			return this;
+		},
+		css		: function(key, value){
+			this.ele.style[key]	= value;
 			return this;
 		},
 		on		: function(type, listener){

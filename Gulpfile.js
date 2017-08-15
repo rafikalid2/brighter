@@ -22,18 +22,21 @@ gulp.task('styles-prod', function() {
 
 
 // javascript
+	var lstOrder = order([
+		'params.js',
+		'lib/**/*.js',
+		'jQuery-plugins/**/*.js',
+		'initializer.js'
+	]);
 	gulp.task('js', ()=>{
 		gulp.src('assets/js/**/*.js')
-			.pipe(order([
-				'params.js',
-				'jQuery-plugins/**/*.js',
-				'initializer.js'
-			]))
+			.pipe(lstOrder)
 			.pipe(concat('brighter.js', {newLine: ';'}))
 			.pipe(gulp.dest('./dest/'));
 	});
 	gulp.task('js-prod', ()=>{
 		gulp.src('assets/js/**/*.js')
+			.pipe(lstOrder)
 			.pipe(minify({
 		        ext:{
 		            src:'-debug.js',

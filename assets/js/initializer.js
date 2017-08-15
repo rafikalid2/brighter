@@ -1,4 +1,9 @@
 (function(){
+	//	init Hammer
+		// if(typeof Hammer != 'undefined')
+		// 	Hammer.plugins.fakeMultitouch();
+		// else
+		// 	$.logger.warn('Hammer lib is not detected.');
 	// change jQuery DOM fx
 		
 	// init body

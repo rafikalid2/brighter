@@ -49,16 +49,20 @@
 		// add years
 			// this._createYears(currentDate.getFullYear() - CURRENT_YEAR_POSITION);
 			// var fragment = this._createMonths();
-			var fragment	= this._createDays(2017, 7);
+			// var fragment	= this._createDays(2017, 7);
+			var fragment	= this._createTimer();
 			this.contentDiv.appendChild(fragment);
 	}
 
 	$.extend(BasicCalendar.prototype,{
 		_init		: _initBasicCalendar,
 
+		_setTitle	: _basicCalendarSetTitle,
+
 		_createYears	: _basicCalendarCreateYears,
 		_createMonths	: _basicCalendarCreateMonths,
 		_createDays		: _basicCalendarCreateDays,
+		_createTimer	: _basicCalendarCreateTimer
 	});
 
 	// create calendar
@@ -82,6 +86,7 @@
 			// middle button
 				var middleButton		= $.createElement('span').attr('class','btn');
 				headerBuilder.append(middleButton.get());
+				this._titleBtn	= middleButton;
 			//right button
 				var rightButton			= $.createElement('span')
 					.attr('class','btn pull-right')
@@ -107,6 +112,10 @@
 			}
 		// add to container
 			this.container.append(container);
+	}
+
+	function _basicCalendarSetTitle(title){
+		this._titleBtn.innerText(title);
 	}
 
 	function _basicCalendarCreateYears(startYear){
@@ -165,14 +174,14 @@
 		//show dates
 			while(currentDate.getMonth() != nextMonth){
 				var row 	= $.createElement('div').attr('class', 'nowrap');
-				var cDate	= currentDate.getDate();
 				for(var i = 0; i < 7; ++i){
-					row.append(
-						$.createElement('span')
+					var cDate	= currentDate.getDate();
+					var dayBuilder	= $.createElement('span')
 							.attr('class', 'btn')
-							.text(cDate)
-							.get()
-					);
+							.text(cDate);
+					if(currentDate.getMonth() != month)
+						dayBuilder.addClass('disabled');
+					row.append(dayBuilder.get());
 					currentDate.setDate(cDate + 1);
 				}
 				container.append(row.get());
@@ -180,5 +189,64 @@
 		// end
 			return container.get();
 	}
+
+	function _basicCalendarCreateTimer(){
+		var container	= $.createElement('form').attr('class', 'calendar-timer drum-inline-block');
+		//var timerBuilder= $.createElement('div').attr('class', 'tmer-vp');
+		
+			container.append(_basicCalendarCreateTimerAddSelect(0,23)); // hours
+			container.appendText(':');
+			container.append(_basicCalendarCreateTimerAddSelect(0,59)); // mins
+			container.appendText(':');
+			container.append(_basicCalendarCreateTimerAddSelect(0,59)); // secondes
+
+			// $(container).children().drum({
+			// 	//onChange : function(selectedOption){}
+			// });
+		// hours
+		// 	var hours = new TimerGroup(0, 11, 2);
+		// 	timerBuilder.append(hours.getContainer());
+
+		// container.append(timerBuilder.get());
+		return container.get();
+	}
+
+	function _basicCalendarCreateTimerAddSelect(min, max){
+		var selectElement	= $.createElement('select').get();
+		for(var i = min; i <= max; ++i){
+			$.createElement('option')
+				.attr('value', i)
+				.text(i)
+				.appendTo(selectElement);
+		}
+		return selectElement;
+	}
+
+	// // timer
+	// 	function TimerGroup(start, end, countNbrs){
+	// 		var container	= $.createElement('div').attr('class', 'tmer-c').get(0);
+	// 		this.container	= container;
+	// 		var parts		= [];
+	// 		this.parts		= parts;
+	// 		for(var i = start; i< end; ++i){
+	// 			parts.push(
+	// 				$.createElement('div')
+	// 					.attr('class', 'tmer-v')
+	// 					.text(i)
+	// 					// .css('transform', 'rotateX(-45deg) translateZ(63px)')
+	// 					.appendTo(container)
+	// 					.get()
+	// 			);
+	// 		}
+	// 		this.setSelectedItem(0);
+	// 	}
+	// 	var TIMER_DEG_FRAC		= 10;
+	// 	var TIMER_TRRANSLATE_BY	= 30;
+	// 	$.extend(TimerGroup.prototype,{
+	// 		getContainer	: function(){return this.container;},
+	// 		setSelectedItem	: function(index){
+
+	// 		}
+	// 	});
 
 })(jQuery);
