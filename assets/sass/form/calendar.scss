@@ -35,7 +35,8 @@
 	}
 
 	&-timer{
-		text-align: center;
+		text-align	: center;
+		position	: relative;
 		// padding	: 40px 0;
 
 		// .tmer-vp{
@@ -56,6 +57,14 @@
 		// 	top		: 0;
 		// 	background: #ccc;
 		// }
+	}
+	&-timer-lne{
+		position	: absolute;
+		width		: 100%;
+		top			: 4em;
+		border		: $border-color solid;
+		border-width: 1px 0;
+		height		: 2em;
 	}
 }
 

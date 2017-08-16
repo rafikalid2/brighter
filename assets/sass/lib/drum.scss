@@ -57,20 +57,22 @@ div.drum-wrapper .dial div {
 	height: 10px;
 	margin: 0 auto;
 }
-div.drum-wrapper .dial svg {
+div.drum-wrapper .dial div {
 	position: absolute;
+	width	: 100%;
+	text-align: center;
 }
 div.drum-wrapper .up {
 	top: 0px;
 }
-div.drum-wrapper .up svg {
-	top: 2px
+div.drum-wrapper .up div {
+	top: 0
 }
 div.drum-wrapper .down {
 	bottom: 0px;
 }
-div.drum-wrapper .down svg {
-	bottom: 2px;
+div.drum-wrapper .down div {
+	bottom: 0;
 }
 
 /* actual drum styles */
@@ -107,7 +109,7 @@ div.drum figure {
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	overflow: hidden;
-	width: 100%;
+	// width: 100%;
 	text-align: left;
 }
 

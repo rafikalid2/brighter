@@ -26,10 +26,6 @@
 			this.ele.classList.remove(className);
 			return this;
 		},
-		text	: function(value){
-			this.ele.text(txt);
-			return this;
-		},
 		appendText: function(value){
 			var txt	= document.createTextNode(value);
 			this.ele.appendChild(txt);
@@ -51,15 +47,6 @@
 			this.ele.style[key]	= value;
 			return this;
 		},
-		on		: function(type, listener){
-			if(this.ele.addEventListener)
-				this.ele.addEventListener(type, listener, false);
-			else if(this.ele.attachEvent) // ie
-				this.ele.attachEvent(type, listener);
-			else
-				throw new Error('Could not attach event.');
-			return this;
-		},
 		build	: function(){
 			return this.ele;
 		},
@@ -67,4 +54,21 @@
 			return this.ele;
 		}
 	});
+
+	// navigator compatible functions
+		var hasDivCreator	= typeof HTMLDivElement != 'undefined'; // juste pour  s'assurer :D
+		// text
+			DOMElementBuilder.prototype.text	=
+				hasDivCreator
+				&& HTMLDivElement.prototype.hasOwnProperty('innerText') ?
+					function(value){this.ele.innerText	= value; return this;}
+					: function(value){this.ele.innerHTML	= value; return this;};
+
+		// add event listener
+			DOMElementBuilder.prototype.on = 
+				hasDivCreator
+				&& HTMLDivElement.prototype.addEventListener ?
+					function(type, listener){this.ele.addEventListener(type, listener, false); return this;}
+					: function(type, listener){this.ele.attachEvent(type, listener); return this;};
+
 })(jQuery);

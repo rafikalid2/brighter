@@ -1045,6 +1045,36 @@ Default data format:
 	&lt;/div&gt;
 </code>
 
+<code><b>Formats:</b>
+	y - yy	: year
+	yyyy	: full year
+
+	m			: month (1 to 12)
+	mm			: month (01 to 12)
+	M			: month (jan to dec)
+	MM			: month (January to December)
+
+	W - WW		: week of year (difference with W and WW: 1 or 01)
+	w - ww		: week of month
+
+	D - DD		: day in year
+	d - dd		: day in month
+
+	E - EE		: day of week
+
+	a			: am/pm marker
+	A			: AM/PM marker
+
+	H - HH		: hour in day (0 to 24)
+	h - hh		: hour in day (0 to 12)
+
+	i - ii		: minute in hour
+	s - ss		: second in minute
+	S - SS - SSS: millisecond in second
+
+	z			: time zone
+</code>
+
 <!-- date container -->
 	<div
 		data-calendar	= "basic"
@@ -1055,9 +1085,21 @@ Default data format:
 		data-today		= "true"
 		data-level		= "years"
 		data-format		= "yyyy/MM/ddThh:mm"
-		></div>
+	></div>
 
-	<br><br>
+<br><br>
+	<div
+		data-calendar	= "basic"
+		value			= "2017-06-01"
+		data-min		= "2016-04-01"
+		data-max		= "2018-06-30"
+		data-readonly	= "false"
+		data-today		= "true"
+		data-level		= "years"
+		data-format		= "HH:ii:SSS"
+	></div>
+
+<br><br>
 	<!-- <div class="date-container text-center">
 		<div class="nowrap clearfix">
 			<span class="btn pull-left"><span class="icon-left-open-big"></span></span>

@@ -701,7 +701,16 @@ label.drop-down input[type="checkbox"]:checked ~ .btn, label.drop-down input[typ
     margin: 0; }
 
 .calendar-timer {
-  text-align: center; }
+  text-align: center;
+  position: relative; }
+
+.calendar-timer-lne {
+  position: absolute;
+  width: 100%;
+  top: 4em;
+  border: #ddd solid;
+  border-width: 1px 0;
+  height: 2em; }
 
 .default input, .default textarea, .default select, .default {
   color: #676767;
@@ -2038,20 +2047,22 @@ div.drum-wrapper .dial div {
   height: 10px;
   margin: 0 auto; }
 
-div.drum-wrapper .dial svg {
-  position: absolute; }
+div.drum-wrapper .dial div {
+  position: absolute;
+  width: 100%;
+  text-align: center; }
 
 div.drum-wrapper .up {
   top: 0px; }
 
-div.drum-wrapper .up svg {
-  top: 2px; }
+div.drum-wrapper .up div {
+  top: 0; }
 
 div.drum-wrapper .down {
   bottom: 0px; }
 
-div.drum-wrapper .down svg {
-  bottom: 2px; }
+div.drum-wrapper .down div {
+  bottom: 0; }
 
 /* actual drum styles */
 div.drum {
@@ -2086,7 +2097,6 @@ div.drum figure {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  width: 100%;
   text-align: left; }
 
 div.drum-wrapper div.container, div.drum-wrapper figure {
