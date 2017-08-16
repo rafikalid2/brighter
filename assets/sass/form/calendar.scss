@@ -1,4 +1,4 @@
-[data-calendar]{
+[data-calendar], .calendar{
 	display	: inline-block;
 	width	: 250px;
 	padding	: 5px;
@@ -6,10 +6,6 @@
 
 	&:empty{
 		@extend %component-loading;
-	}
-
-	.btn{
-		border: none;
 	}
 }
 
@@ -37,26 +33,6 @@
 	&-timer{
 		text-align	: center;
 		position	: relative;
-		// padding	: 40px 0;
-
-		// .tmer-vp{
-		// 	border			: $border-color solid;
-		// 	border-width	: 1px 0;
-		// 	text-align		: center;
-		// }
-		// .tmer-c{
-		// 	height	: 30px;
-		// 	width	: 30px;
-		// 	position: relative;
-		// }
-		// .tmer-v{
-		// 	display	: inline-block;
-		// 	height	: 30px;
-		// 	width	: 30px;
-		// 	position: absolute;
-		// 	top		: 0;
-		// 	background: #ccc;
-		// }
 	}
 	&-timer-lne{
 		position	: absolute;
@@ -65,6 +41,16 @@
 		border		: $border-color solid;
 		border-width: 1px 0;
 		height		: 2em;
+	}
+
+	.btn{
+		border: none;
+	}
+
+	.btn{
+		&.selected{
+			outline	: 1px $primary solid;
+		}
 	}
 }
 

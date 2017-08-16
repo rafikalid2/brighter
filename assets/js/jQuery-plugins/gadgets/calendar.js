@@ -3,11 +3,12 @@
  */
 (function($){
 	var _defaultOptions	= {
-		min			: 'infinit',
-		max			: 'infinit',
+		value		: '',
+		min			: Infinity,
+		max			: Infinity,
 		readonly	: false,
 		today		: true,
-		level		: 'years',
+		level		: 'year',
 		format		: 'dd/MM/YYYY'
 	};
 
@@ -26,15 +27,34 @@
 
 
 	$.fn.calendar	= function(options){
-		return this.empty().each(function(){
-			//init options
-				var fOptions = {};
-				for(var i in _defaultOptions){
-					fOptions[i]	= this.getAttribute(i) || this.getAttribute('data-' + i) || options[i] || _defaultOptions[i];
-				}
-			//create element
-				new BasicCalendar(this, fOptions);
-		});
+		if(!options)
+			options	= {};
+		return this
+				.empty()
+				.addClass('calendar')
+				.each(function(){
+					//init options
+						var fOptions = {};
+						for(var i in _defaultOptions){
+							fOptions[i]	= this.getAttribute(i) || this.getAttribute('data-' + i) || options[i] || _defaultOptions[i];
+						}
+					// init value
+						try{
+							if(fOptions.value && !(fOptions.value instanceof Date)){
+								if(fOptions.value.match(/^[0-9]+$/))
+									fOptions.value	= new Date(parseInt(fOptions.value));
+								else{
+									if(fOptions.value.startsWith('T'))
+										fOptions.value	= '2017-01-01' + fOptions.value;
+									fOptions.value		= new Date(fOptions.value);
+								}
+							}
+						}catch(e){
+							$.logger.error(e);
+						}
+					//create element
+						new BasicCalendar(this, fOptions);
+				});
 	};
 
 /////////////////////////////// basic calendar ///////////////////////////////
@@ -43,17 +63,17 @@
 		this.container	= container;
 
 		//date
-			var currentDate = new Date();
+			var currentDate = options.value || new Date();
 		// format
 			this._initFormat();
 		// init calendard
 			this._init();
 		// add years
-			// this._createYears(currentDate.getFullYear() - CURRENT_YEAR_POSITION);
+			// var fragment = this._createYears(currentDate.getFullYear() - CURRENT_YEAR_POSITION);
 			// var fragment = this._createMonths();
-			// var fragment	= this._createDays(2017, 7);
-			this._createTimer(this.contentDiv);
-			// this.contentDiv.appendChild(fragment);
+			var fragment	= this._createDays(2017, 7);
+			// var fragment	= this._createTimer();
+			this.contentDiv.appendChild(fragment);
 	}
 
 	$.extend(BasicCalendar.prototype,{
@@ -144,12 +164,13 @@
 	function _basicCalendarCreateYears(startYear){
 		var fragment	= document.createDocumentFragment();
 		var currentYear	= startYear;
+		var selectedYear= this.options.value && this.options.value.getFullYear();
 		for(var i = 0; i < YEAR_ROW_COUNT; ++i){
 			var row	= $.createElement('div');
 			for(var j =0; j < YEAR_PER_ROW; ++j){
 				row.append(
 					$.createElement('span')
-						.attr('class', 'btn')
+						.attr('class', selectedYear == currentYear ? 'btn selected': 'btn')
 						.text(currentYear++)
 						.get()
 				);
@@ -162,10 +183,11 @@
 	function _basicCalendarCreateMonths(){
 		var container	= $.createElement('div')
 				.attr('class', 'calendar-months');
+		var currentMonth	= this.options.value && this.options.value.getMonth();
 		for(var i=0; i < i18nMonths.length; ++i){
 			container.append(
 				$.createElement('span')
-					.attr('class', 'btn')
+					.attr('class', currentMonth === i ? 'btn selected' : 'btn')
 					.text(i18nMonths[i])
 					.get()
 			);
@@ -185,6 +207,16 @@
 				);
 			}
 			container.append(headerRow.get());
+		// selected Date
+			var selectedYear;
+			var selectedMonth;
+			var selectedDay;
+			var selectedDate	= this.options.value;
+			if(selectedDate){
+				selectedYear	= selectedDate.getFullYear();
+				selectedMonth	= selectedDate.getMonth();
+				selectedDay		= selectedDate.getDate();
+			}
 		// add dates
 			var currentDate	= new Date(year, month, 1);
 		// get next month
@@ -200,7 +232,7 @@
 				for(var i = 0; i < 7; ++i){
 					var cDate	= currentDate.getDate();
 					var dayBuilder	= $.createElement('span')
-							.attr('class', 'btn')
+							.attr('class', selectedYear === year && selectedMonth === month && selectedDay === cDate ? 'btn selected' : 'btn')
 							.text(cDate);
 					if(currentDate.getMonth() != month)
 						dayBuilder.addClass('disabled');
@@ -213,79 +245,76 @@
 			return container.get();
 	}
 
-	function _basicCalendarCreateTimer(parentContainer){
+	function _basicCalendarCreateTimer(){
 		var container	= $.createElement('form').attr('class', 'calendar-timer drum-inline-block');
 		//var timerBuilder= $.createElement('div').attr('class', 'tmer-vp');
 		var format	= this._format;
 		// append hours
+			var hSelect;
 			if(format.hour){
 				var hoursHolderLength	= format.hour.length;
-				var selectEle			= $.createElement('select').get();
+				hSelect					= $.createElement('select').get();
 					if(format.hour.charAt(0) == 'H'){ // 0 - 24
-						_basicCalendarCreateTimerAddToSelect(selectEle, null, hoursHolderLength, 0, 23, 0);
+						_basicCalendarCreateTimerAddToSelect(hSelect, null, hoursHolderLength, 0, 23, 0);
 					}else{ // 0 - 12
 						// 12 AM (minuit)
-							_basicCalendarCreateTimerAddOptionToSelect(selectEle, 'AM ', hoursHolderLength, 0, 12);
-						_basicCalendarCreateTimerAddToSelect(selectEle, 'AM ', hoursHolderLength, 1, 11, 1);
+							_basicCalendarCreateTimerAddOptionToSelect(hSelect, 'AM ', hoursHolderLength, 0, 12);
+						_basicCalendarCreateTimerAddToSelect(hSelect, 'AM ', hoursHolderLength, 1, 11, 1);
 						// 12 PM (midi)
-							_basicCalendarCreateTimerAddOptionToSelect(selectEle, 'PM ', hoursHolderLength, 12, 12);
-						_basicCalendarCreateTimerAddToSelect(selectEle, 'PM ', hoursHolderLength, 13, 23, 1);
+							_basicCalendarCreateTimerAddOptionToSelect(hSelect, 'PM ', hoursHolderLength, 12, 12);
+						_basicCalendarCreateTimerAddToSelect(hSelect, 'PM ', hoursHolderLength, 13, 23, 1);
 					}
-				container.append(selectEle);
+				container.append(hSelect);
 			}
 		// append minutes
+			var mSelect;
 			if(format.minute){
 				var holerLength	= format.minute.length;
-				var selectEle			= $.createElement('select').get();
-				_basicCalendarCreateTimerAddToSelect(selectEle, null, holerLength, 0, 59, 0);
-				container.append(selectEle);
+				mSelect			= $.createElement('select').get();
+				_basicCalendarCreateTimerAddToSelect(mSelect, null, holerLength, 0, 59, 0);
+				container.append(mSelect);
 			}
 		// append seconds
+			var sSelect;
 			if(format.second){
 				var holerLength	= format.second.length;
-				var selectEle	= $.createElement('select').get();
-				_basicCalendarCreateTimerAddToSelect(selectEle, null, holerLength, 0, 59, 0);
-				container.append(selectEle);
+				sSelect			= $.createElement('select').get();
+				_basicCalendarCreateTimerAddToSelect(sSelect, null, holerLength, 0, 59, 0);
+				container.append(sSelect);
 			}
 		// add miliseconds
+			var msSelect;
 			if(format.ms){
 				var holerLength	= format.ms.length;
-				var selectEle	= $.createElement('select').get();
+				msSelect		= $.createElement('select').get();
 				var vMax		= holerLength == 1 ? 9 : ( holerLength == 2 ? 99 : 999);
-				_basicCalendarCreateTimerAddToSelect(selectEle, null, holerLength, 0, vMax, 0);
-				container.append(selectEle);
+				_basicCalendarCreateTimerAddToSelect(msSelect, null, holerLength, 0, vMax, 0);
+				container.append(msSelect);
 			}
-			
-			// container.appendText(':');
-			// container.append(_basicCalendarCreateTimerCreateSelect(0,59)); // mins
-			// container.appendText(':');
-			// container.append(_basicCalendarCreateTimerCreateSelect(0,59)); // secondes
 		//add line
 			container.append($.createElement('div').attr('class', 'calendar-timer-lne').get());
-		// add to parent
-			parentContainer.appendChild(container.get());
 
+		// get container
+			container	= container.get();
 		//enable effect
-			$('select', parentContainer).drum({
-				//onChange : function(selectedOption){}
-			});
-		// init drum size
 			setTimeout(function(){
-				$(parentContainer).find('.drum-wrapper')
-					.each(function(){
-						var $this	= $(this);
-						var width	= $this.find('figure:first').width();
-						if(width)
-							$this.width(width + 10);
-					});
-			},0);
-			
-		// hours
-		// 	var hours = new TimerGroup(0, 11, 2);
-		// 	timerBuilder.append(hours.getContainer());
-
-		// container.append(timerBuilder.get());
-		// return container.get();
+				$('select', container)
+					.drum({
+						//onChange : function(selectedOption){}
+					})
+				// add semicolones
+					.slice(1)
+						.before(':');
+				// values
+					var value	= this.options.value;
+					if(value){
+						hSelect && $(hSelect).drum('setIndex', value.getHours());
+						mSelect && $(mSelect).drum('setIndex', value.getMinutes());
+						sSelect && $(sSelect).drum('setIndex', value.getSeconds());
+						msSelect&& $(msSelect).drum('setIndex', value.getMilliseconds());
+					}
+			}.bind(this), 0);
+		return container;
 	}
 
 	function _basicCalendarCreateTimerAddToSelect(selectEle, prefix, zeroPadding, vMin, vMax, tMin){
@@ -323,32 +352,5 @@
 				.text(tminText)
 				.appendTo(selectEle);
 	}
-
-	// // timer
-	// 	function TimerGroup(start, end, countNbrs){
-	// 		var container	= $.createElement('div').attr('class', 'tmer-c').get(0);
-	// 		this.container	= container;
-	// 		var parts		= [];
-	// 		this.parts		= parts;
-	// 		for(var i = start; i< end; ++i){
-	// 			parts.push(
-	// 				$.createElement('div')
-	// 					.attr('class', 'tmer-v')
-	// 					.text(i)
-	// 					// .css('transform', 'rotateX(-45deg) translateZ(63px)')
-	// 					.appendTo(container)
-	// 					.get()
-	// 			);
-	// 		}
-	// 		this.setSelectedItem(0);
-	// 	}
-	// 	var TIMER_DEG_FRAC		= 10;
-	// 	var TIMER_TRRANSLATE_BY	= 30;
-	// 	$.extend(TimerGroup.prototype,{
-	// 		getContainer	: function(){return this.container;},
-	// 		setSelectedItem	: function(index){
-
-	// 		}
-	// 	});
 
 })(jQuery);

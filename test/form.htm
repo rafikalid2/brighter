@@ -1024,7 +1024,7 @@ Default data format:
 		data-max		= "2018-06-30"
 		data-readonly	= "false"		<i>// if we can change this value</i>
 		data-today		= "true"		<i>// Enable today button</i>
-		data-level		= "years|months|days" <i>// visible level</i>
+		data-level		= "year|month|day|time" <i>// visible level</i>
 
 		data-format	= "yyyy"				<i>// years only</i>
 		data-format	= "MM"					<i>// months only</i>
@@ -1075,28 +1075,45 @@ Default data format:
 	z			: time zone
 </code>
 
+<code><b>Values:</b>
+	value	and data-value
+	min 	and data-min
+	max		and data-max
+
+	valid values are:
+		- unix timestamp in milliseconds. Example: 1502883267360
+		- ISO 8601 date: yyyy-mm-ddTHH:ii:ss. Examples:
+			- 2017
+			- 2017-05
+			- 2017-05-25
+			- 2017-05-25T22:15
+			- 2017-05-25T22:15:23
+			- T22:15:23
+			- T22:15
+</code>
+
 <!-- date container -->
 	<div
 		data-calendar	= "basic"
-		value			= "2017-06-01"
+		data-value		= "2017-01-01"
 		data-min		= "2016-04-01"
 		data-max		= "2018-06-30"
 		data-readonly	= "false"
 		data-today		= "true"
-		data-level		= "years"
+		data-level		= "year"
 		data-format		= "yyyy/MM/ddThh:mm"
 	></div>
 
 <br><br>
 	<div
 		data-calendar	= "basic"
-		value			= "2017-06-01"
+		data-value		= "2018-12-30T12:35:46"
 		data-min		= "2016-04-01"
 		data-max		= "2018-06-30"
 		data-readonly	= "false"
 		data-today		= "true"
-		data-level		= "years"
-		data-format		= "HH:ii:SSS"
+		data-level		= "year"
+		data-format		= "HH:ii:ss"
 	></div>
 
 <br><br>

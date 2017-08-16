@@ -353,6 +353,15 @@
 	$.fn.drum = function(methodOrOptions)
 	{
 		var _arguments = arguments;
+		setTimeout(function(){
+			this.parent().find('.drum-wrapper')
+				.each(function(){
+					var $this	= $(this);
+					var width	= $this.find('figure:first').width();
+					if(width)
+						$this.width(width + 10);
+				});
+		}.bind(this), 0);
 		return this.each(function() {
 			if ( methods[methodOrOptions] ) {
 				return methods[ methodOrOptions ].apply( this, Array.prototype.slice.call( _arguments, 1 ));
