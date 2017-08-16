@@ -50,6 +50,8 @@
 	.btn{
 		&.selected{
 			outline	: 1px $primary solid;
+			z-index	: 10;
+			position: relative;
 		}
 	}
 }

@@ -1,5 +1,33 @@
 'use strict';
-;/*! Drum.JS - v0.1dev - 2014-01-09
+;// week of year
+	if(!Date.prototype.hasOwnProperty('getWeekOfYear'))
+		Date.prototype.getWeekofYear = function(){
+			var d		= new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate()));
+			var dayNum	= d.getUTCDay() || 7;
+			d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+			var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+			return Math.ceil((((d - yearStart) / 86400000) + 1)/7)
+		};
+
+// week of month
+	if(!Date.prototype.hasOwnProperty('getWeekOfMonth'))
+		Date.prototype.getWeekOfMonth	= function(){
+			var d	= new Date(this.getFullYear(), this.getMonth(), 1);
+			return (d.getDay() + this.getDate()) / 7;
+		};
+
+// day of year
+	if(!Date.prototype.hasOwnProperty('getDayOfYear'))
+		Date.prototype.getDayOfYear	= function(){
+			var d	= new Date(this.getFullYear(), 0, 0);
+			return Math.floor((this - d) / 86400000);
+		};
+
+// now
+	if(!Date.now)
+		Date.now	= function(){
+			return new Date().getTime();
+		};;/*! Drum.JS - v0.1dev - 2014-01-09
  * http://mb.aquarius.uberspace.de/drum.js
  *
  * Copyright (c) 2013 Marcel Bretschneider <marcel.bretschneider@gmail.com>;
@@ -385,6 +413,41 @@
 		fatalError	: function(){console.error.apply(console, arguments);}
 	};
 
+})(jQuery);;(function($){
+	$.i18n	= {
+		get			: _getMessage,
+		getLanguage	: _getLanguage
+	};
+
+	function _getMessage(key, params){
+		var value;
+		if($._i18nMsg){
+			value	= $._i18nMsg[key];
+			if(value && params)
+				value = _replaceParams(value, params);
+		}
+		return value;
+	}
+
+	function _replaceParams(value, replaces){
+		if(Array.isArray(value)){
+			for(var i = 0; i < value.length; ++i)
+				value[i]	= _replaceParams(value[i], params);
+		}else if(replaces && (typeof value == 'string')){
+			value = value.replace(/\$([a-zA-Z1-9_]+)/g, function(a,b){
+				if(replaces.hasOwnProperty(b))
+					return replaces[b];
+				else
+					return a;
+			});
+		}
+
+		return value;
+	}
+
+	function _getLanguage(){
+		return $._i18nMsg && $._i18nMsg.lang;
+	}
 })(jQuery);;/**
  * native HTML element builder
  * to be used when creating lot of elements
@@ -458,6 +521,92 @@
 					function(type, listener){this.ele.addEventListener(type, listener, false); return this;}
 					: function(type, listener){this.ele.attachEvent(type, listener); return this;};
 
+})(jQuery);;(function($){
+
+	$.dateFormat	= function(date, format){
+		format.replace(/(^|[^a-z\\])([adehimstwyz+])([^a-z\\]|$)/ig, function(a, b, c, d){
+			if(_replacer[c])
+				a	= b + _replacer[c](date) + d;
+			return a;
+		});
+	};
+
+	// var i18nToday		= $.i18n.get('today');
+	var i18nMonths		= $.i18n.get('months'); // ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+	var i18nMonthsAbbr	= $.i18n.get('monthsAbbr'); // ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+	var i18nDaysOfWeek	= $.i18n.get('daysAbbr'); // ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+	var i18nDaysFull	= $.i18n.get('days'); // ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+	var _replacer	= {
+		y		: _yy,
+		yy		: _yy,
+		yyyy	: function(date){return date.getFullYear();},
+
+		m		: function(date){return date.getMonth()},
+		mm		: function(date){return _addZero(date.getMonth())},
+		M		: function(date){return i18nMonthsAbbr[date.getMonth()]},
+		MM		: function(date){return i18nMonths[date.getMonth()]},
+
+		W		: function(date){return date.getWeekOfYear();},
+		WW		: function(date){return _addZero(date.getWeekOfYear());},
+
+		w		: function(date){return date.getWeekOfMonth();},
+		ww		: function(date){return _addZero(date.getWeekOfMonth());},
+
+		D		: function(date){return date.getDayOfYear();},
+		DD		: function(date){return _addZero(date.getDayOfYear());},
+		d		: function(date){return date.getDate();},
+		dd		: function(date){return _addZero(date.getDate());},
+		th		: function(date){
+						var dt	= date.getDate();
+						return dt == 1 ? 'st' : ( dt == 2 ? 'nd' : 'th');
+					},
+
+		e		: function(date){return date.getDay()},
+		ee		: function(date){return _addZero(date.getDay());},
+		E		: function(date){return i18nDaysOfWeek[date.getDay()];},
+		EE		: function(date){return i18nDaysFull[date.getDay()];},
+
+		a		: function(date){return date.getHours() > 11 ? 'pm' : 'am'},
+		A		: function(date){return date.getHours() > 11 ? 'PM' : 'AM'},
+
+		H		: function(date){return date.getHours();},
+		HH		: function(date){return _addZero(date.getHours());},
+		h		: function(date){return _get12Hours(date);},
+		hh		: function(date){return _addZero(_get12Hours(date));},
+
+		i		: function(date){return date.getMinutes();},
+		ii		: function(date){return _addZero(date.getMinutes());},
+		s		: function(date){return date.getSeconds();},
+		ss		: function(date){return _addZero(date.getSeconds());},
+		S		: function(date){return date.getMilliseconds().toString().substr(0,1);},
+		SS		: function(date){return date.getMilliseconds().toString().substr(0,2);},
+		SSS		: function(date){return date.getMilliseconds();},
+
+		z		: function(date){
+			var z	= date.getTimezoneOffset() / 60;
+			return z ? 'UTC' + (z > 0 ? '+' + z : z) : 'UTC';
+		}
+	};
+
+	function _get12Hours(date){
+		var a= date.getHours();
+		if(a == 0)
+			a = 12;
+		else if(a > 12)
+			a -= 12;
+		return a;
+	}
+
+	function _yy(date){
+		var y	= date.getFullYear().toString();
+		return y.substring(y.length - 2);
+	}
+
+	function _addZero(value){
+		return value < 10 ? '0' + value : value;
+	}
 })(jQuery);;/**
  * Calendar
  */
@@ -469,7 +618,7 @@
 		readonly	: false,
 		today		: true,
 		level		: 'year',
-		format		: 'dd/MM/YYYY'
+		format		: $.i18n.get('dateFormat')
 	};
 
 	//basic calendar
@@ -478,12 +627,16 @@
 		var CURRENT_YEAR_POSITION	= Math.round(YEAR_ROW_COUNT * YEAR_PER_ROW / 2);
 
 	//i18n
-		var i18nToday		= 'Today';
-		var i18nMonths		= ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-		var i18nMonthsAbbr	= ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+		var i18nToday		= $.i18n.get('today');
+		var i18nMonths		= $.i18n.get('months'); // ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+		var i18nMonthsAbbr	= $.i18n.get('monthsAbbr'); // ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-		var i18nDaysOfWeek	= ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-		var i18nDaysFull	= ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+		var i18nDaysOfWeek	= $.i18n.get('daysAbbr'); // ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+		var i18nDaysFull	= $.i18n.get('days'); // ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+
+		var i18nMonthYearFormat		= $.i18n.get('MonthYearFormat'); // 'MM yyyy';
+		var i18nMonthYearDayFormat	= $.i18n.get('fullDateFormat'); //'E M, dd<sup>th</sup> yyyy';
 
 
 	$.fn.calendar	= function(options){
@@ -518,8 +671,10 @@
 	};
 
 /////////////////////////////// basic calendar ///////////////////////////////
+	var _basicLevels	= ['year', 'month', 'day', 'time'];
 	function BasicCalendar(container, options){
 		this.options	= options;
+		this.value		= options.value;
 		this.container	= container;
 
 		//date
@@ -528,15 +683,40 @@
 			this._initFormat();
 		// init calendard
 			this._init();
+		// current lavel
+			var level;
+			if(options.level){
+				if(this._format.hasOwnProperty(options.level))
+					level	= options.level;
+				else
+					$.logger.warn('CALENDAR: incorrect level: ', options.level, ', format is: ', options.format);
+			}
+			if(!level){
+				for(var i=0; i< _basicLevels.length; ++i){
+					if(this._format.hasOwnProperty(_basicLevels[i])){
+						level	= _basicLevels[i];
+						break;
+					}
+				}
+				if(!level)
+					throw new Error('Calendar: Could not get a correct level');
+			}
 		// add years
-			// var fragment = this._createYears(currentDate.getFullYear() - CURRENT_YEAR_POSITION);
-			// var fragment = this._createMonths();
-			var fragment	= this._createDays(2017, 7);
-			// var fragment	= this._createTimer();
+			var fragment;
+			if(level == 'year')
+				fragment = this._createYears(currentDate.getFullYear() - CURRENT_YEAR_POSITION);
+			else if(level == 'month')
+				fragment = this._createMonths();
+			else if(level == 'day')
+				fragment	= this._createDays(currentDate.getFullYear(), currentDate.getMonth());
+			else
+				fragment	= this._createTimer();
 			this.contentDiv.appendChild(fragment);
 	}
 
 	$.extend(BasicCalendar.prototype,{
+		getValue		: _basicCalendarGetValue,
+
 		_init			: _initBasicCalendar,
 		_initFormat		: _basicCalendarInitFormat,
 
@@ -545,7 +725,9 @@
 		_createYears	: _basicCalendarCreateYears,
 		_createMonths	: _basicCalendarCreateMonths,
 		_createDays		: _basicCalendarCreateDays,
-		_createTimer	: _basicCalendarCreateTimer
+		_createTimer	: _basicCalendarCreateTimer,
+
+		_slideBtns		: _basicCalendarSlideBtnsVisiblity
 	});
 
 	// create calendar
@@ -557,14 +739,15 @@
 			container.append(headerBuilder.get());
 
 			// left button
-				var leftButtonBuilder	= $.createElement('span')
+				var leftButton	= $.createElement('span')
 					.attr('class', 'btn pull-left')
 					.append(
 						$.createElement('span')
 							.attr('class', 'icon-left-open-big')
 							.get()
-					);
-				headerBuilder.append(leftButtonBuilder.get());
+					).get();
+					this._leftButton	= leftButton;
+				headerBuilder.append(leftButton);
 
 			// middle button
 				var middleButton		= $.createElement('span').attr('class','btn');
@@ -577,8 +760,9 @@
 						$.createElement('span')
 							.attr('class', 'icon-right-open-big')
 							.get()
-					);
-				headerBuilder.append(rightButton.get());
+					).get();
+				this._rightButton	= rightButton;
+				headerBuilder.append(rightButton);
 		// middle (content)
 			var contentDiv	= $.createElement('div').attr('class', 'nowrap').get();
 			container.appendChild(contentDiv);
@@ -615,16 +799,22 @@
 			if(a && a.length)
 				format[ele[0]]	= a[0];
 		});
+		if(format.minute || format.second || format.ms)
+			format.time	= true;
 	}
 
 	function _basicCalendarSetTitle(title){
-		this._titleBtn.innerText(title);
+		this._titleBtn.style.display	= title ? '' : 'none';
+		if(title)
+			this._titleBtn.innerText(title);
 	}
 
 	function _basicCalendarCreateYears(startYear){
+		// slide btns
+			this._slideBtns(true);
 		var fragment	= document.createDocumentFragment();
 		var currentYear	= startYear;
-		var selectedYear= this.options.value && this.options.value.getFullYear();
+		var selectedYear= this.value && this.value.getFullYear();
 		for(var i = 0; i < YEAR_ROW_COUNT; ++i){
 			var row	= $.createElement('div');
 			for(var j =0; j < YEAR_PER_ROW; ++j){
@@ -637,13 +827,16 @@
 			}
 			fragment.appendChild(row.get());
 		}
+		this._setTitle(startYear + ' - ' + (currentYear - 1));
 		return fragment;
 	}
 
 	function _basicCalendarCreateMonths(){
+		// slide btns
+			this._slideBtns(true);
 		var container	= $.createElement('div')
 				.attr('class', 'calendar-months');
-		var currentMonth	= this.options.value && this.options.value.getMonth();
+		var currentMonth	= this.value && this.value.getMonth();
 		for(var i=0; i < i18nMonths.length; ++i){
 			container.append(
 				$.createElement('span')
@@ -652,10 +845,14 @@
 					.get()
 			);
 		}
+		this._setTitle(this.value && this.value.getFullYear());
 		return container.get();
 	}
 
 	function _basicCalendarCreateDays(year, month){
+		// slide btns
+			this._slideBtns(true);
+			this._setTitle(this.getValue(i18nMonthYearFormat));
 		var container	= $.createElement('div').attr('class', 'calendar-days');
 		//add day header
 			var headerRow = $.createElement('div').attr('class', 'nowrap');
@@ -671,7 +868,7 @@
 			var selectedYear;
 			var selectedMonth;
 			var selectedDay;
-			var selectedDate	= this.options.value;
+			var selectedDate	= this.value;
 			if(selectedDate){
 				selectedYear	= selectedDate.getFullYear();
 				selectedMonth	= selectedDate.getMonth();
@@ -691,10 +888,15 @@
 				var row 	= $.createElement('div').attr('class', 'nowrap');
 				for(var i = 0; i < 7; ++i){
 					var cDate	= currentDate.getDate();
+					var currentM= currentDate.getMonth();
 					var dayBuilder	= $.createElement('span')
-							.attr('class', selectedYear === year && selectedMonth === month && selectedDay === cDate ? 'btn selected' : 'btn')
+							.attr('class', (
+								selectedYear === currentDate.getFullYear()
+								&& selectedMonth === currentM
+								&& selectedDay === cDate
+							) ? 'btn selected' : 'btn')
 							.text(cDate);
-					if(currentDate.getMonth() != month)
+					if(currentM != month)
 						dayBuilder.addClass('disabled');
 					row.append(dayBuilder.get());
 					currentDate.setDate(cDate + 1);
@@ -706,6 +908,9 @@
 	}
 
 	function _basicCalendarCreateTimer(){
+		// slide btns
+			this._slideBtns(false);
+			this._setTitle(this.getValue(i18nMonthYearDayFormat));
 		var container	= $.createElement('form').attr('class', 'calendar-timer drum-inline-block');
 		//var timerBuilder= $.createElement('div').attr('class', 'tmer-vp');
 		var format	= this._format;
@@ -766,7 +971,7 @@
 					.slice(1)
 						.before(':');
 				// values
-					var value	= this.options.value;
+					var value	= this.value;
 					if(value){
 						hSelect && $(hSelect).drum('setIndex', value.getHours());
 						mSelect && $(mSelect).drum('setIndex', value.getMinutes());
@@ -813,6 +1018,17 @@
 				.appendTo(selectEle);
 	}
 
+	function _basicCalendarSlideBtnsVisiblity(state){
+		var st	= state ? '' : 'none';
+		this._leftButton.style.display	= st;
+		this._rightButton.style.display	= st;
+	}
+
+	function _basicCalendarGetValue(format){
+		var value;
+		if(this.value){}
+		return value;
+	}
 })(jQuery);;(function(){
 	//	init Hammer
 		// if(typeof Hammer != 'undefined')

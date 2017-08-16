@@ -15,6 +15,7 @@
 
 	<script type="text/javascript" src="../dest/jquery-3.2.1.min.js"></script>
 	<script type="text/javascript" src="../dest/hammer.2.0.8.min.js"></script>
+	<script type="text/javascript" src="../dest/locales/en.js"></script>
 </head>
 <body>
 
@@ -1059,8 +1060,10 @@ Default data format:
 
 	D - DD		: day in year
 	d - dd		: day in month
+	th			: 1st, 2nd, 3th, ...
 
-	E - EE		: day of week
+	e - ee		: day of week (0 to 6)
+	E - EE		: day of week (Mon - Monday)
 
 	a			: am/pm marker
 	A			: AM/PM marker
@@ -1095,7 +1098,7 @@ Default data format:
 <!-- date container -->
 	<div
 		data-calendar	= "basic"
-		data-value		= "2017-01-01"
+		data-value		= "2017-01-9"
 		data-min		= "2016-04-01"
 		data-max		= "2018-06-30"
 		data-readonly	= "false"
@@ -1109,7 +1112,7 @@ Default data format:
 		data-calendar	= "basic"
 		data-value		= "2018-12-30T12:35:46"
 		data-min		= "2016-04-01"
-		data-max		= "2018-06-30"
+		data-max		= "2018-06-20"
 		data-readonly	= "false"
 		data-today		= "true"
 		data-level		= "year"

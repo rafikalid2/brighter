@@ -9,7 +9,7 @@
 		readonly	: false,
 		today		: true,
 		level		: 'year',
-		format		: 'dd/MM/YYYY'
+		format		: $.i18n.get('dateFormat')
 	};
 
 	//basic calendar
@@ -18,12 +18,16 @@
 		var CURRENT_YEAR_POSITION	= Math.round(YEAR_ROW_COUNT * YEAR_PER_ROW / 2);
 
 	//i18n
-		var i18nToday		= 'Today';
-		var i18nMonths		= ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-		var i18nMonthsAbbr	= ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+		var i18nToday		= $.i18n.get('today');
+		var i18nMonths		= $.i18n.get('months'); // ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+		var i18nMonthsAbbr	= $.i18n.get('monthsAbbr'); // ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-		var i18nDaysOfWeek	= ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-		var i18nDaysFull	= ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+		var i18nDaysOfWeek	= $.i18n.get('daysAbbr'); // ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+		var i18nDaysFull	= $.i18n.get('days'); // ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+
+		var i18nMonthYearFormat		= $.i18n.get('MonthYearFormat'); // 'MM yyyy';
+		var i18nMonthYearDayFormat	= $.i18n.get('fullDateFormat'); //'E M, dd<sup>th</sup> yyyy';
 
 
 	$.fn.calendar	= function(options){
@@ -58,8 +62,10 @@
 	};
 
 /////////////////////////////// basic calendar ///////////////////////////////
+	var _basicLevels	= ['year', 'month', 'day', 'time'];
 	function BasicCalendar(container, options){
 		this.options	= options;
+		this.value		= options.value;
 		this.container	= container;
 
 		//date
@@ -68,15 +74,40 @@
 			this._initFormat();
 		// init calendard
 			this._init();
+		// current lavel
+			var level;
+			if(options.level){
+				if(this._format.hasOwnProperty(options.level))
+					level	= options.level;
+				else
+					$.logger.warn('CALENDAR: incorrect level: ', options.level, ', format is: ', options.format);
+			}
+			if(!level){
+				for(var i=0; i< _basicLevels.length; ++i){
+					if(this._format.hasOwnProperty(_basicLevels[i])){
+						level	= _basicLevels[i];
+						break;
+					}
+				}
+				if(!level)
+					throw new Error('Calendar: Could not get a correct level');
+			}
 		// add years
-			// var fragment = this._createYears(currentDate.getFullYear() - CURRENT_YEAR_POSITION);
-			// var fragment = this._createMonths();
-			var fragment	= this._createDays(2017, 7);
-			// var fragment	= this._createTimer();
+			var fragment;
+			if(level == 'year')
+				fragment = this._createYears(currentDate.getFullYear() - CURRENT_YEAR_POSITION);
+			else if(level == 'month')
+				fragment = this._createMonths();
+			else if(level == 'day')
+				fragment	= this._createDays(currentDate.getFullYear(), currentDate.getMonth());
+			else
+				fragment	= this._createTimer();
 			this.contentDiv.appendChild(fragment);
 	}
 
 	$.extend(BasicCalendar.prototype,{
+		getValue		: _basicCalendarGetValue,
+
 		_init			: _initBasicCalendar,
 		_initFormat		: _basicCalendarInitFormat,
 
@@ -85,7 +116,9 @@
 		_createYears	: _basicCalendarCreateYears,
 		_createMonths	: _basicCalendarCreateMonths,
 		_createDays		: _basicCalendarCreateDays,
-		_createTimer	: _basicCalendarCreateTimer
+		_createTimer	: _basicCalendarCreateTimer,
+
+		_slideBtns		: _basicCalendarSlideBtnsVisiblity
 	});
 
 	// create calendar
@@ -97,14 +130,15 @@
 			container.append(headerBuilder.get());
 
 			// left button
-				var leftButtonBuilder	= $.createElement('span')
+				var leftButton	= $.createElement('span')
 					.attr('class', 'btn pull-left')
 					.append(
 						$.createElement('span')
 							.attr('class', 'icon-left-open-big')
 							.get()
-					);
-				headerBuilder.append(leftButtonBuilder.get());
+					).get();
+					this._leftButton	= leftButton;
+				headerBuilder.append(leftButton);
 
 			// middle button
 				var middleButton		= $.createElement('span').attr('class','btn');
@@ -117,8 +151,9 @@
 						$.createElement('span')
 							.attr('class', 'icon-right-open-big')
 							.get()
-					);
-				headerBuilder.append(rightButton.get());
+					).get();
+				this._rightButton	= rightButton;
+				headerBuilder.append(rightButton);
 		// middle (content)
 			var contentDiv	= $.createElement('div').attr('class', 'nowrap').get();
 			container.appendChild(contentDiv);
@@ -155,16 +190,22 @@
 			if(a && a.length)
 				format[ele[0]]	= a[0];
 		});
+		if(format.minute || format.second || format.ms)
+			format.time	= true;
 	}
 
 	function _basicCalendarSetTitle(title){
-		this._titleBtn.innerText(title);
+		this._titleBtn.style.display	= title ? '' : 'none';
+		if(title)
+			this._titleBtn.innerText(title);
 	}
 
 	function _basicCalendarCreateYears(startYear){
+		// slide btns
+			this._slideBtns(true);
 		var fragment	= document.createDocumentFragment();
 		var currentYear	= startYear;
-		var selectedYear= this.options.value && this.options.value.getFullYear();
+		var selectedYear= this.value && this.value.getFullYear();
 		for(var i = 0; i < YEAR_ROW_COUNT; ++i){
 			var row	= $.createElement('div');
 			for(var j =0; j < YEAR_PER_ROW; ++j){
@@ -177,13 +218,16 @@
 			}
 			fragment.appendChild(row.get());
 		}
+		this._setTitle(startYear + ' - ' + (currentYear - 1));
 		return fragment;
 	}
 
 	function _basicCalendarCreateMonths(){
+		// slide btns
+			this._slideBtns(true);
 		var container	= $.createElement('div')
 				.attr('class', 'calendar-months');
-		var currentMonth	= this.options.value && this.options.value.getMonth();
+		var currentMonth	= this.value && this.value.getMonth();
 		for(var i=0; i < i18nMonths.length; ++i){
 			container.append(
 				$.createElement('span')
@@ -192,10 +236,14 @@
 					.get()
 			);
 		}
+		this._setTitle(this.value && this.value.getFullYear());
 		return container.get();
 	}
 
 	function _basicCalendarCreateDays(year, month){
+		// slide btns
+			this._slideBtns(true);
+			this._setTitle(this.getValue(i18nMonthYearFormat));
 		var container	= $.createElement('div').attr('class', 'calendar-days');
 		//add day header
 			var headerRow = $.createElement('div').attr('class', 'nowrap');
@@ -211,7 +259,7 @@
 			var selectedYear;
 			var selectedMonth;
 			var selectedDay;
-			var selectedDate	= this.options.value;
+			var selectedDate	= this.value;
 			if(selectedDate){
 				selectedYear	= selectedDate.getFullYear();
 				selectedMonth	= selectedDate.getMonth();
@@ -231,10 +279,15 @@
 				var row 	= $.createElement('div').attr('class', 'nowrap');
 				for(var i = 0; i < 7; ++i){
 					var cDate	= currentDate.getDate();
+					var currentM= currentDate.getMonth();
 					var dayBuilder	= $.createElement('span')
-							.attr('class', selectedYear === year && selectedMonth === month && selectedDay === cDate ? 'btn selected' : 'btn')
+							.attr('class', (
+								selectedYear === currentDate.getFullYear()
+								&& selectedMonth === currentM
+								&& selectedDay === cDate
+							) ? 'btn selected' : 'btn')
 							.text(cDate);
-					if(currentDate.getMonth() != month)
+					if(currentM != month)
 						dayBuilder.addClass('disabled');
 					row.append(dayBuilder.get());
 					currentDate.setDate(cDate + 1);
@@ -246,6 +299,9 @@
 	}
 
 	function _basicCalendarCreateTimer(){
+		// slide btns
+			this._slideBtns(false);
+			this._setTitle(this.getValue(i18nMonthYearDayFormat));
 		var container	= $.createElement('form').attr('class', 'calendar-timer drum-inline-block');
 		//var timerBuilder= $.createElement('div').attr('class', 'tmer-vp');
 		var format	= this._format;
@@ -306,7 +362,7 @@
 					.slice(1)
 						.before(':');
 				// values
-					var value	= this.options.value;
+					var value	= this.value;
 					if(value){
 						hSelect && $(hSelect).drum('setIndex', value.getHours());
 						mSelect && $(mSelect).drum('setIndex', value.getMinutes());
@@ -353,4 +409,15 @@
 				.appendTo(selectEle);
 	}
 
+	function _basicCalendarSlideBtnsVisiblity(state){
+		var st	= state ? '' : 'none';
+		this._leftButton.style.display	= st;
+		this._rightButton.style.display	= st;
+	}
+
+	function _basicCalendarGetValue(format){
+		var value;
+		if(this.value){}
+		return value;
+	}
 })(jQuery);

@@ -714,7 +714,9 @@ label.drop-down input[type="checkbox"]:checked ~ .btn, label.drop-down input[typ
   border: none; }
 
 .calendar .btn.selected {
-  outline: 1px #428bca solid; }
+  outline: 1px #428bca solid;
+  z-index: 10;
+  position: relative; }
 
 .default input, .default textarea, .default select, .default {
   color: #676767;

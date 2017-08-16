@@ -27,7 +27,9 @@ gulp.task('styles-prod', function() {
 		gulp.src('assets/js/**/*.js')
 			.pipe(order([
 				'params.js',
+				'native-plugins/**/*.js',
 				'lib/**/*.js',
+				'jQuery-plugins/basic/**/*.js',
 				'jQuery-plugins/**/*.js',
 				'initializer.js'
 			]))
@@ -40,7 +42,9 @@ gulp.task('styles-prod', function() {
 		gulp.src('assets/js/**/*.js')
 			.pipe(order([
 				'params.js',
+				'native-plugins/**/*.js',
 				'lib/**/*.js',
+				'jQuery-plugins/basic/**/*.js',
 				'jQuery-plugins/**/*.js',
 				'initializer.js'
 			]))
@@ -55,8 +59,26 @@ gulp.task('styles-prod', function() {
 			.pipe(gulp.dest('./dest/'));
 	});
 
+// local
+	gulp.task('locales', ()=>{
+		gulp.src('assets/locales/**/*.js')
+			.pipe(gulp.dest('./dest/locales/'));
+	});
+
+	gulp.task('locales-prod', ()=>{
+		gulp.src('assets/locales/**/*.js')
+			.pipe(minify({
+		        ext:{
+		            src:'-debug.js',
+		            min:'.min.js'
+		        },
+		    }))
+			.pipe(gulp.dest('./dest/locales/'));
+	});
+
 //Watch task
-gulp.task('default',['styles', 'js'], function() {
+gulp.task('default',['styles', 'js', 'locales'], function() {
     gulp.watch('assets/sass/**/*.scss',['styles']);
     gulp.watch('assets/js/**/*.js', ['js']);
+    gulp.watch('assets/locales/**/*.js', ['locales']);
 });
