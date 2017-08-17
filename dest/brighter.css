@@ -695,19 +695,19 @@ label.drop-down input[type="checkbox"]:checked ~ .btn, label.drop-down input[typ
     display: inline-block; }
   .calendar-content.anim-goIn, .calendar-content.anim-goOut {
     overflow: visible; }
-    .calendar-content.anim-goIn > div, .calendar-content.anim-goOut > div {
+    .calendar-content.anim-goIn > *, .calendar-content.anim-goOut > * {
       position: absolute;
-      left: 0;
-      right: 0; }
-  .calendar-content.anim-goIn > div:first-child {
+      top: 0;
+      left: 0; }
+  .calendar-content.anim-goIn > *:first-child {
     animation: goInFront 0.3s ease; }
-  .calendar-content.anim-goIn > div:last-child {
+  .calendar-content.anim-goIn > *:last-child {
     position: initial;
     animation: goInBack 0.3s ease; }
-  .calendar-content.anim-goOut > div:first-child {
+  .calendar-content.anim-goOut > *:first-child {
     position: initial;
     animation: goInBack 0.3s ease reverse; }
-  .calendar-content.anim-goOut > div:last-child {
+  .calendar-content.anim-goOut > *:last-child {
     animation: goInFront 0.3s ease reverse; }
 
 .calendar-months {

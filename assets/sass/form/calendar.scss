@@ -24,28 +24,28 @@
 
 		&.anim-goIn, &.anim-goOut{
 			overflow: visible;
-			&>div{
+			&>*{
 				position: absolute;
+				top		: 0;
 				left	: 0;
-				right	: 0;
 			}
 		}
 		&.anim-goIn{
-			&>div:first-child{
+			&>*:first-child{
 				animation: goInFront 0.3s ease;
 			}
-			&>div:last-child{
+			&>*:last-child{
 				position: initial;
 				animation: goInBack 0.3s ease;
 			}
 		}
 
 		&.anim-goOut{
-			&>div:first-child{
+			&>*:first-child{
 				position: initial;
 				animation: goInBack 0.3s ease reverse;
 			}
-			&>div:last-child{
+			&>*:last-child{
 				animation: goInFront 0.3s ease reverse;
 			}
 		}

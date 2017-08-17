@@ -851,7 +851,7 @@
 			if(a && a.length)
 				format[ele[0]]	= a[0];
 		});
-		if(format.minute || format.second || format.ms)
+		if(format.hour || format.minute || format.second || format.ms)
 			format.time	= true;
 	}
 
@@ -862,6 +862,7 @@
 	}
 
 	function _basicCalendarCreateYears(currentDate){
+		var self		= this;
 		var startYear	= currentDate.getFullYear() - CURRENT_YEAR_POSITION;
 		// slide btns
 			this._slideBtns(true);
@@ -886,14 +887,14 @@
 					.text(currentYear)
 					.click(function(){
 						currentDate.setFullYear(currentYear);
-						self.select('year', currentYear);
+						self.select('year', currentDate);
 					})
 					.get()
 			);
 		}
 	}
 
-	function _basicCalendarCreateMonths(){
+	function _basicCalendarCreateMonths(currentDate){
 		var self	= this;
 		// slide btns
 			this._slideBtns(true);
@@ -906,17 +907,13 @@
 					.attr('class', currentMonth === i ? 'btn selected' : 'btn')
 					.text(i18nMonth)
 					.click(function(){
-						if(this.value){
-							this.value.setMonth(i);
-							self.select('month', this.value);
-						}else{
-							self.select('month', i);
-						}
+						currentDate.setMonth(i);
+						self.select('month', currentDate);
 					})
 					.get()
 			);
 		});
-		this._setTitle(this.value && this.value.getFullYear());
+		this._setTitle(this._format.year && currentDate.getFullYear());
 		return container.get();
 	}
 
@@ -1049,20 +1046,38 @@
 			container	= container.get();
 		//enable effect
 			setTimeout(function(){
-				$('select', container)
-					.drum({
-						//onChange : function(selectedOption){}
-					})
+				var self	= this;
 				// add semicolones
-					.slice(1)
-						.before(':');
+					$('select', container)
+						.slice(1)
+							.before(':');
 				// values
 					var value	= this.value;
 					if(value){
-						hSelect && $(hSelect).drum('setIndex', value.getHours());
-						mSelect && $(mSelect).drum('setIndex', value.getMinutes());
-						sSelect && $(sSelect).drum('setIndex', value.getSeconds());
-						msSelect&& $(msSelect).drum('setIndex', value.getMilliseconds());
+						hSelect && $(hSelect)
+							.drum({onChange : function(selectedOption){
+								currentDate.setHours(selectedOption.value);
+								self.select('time', currentDate);
+							}})
+							.drum('setIndex', value.getHours());
+						mSelect && $(mSelect)
+							.drum({onChange : function(selectedOption){
+								currentDate.setMinutes(selectedOption.value);
+								self.select('time', currentDate);
+							}})
+							.drum('setIndex', value.getMinutes());
+						sSelect && $(sSelect)
+							.drum({onChange : function(selectedOption){
+								currentDate.setSeconds(selectedOption.value);
+								self.select('time', currentDate);
+							}})
+							.drum('setIndex', value.getSeconds());
+						msSelect&& $(msSelect)
+							.drum({onChange : function(selectedOption){
+								currentDate.setMilliseconds(selectedOption.value);
+								self.select('time', currentDate);
+							}})
+							.drum('setIndex', value.getMilliseconds());
 					}
 			}.bind(this), 0);
 		return container;
@@ -1208,8 +1223,24 @@
 	/**
 	 * @param  {Date | number} value
 	 */
-	function _basicCalendarSelect(level, value){
+	function _basicCalendarSelect(level, date){
+		var isEnd	= true;
+		//save value
+			this._currentDate	= date;
+		var levelIndex	= LEVELS.indexOf(this._level) + 1;
+		if(levelIndex < LEVELS.length){
+			var level	= LEVELS[levelIndex];console.log('---level: ', level);
+			if(this._format.hasOwnProperty(level)){
+				this._level	= level;
+				this._animFade(true);
+			}
+		}
 
+		if(isEnd){
+			console.log('--- click: ', levelIndex, '----', this._format );
+			this.value	= date;
+		}
+		return isEnd;
 	}
 
 })(jQuery);;(function(){
