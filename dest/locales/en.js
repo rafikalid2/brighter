@@ -9,7 +9,7 @@
 		daysAbbr		: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
 
 		MonthYearFormat	: 'MM yyyy',
-		dateFormat		: 'mm/dd/yyyy',
+		dateFormat		: 'M, dd yyyy',
 		fullDateFormat	: 'E M, dd<sup>th</sup> yyyy',
 	};
 

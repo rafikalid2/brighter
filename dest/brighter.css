@@ -88,7 +88,7 @@ select:disabled {
 
 [data-calendar]:empty:before, .calendar:empty:before {
   content: 'loading...';
-  color: GrayText; }
+  color: gray; }
 
 .text-left {
   text-align: left; }
@@ -115,7 +115,7 @@ select:disabled {
   text-transform: capitalize; }
 
 .text-comment {
-  color: GrayText; }
+  color: gray; }
 
 blockquote {
   padding: 10px 20px;
@@ -315,7 +315,7 @@ select {
   select:disabled {
     cursor: default;
     background: #f7f7f7;
-    color: GrayText; }
+    color: gray; }
 
 .input-group {
   display: inline-block;
@@ -386,7 +386,7 @@ select {
   .btn.disabled, .btn:disabled, [class^="btn-"].disabled, [class^="btn-"]:disabled, [class*=" btn-"].disabled, [class*=" btn-"]:disabled {
     cursor: default;
     background: #f7f7f7 !important;
-    color: GrayText; }
+    color: gray; }
   .btn[class^="icon-"], .btn[class*=" icon-"], [class^="btn-"][class^="icon-"], [class^="btn-"][class*=" icon-"], [class*=" btn-"][class^="icon-"], [class*=" btn-"][class*=" icon-"] {
     padding-left: 0; }
     .btn[class^="icon-"]:before, .btn[class*=" icon-"]:before, [class^="btn-"][class^="icon-"]:before, [class^="btn-"][class*=" icon-"]:before, [class*=" btn-"][class^="icon-"]:before, [class*=" btn-"][class*=" icon-"]:before {
@@ -684,6 +684,32 @@ label.drop-down input[type="checkbox"]:checked ~ .btn, label.drop-down input[typ
   padding: 5px;
   border: 1px solid #ddd; }
 
+.calendar.anim {
+  pointer-events: none; }
+
+.calendar-content {
+  white-space: nowrap;
+  overflow: hidden;
+  position: relative; }
+  .calendar-content > div {
+    display: inline-block; }
+  .calendar-content.anim-goIn, .calendar-content.anim-goOut {
+    overflow: visible; }
+    .calendar-content.anim-goIn > div, .calendar-content.anim-goOut > div {
+      position: absolute;
+      left: 0;
+      right: 0; }
+  .calendar-content.anim-goIn > div:first-child {
+    animation: goInFront 0.3s ease; }
+  .calendar-content.anim-goIn > div:last-child {
+    position: initial;
+    animation: goInBack 0.3s ease; }
+  .calendar-content.anim-goOut > div:first-child {
+    position: initial;
+    animation: goInBack 0.3s ease reverse; }
+  .calendar-content.anim-goOut > div:last-child {
+    animation: goInFront 0.3s ease reverse; }
+
 .calendar-months {
   white-space: normal; }
   .calendar-months .btn {
@@ -717,6 +743,28 @@ label.drop-down input[type="checkbox"]:checked ~ .btn, label.drop-down input[typ
   outline: 1px #428bca solid;
   z-index: 10;
   position: relative; }
+
+.calendar .obsolete {
+  border-radius: 0; }
+  .calendar .obsolete:hover {
+    outline: 1px #ddd solid;
+    outline-offset: -1px; }
+
+@keyframes goInFront {
+  from {
+    transform: scale(1);
+    opacity: 1; }
+  to {
+    transform: scale(1.5);
+    opacity: 0; } }
+
+@keyframes goInBack {
+  from {
+    transform: scale(0.5);
+    opacity: 0; }
+  to {
+    transform: scale(1);
+    opacity: 1; } }
 
 .default input, .default textarea, .default select, .default {
   color: #676767;
@@ -759,6 +807,10 @@ label.drop-down input[type="checkbox"]:checked ~ .btn, label.drop-down input[typ
 
 .bg-danger {
   background-color: #E5343D; }
+
+.obsolete {
+  color: gray !important;
+  background: whitesmoke !important; }
 
 .block {
   display: block; }

@@ -39,10 +39,10 @@
 			parent.appendChild(this.ele);
 			return this;
 		},
-		insertBefore : function(element){
-			this.ele.insertBefore(element);
-			return this;
-		},
+		// insertBefore : function(element){
+		// 	this.ele.insertBefore(element);
+		// 	return this;
+		// },
 		css		: function(key, value){
 			this.ele.style[key]	= value;
 			return this;
@@ -52,6 +52,10 @@
 		},
 		get		: function(){
 			return this.ele;
+		},
+
+		click	: function(callBack){
+			return this.on('click', callBack);
 		}
 	});
 

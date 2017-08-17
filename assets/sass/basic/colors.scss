@@ -27,3 +27,8 @@
 .bg-info{ @extend %bg-info; }
 .bg-warning{ @extend %bg-warning; }
 .bg-danger{ @extend %bg-danger; }
+
+.obsolete{
+	color	: $GrayText!important;
+	background: lighten($GrayText, 46%)!important;
+}

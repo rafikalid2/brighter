@@ -2,6 +2,10 @@
  * Calendar
  */
 (function($){
+	var ANIMATION_DURATION	= 300; //ms
+	var LEVELS				= ['year', 'month', 'day', 'time'];
+
+
 	var _defaultOptions	= {
 		value		: '',
 		min			: Infinity,
@@ -27,8 +31,7 @@
 
 
 		var i18nMonthYearFormat		= $.i18n.get('MonthYearFormat'); // 'MM yyyy';
-		var i18nMonthYearDayFormat	= $.i18n.get('fullDateFormat'); //'E M, dd<sup>th</sup> yyyy';
-
+		var i18nMonthYearDayFormat	= $.i18n.get('dateFormat'); // M, dd yyyy
 
 	$.fn.calendar	= function(options){
 		if(!options)
@@ -62,14 +65,13 @@
 	};
 
 /////////////////////////////// basic calendar ///////////////////////////////
-	var _basicLevels	= ['year', 'month', 'day', 'time'];
 	function BasicCalendar(container, options){
 		this.options	= options;
 		this.value		= options.value;
 		this.container	= container;
 
 		//date
-			var currentDate = options.value || new Date();
+			var currentDate = new Date(options.value && options.value.getTime() || undefined);
 		// format
 			this._initFormat();
 		// init calendard
@@ -83,35 +85,35 @@
 					$.logger.warn('CALENDAR: incorrect level: ', options.level, ', format is: ', options.format);
 			}
 			if(!level){
-				for(var i=0; i< _basicLevels.length; ++i){
-					if(this._format.hasOwnProperty(_basicLevels[i])){
-						level	= _basicLevels[i];
+				for(var i=0; i< LEVELS.length; ++i){
+					if(this._format.hasOwnProperty(LEVELS[i])){
+						level	= LEVELS[i];
 						break;
 					}
 				}
 				if(!level)
 					throw new Error('Calendar: Could not get a correct level');
 			}
-		// add years
-			var fragment;
-			if(level == 'year')
-				fragment = this._createYears(currentDate.getFullYear() - CURRENT_YEAR_POSITION);
-			else if(level == 'month')
-				fragment = this._createMonths();
-			else if(level == 'day')
-				fragment	= this._createDays(currentDate.getFullYear(), currentDate.getMonth());
-			else
-				fragment	= this._createTimer();
-			this.contentDiv.appendChild(fragment);
+			this._level	= level;
+		// add fragment
+			this.contentDiv.appendChild(this._createFragment(currentDate));
 	}
 
 	$.extend(BasicCalendar.prototype,{
 		getValue		: _basicCalendarGetValue,
+		select			: _basicCalendarSelect,
 
 		_init			: _initBasicCalendar,
 		_initFormat		: _basicCalendarInitFormat,
 
 		_setTitle		: _basicCalendarSetTitle,
+
+		_createFragment	: _basicCalendarCreateFragment,
+
+		_animSlide		: _basicCalendarAnimSlide,
+		_animFade		: _basicCalendarAnimFade,
+
+		_goUp			: _basicCalendarGoUp,
 
 		_createYears	: _basicCalendarCreateYears,
 		_createMonths	: _basicCalendarCreateMonths,
@@ -123,7 +125,8 @@
 
 	// create calendar
 	function _initBasicCalendar(){
-		var options	= this.options;
+		var self		= this;
+		var options		= this.options;
 		var container	= document.createDocumentFragment();
 		// head
 			var headerBuilder	= $.createElement('div').attr('class','nowrap text-center clearfix');
@@ -136,13 +139,22 @@
 						$.createElement('span')
 							.attr('class', 'icon-left-open-big')
 							.get()
-					).get();
+					)
+					.click(function(){
+						self._animSlide(-1);
+					})
+					.get();
 					this._leftButton	= leftButton;
 				headerBuilder.append(leftButton);
 
 			// middle button
-				var middleButton		= $.createElement('span').attr('class','btn');
-				headerBuilder.append(middleButton.get());
+				var middleButton		= $.createElement('span')
+						.attr('class','btn')
+						.click(function(){
+							self._goUp();
+						})
+						.get();
+				headerBuilder.append(middleButton);
 				this._titleBtn	= middleButton;
 			//right button
 				var rightButton			= $.createElement('span')
@@ -151,11 +163,15 @@
 						$.createElement('span')
 							.attr('class', 'icon-right-open-big')
 							.get()
-					).get();
+					)
+					.click(function(){
+						self._animSlide(1);
+					})
+					.get();
 				this._rightButton	= rightButton;
 				headerBuilder.append(rightButton);
 		// middle (content)
-			var contentDiv	= $.createElement('div').attr('class', 'nowrap').get();
+			var contentDiv	= $.createElement('div').attr('class', 'calendar-content').get();
 			container.appendChild(contentDiv);
 			this.contentDiv	= contentDiv;
 
@@ -197,53 +213,75 @@
 	function _basicCalendarSetTitle(title){
 		this._titleBtn.style.display	= title ? '' : 'none';
 		if(title)
-			this._titleBtn.innerText(title);
+			this._titleBtn.innerText	= title;
 	}
 
-	function _basicCalendarCreateYears(startYear){
+	function _basicCalendarCreateYears(currentDate){
+		var startYear	= currentDate.getFullYear() - CURRENT_YEAR_POSITION;
 		// slide btns
 			this._slideBtns(true);
-		var fragment	= document.createDocumentFragment();
+		var fragment	= document.createElement('div');
 		var currentYear	= startYear;
 		var selectedYear= this.value && this.value.getFullYear();
 		for(var i = 0; i < YEAR_ROW_COUNT; ++i){
 			var row	= $.createElement('div');
 			for(var j =0; j < YEAR_PER_ROW; ++j){
-				row.append(
-					$.createElement('span')
-						.attr('class', selectedYear == currentYear ? 'btn selected': 'btn')
-						.text(currentYear++)
-						.get()
-				);
+				_addYear(row, currentYear);
+				++currentYear;
 			}
 			fragment.appendChild(row.get());
 		}
 		this._setTitle(startYear + ' - ' + (currentYear - 1));
 		return fragment;
+
+		function _addYear(row, currentYear){
+			row.append(
+				$.createElement('span')
+					.attr('class', selectedYear == currentYear ? 'btn selected': 'btn')
+					.text(currentYear)
+					.click(function(){
+						currentDate.setFullYear(currentYear);
+						self.select('year', currentYear);
+					})
+					.get()
+			);
+		}
 	}
 
 	function _basicCalendarCreateMonths(){
+		var self	= this;
 		// slide btns
 			this._slideBtns(true);
 		var container	= $.createElement('div')
 				.attr('class', 'calendar-months');
 		var currentMonth	= this.value && this.value.getMonth();
-		for(var i=0; i < i18nMonths.length; ++i){
+		i18nMonths.forEach(function(i18nMonth, i){
 			container.append(
 				$.createElement('span')
 					.attr('class', currentMonth === i ? 'btn selected' : 'btn')
-					.text(i18nMonths[i])
+					.text(i18nMonth)
+					.click(function(){
+						if(this.value){
+							this.value.setMonth(i);
+							self.select('month', this.value);
+						}else{
+							self.select('month', i);
+						}
+					})
 					.get()
 			);
-		}
+		});
 		this._setTitle(this.value && this.value.getFullYear());
 		return container.get();
 	}
 
-	function _basicCalendarCreateDays(year, month){
+	function _basicCalendarCreateDays(visibleDate){
+		var self	= this;
+		var year	= visibleDate.getFullYear();
+		var month	= visibleDate.getMonth();
 		// slide btns
 			this._slideBtns(true);
-			this._setTitle(this.getValue(i18nMonthYearFormat));
+			this._setTitle($.dateFormat(visibleDate, i18nMonthYearFormat));
 		var container	= $.createElement('div').attr('class', 'calendar-days');
 		//add day header
 			var headerRow = $.createElement('div').attr('class', 'nowrap');
@@ -272,36 +310,48 @@
 			if(nextMonth == 12)
 				nextMonth = 0;
 		// start date of week
-			if(currentDate.getDay() > 0)
-				currentDate.setDate(-currentDate.getDay());
+			var currentDay	= currentDate.getDay();
+			if(currentDay > 0)
+				currentDate.setDate(-currentDay + 1);
 		//show dates
 			while(currentDate.getMonth() != nextMonth){
 				var row 	= $.createElement('div').attr('class', 'nowrap');
-				for(var i = 0; i < 7; ++i){
-					var cDate	= currentDate.getDate();
-					var currentM= currentDate.getMonth();
-					var dayBuilder	= $.createElement('span')
-							.attr('class', (
-								selectedYear === currentDate.getFullYear()
-								&& selectedMonth === currentM
-								&& selectedDay === cDate
-							) ? 'btn selected' : 'btn')
-							.text(cDate);
-					if(currentM != month)
-						dayBuilder.addClass('disabled');
-					row.append(dayBuilder.get());
-					currentDate.setDate(cDate + 1);
-				}
+				for(var i = 0; i < 7; ++i)
+					_addDay(row);
 				container.append(row.get());
+			}
+		// add each day
+			function _addDay(row){
+				var cDate		= currentDate.getDate();
+				var currentM	= currentDate.getMonth();
+				var currentY	= currentDate.getFullYear();
+				var dayBuilder	= $.createElement('span')
+						.attr('class', (
+							selectedYear === currentY
+							&& selectedMonth === currentM
+							&& selectedDay === cDate
+						) ? 'btn selected' : 'btn')
+						.attr('data-value', cDate)
+						.click(function(){
+							visibleDate.setDate(cDate);
+							visibleDate.setMonth(currentM);
+							visibleDate.setFullYear(currentY);
+							self.select('day', visibleDate);
+						})
+						.text(cDate);
+				if(currentM != month)
+					dayBuilder.addClass('obsolete');
+				row.append(dayBuilder.get());
+				currentDate.setDate(cDate + 1);
 			}
 		// end
 			return container.get();
 	}
 
-	function _basicCalendarCreateTimer(){
+	function _basicCalendarCreateTimer(currentDate){
 		// slide btns
 			this._slideBtns(false);
-			this._setTitle(this.getValue(i18nMonthYearDayFormat));
+			this._setTitle($.dateFormat(currentDate, i18nMonthYearDayFormat));
 		var container	= $.createElement('form').attr('class', 'calendar-timer drum-inline-block');
 		//var timerBuilder= $.createElement('div').attr('class', 'tmer-vp');
 		var format	= this._format;
@@ -420,4 +470,101 @@
 		if(this.value){}
 		return value;
 	}
+
+	function _basicCalendarCreateFragment(currentDate, goNext){
+		var container;
+		var level	= this._level;
+		if(level == 'year'){
+			if(goNext)
+				currentDate.setFullYear(currentDate.getFullYear() + goNext * CURRENT_YEAR_POSITION * 2);
+			container = this._createYears(currentDate);
+		}
+		else if(level == 'month'){
+			if(goNext)
+				currentDate.setFullYear(currentDate.getFullYear() + goNext);
+			container = this._createMonths(currentDate);
+		}
+		else if(level == 'day'){
+			if(goNext)
+				currentDate.setMonth(currentDate.getMonth() + goNext);
+			container	= this._createDays(currentDate);
+		}
+		else{
+			container	= this._createTimer(currentDate);
+		}
+		this._currentDate	= currentDate;
+		return container;
+	}
+
+	function _basicCalendarAnimSlide(goNext){
+		var container	= this._createFragment(this._currentDate, goNext);
+		var $contentDiv	= $(this.contentDiv);
+
+		var $currentContainer= $contentDiv.children();
+
+		var margLeft	= (-$currentContainer.width()) + 'px';
+		var $calendar	= $(this.container).addClass('anim');// there is an animation
+		if(goNext == -1){
+			$contentDiv.prepend(container);
+			$(container)
+				.css('margin-left', margLeft)
+				.animate({'margin-left': 0}, ANIMATION_DURATION, function(){
+					$currentContainer.remove();
+					$calendar.removeClass('anim');
+				});
+		}
+		else{
+			$contentDiv.append(container);
+			$currentContainer
+				.animate({'margin-left': margLeft}, ANIMATION_DURATION, function(){
+					$currentContainer.remove();
+					$calendar.removeClass('anim');
+				});
+		}
+	}
+	function _basicCalendarAnimFade(goIn){
+		var container	= this._createFragment(this._currentDate);
+		var $contentDiv	= $(this.contentDiv);
+		var $currentContainer= $contentDiv.children();
+		$contentDiv.append(container);
+		var $container	= $(container);
+
+		var $calendar	= $(this.container).addClass('anim');// there is an animation
+
+		if(goIn){
+			$contentDiv
+				.onCSSAnimationEnd(function(){
+					$contentDiv.removeClass('anim-goIn');
+					$currentContainer.remove();
+					$calendar.removeClass('anim');
+				})
+				.addClass('anim-goIn');
+		}else{
+			$contentDiv
+				.onCSSAnimationEnd(function(){
+					$contentDiv.removeClass('anim-goOut');
+					$currentContainer.remove();
+					$calendar.removeClass('anim');
+				})
+				.addClass('anim-goOut');
+		}
+	}
+	function _basicCalendarGoUp(){
+		var levelIndex	= LEVELS.indexOf(this._level) - 1;
+		if(levelIndex >= 0){
+			var level	= LEVELS[levelIndex];
+			if(this._format.hasOwnProperty(level)){
+				this._level	= level;
+				this._animFade();
+			}
+		}
+	}
+
+	/**
+	 * @param  {Date | number} value
+	 */
+	function _basicCalendarSelect(level, value){
+
+	}
+
 })(jQuery);

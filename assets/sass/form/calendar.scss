@@ -10,6 +10,54 @@
 }
 
 .calendar{
+
+	&.anim{
+		pointer-events: none;
+	}
+	&-content{
+		white-space: nowrap;
+		overflow: hidden;
+		position: relative;
+		&>div{
+			display: inline-block;
+		}
+
+		&.anim-goIn, &.anim-goOut{
+			overflow: visible;
+			&>div{
+				position: absolute;
+				left	: 0;
+				right	: 0;
+			}
+		}
+		&.anim-goIn{
+			&>div:first-child{
+				animation: goInFront 0.3s ease;
+			}
+			&>div:last-child{
+				position: initial;
+				animation: goInBack 0.3s ease;
+			}
+		}
+
+		&.anim-goOut{
+			&>div:first-child{
+				position: initial;
+				animation: goInBack 0.3s ease reverse;
+			}
+			&>div:last-child{
+				animation: goInFront 0.3s ease reverse;
+			}
+		}
+
+		// &.anim-goIn{
+
+		// }
+		// &.anim-goOut{
+		// 	overflow: visible;
+		// }
+	}
+
 	&-months{
 		white-space: normal;
 
@@ -54,10 +102,29 @@
 			position: relative;
 		}
 	}
+
+	.obsolete{
+		border-radius: 0;
+		&:hover{
+			outline	: 1px $border-color solid;
+			outline-offset: -1px;
+		}
+	}
 }
 
 
+// animations
+// goIn
+	@keyframes goInFront{
+		from{transform: scale(1); opacity: 1;}
+		to{transform: scale(1.5); opacity: 0;}
+	}
 
+// goOut
+	@keyframes goInBack{
+		from{transform: scale(0.5); opacity: 0;}
+		to{transform: scale(1); opacity: 1;}
+	}
 
 
 

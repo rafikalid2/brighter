@@ -24,7 +24,7 @@
 	&.disabled, &:disabled{
 		cursor		: default;
 		background	: lighten($border-color, 10%)!important;
-		color		: GrayText;
+		color		: $GrayText;
 	}
 
 	&[class^="icon-"],&[class*=" icon-"]{

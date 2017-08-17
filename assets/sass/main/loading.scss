@@ -2,6 +2,6 @@
 %component-loading{
 	&:before{
 		content	: 'loading...';
-		color	: GrayText;
+		color	: $GrayText;
 	}
 }

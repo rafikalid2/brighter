@@ -1,9 +1,9 @@
 (function($){
 
 	$.dateFormat	= function(date, format){
-		format.replace(/(^|[^a-z\\])([adehimstwyz+])([^a-z\\]|$)/ig, function(a, b, c, d){
-			if(_replacer[c])
-				a	= b + _replacer[c](date) + d;
+		return format.replace(/([\\adehimstwyz]+)/ig, function(a, b){
+			if(_replacer[b])
+				a	= _replacer[b](date);
 			return a;
 		});
 	};
