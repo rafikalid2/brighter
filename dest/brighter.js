@@ -692,15 +692,16 @@
 						}
 					// init value
 						try{
-							if(fOptions.value && !(fOptions.value instanceof Date)){
-								if(fOptions.value.match(/^[0-9]+$/))
-									fOptions.value	= new Date(parseInt(fOptions.value));
-								else{
-									if(fOptions.value.startsWith('T'))
-										fOptions.value	= '2017-01-01' + fOptions.value;
-									fOptions.value		= new Date(fOptions.value);
+							// value
+								if(fOptions.value && !(fOptions.value instanceof Date)){
+									if(fOptions.value.match(/^[0-9]+$/))
+										fOptions.value	= new Date(parseInt(fOptions.value));
+									else{
+										if(fOptions.value.startsWith('T'))
+											fOptions.value	= '2017-01-01' + fOptions.value;
+										fOptions.value		= new Date(fOptions.value);
+									}
 								}
-							}
 						}catch(e){
 							$.logger.error(e);
 						}
@@ -900,11 +901,16 @@
 			this._slideBtns(true);
 		var container	= $.createElement('div')
 				.attr('class', 'calendar-months');
-		var currentMonth	= this.value && this.value.getMonth();
+		var currentMonth;
+		var isCurrentYear;
+		if(this.value){
+			currentMonth	= this.value.getMonth();
+			isCurrentYear	= this.value.getFullYear() == currentDate.getFullYear();
+		}
 		i18nMonths.forEach(function(i18nMonth, i){
 			container.append(
 				$.createElement('span')
-					.attr('class', currentMonth === i ? 'btn selected' : 'btn')
+					.attr('class', isCurrentYear && currentMonth === i ? 'btn selected' : 'btn')
 					.text(i18nMonth)
 					.click(function(){
 						currentDate.setMonth(i);
@@ -1229,16 +1235,20 @@
 			this._currentDate	= date;
 		var levelIndex	= LEVELS.indexOf(this._level) + 1;
 		if(levelIndex < LEVELS.length){
-			var level	= LEVELS[levelIndex];console.log('---level: ', level);
+			var level	= LEVELS[levelIndex];
 			if(this._format.hasOwnProperty(level)){
 				this._level	= level;
 				this._animFade(true);
+				isEnd	= false;
 			}
 		}
 
 		if(isEnd){
-			console.log('--- click: ', levelIndex, '----', this._format );
-			this.value	= date;
+			if(!this.options.readonly){
+				if(this.value	!= date){
+					$(this.container).data('value', value).trigger('change', {});
+				}
+			}
 		}
 		return isEnd;
 	}
