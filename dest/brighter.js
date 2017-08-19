@@ -678,37 +678,43 @@
 		var i18nMonthYearFormat		= $.i18n.get('MonthYearFormat'); // 'MM yyyy';
 		var i18nMonthYearDayFormat	= $.i18n.get('dateFormat'); // M, dd yyyy
 
-	$.fn.calendar	= function(options){
-		if(!options)
-			options	= {};
-		return this
-				.empty()
-				.addClass('calendar')
-				.each(function(){
-					//init options
-						var fOptions = {};
-						for(var i in _defaultOptions){
-							fOptions[i]	= this.getAttribute(i) || this.getAttribute('data-' + i) || options[i] || _defaultOptions[i];
-						}
-					// init value
-						try{
-							// value
-								if(fOptions.value && !(fOptions.value instanceof Date)){
-									if(fOptions.value.match(/^[0-9]+$/))
-										fOptions.value	= new Date(parseInt(fOptions.value));
-									else{
-										if(fOptions.value.startsWith('T'))
-											fOptions.value	= '2017-01-01' + fOptions.value;
-										fOptions.value		= new Date(fOptions.value);
+	// custom tags
+		document.registerElement('calendar-basic', {
+			prototype	: Object.create(HTMLDivElement.prototype),
+			extends		: 'div'
+		});
+	// jQuery
+		$.fn.calendar	= function(options){
+			if(!options)
+				options	= {};
+			return this
+					.empty()
+					.addClass('calendar')
+					.each(function(){
+						//init options
+							var fOptions = {};
+							for(var i in _defaultOptions){
+								fOptions[i]	= this.getAttribute(i) || this.getAttribute('data-' + i) || options[i] || _defaultOptions[i];
+							}
+						// init value
+							try{
+								// value
+									if(fOptions.value && !(fOptions.value instanceof Date)){
+										if(fOptions.value.match(/^[0-9]+$/))
+											fOptions.value	= new Date(parseInt(fOptions.value));
+										else{
+											if(fOptions.value.startsWith('T'))
+												fOptions.value	= '2017-01-01' + fOptions.value;
+											fOptions.value		= new Date(fOptions.value);
+										}
 									}
-								}
-						}catch(e){
-							$.logger.error(e);
-						}
-					//create element
-						new BasicCalendar(this, fOptions);
-				});
-	};
+							}catch(e){
+								$.logger.error(e);
+							}
+						//create element
+							new BasicCalendar(this, fOptions);
+					});
+		};
 
 /////////////////////////////// basic calendar ///////////////////////////////
 	function BasicCalendar(container, options){
