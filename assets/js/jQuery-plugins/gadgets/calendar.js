@@ -7,6 +7,7 @@
 
 
 	var _defaultOptions	= {
+		type		: 'basic-calendar',
 		value		: '',
 		min			: Infinity,
 		max			: Infinity,
@@ -57,11 +58,18 @@
 										fOptions.value		= new Date(fOptions.value);
 									}
 								}
+							// readonly
+								if(fOptions.readonly == 'false')
+									fOptions.readonly = false;
 						}catch(e){
 							$.logger.error(e);
 						}
 					//create element
-						new BasicCalendar(this, fOptions);
+						var ele = new BasicCalendar(this, fOptions);
+
+
+					//add to jQuery
+						$(this).data('br-element', ele);
 				});
 	};
 
@@ -102,6 +110,7 @@
 
 	$.extend(BasicCalendar.prototype,{
 		getValue		: _basicCalendarGetValue,
+		setValue		: _basicCalendarSetValue,
 		select			: _basicCalendarSelect,
 
 		_init			: _initBasicCalendar,
@@ -182,6 +191,9 @@
 					$.createElement('span')
 						.attr('class', 'btn block')
 						.text(i18nToday)
+						.click(function(){
+							self.setValue(new Date());
+						})
 						.get()
 				);
 			}
@@ -334,7 +346,6 @@
 							&& selectedMonth === currentM
 							&& selectedDay === cDate
 						) ? 'btn selected' : 'btn')
-						.attr('data-value', cDate)
 						.click(function(){
 							visibleDate.setDate(cDate);
 							visibleDate.setMonth(currentM);
@@ -488,7 +499,12 @@
 
 	function _basicCalendarGetValue(format){
 		var value;
-		if(this.value){}
+		if(this.value){
+			if(format)
+				value	= $.dateForamt(this.value, format);
+			else
+				value	= this.value;
+		}
 		return value;
 	}
 
@@ -601,11 +617,19 @@
 		if(isEnd){
 			if(!this.options.readonly){
 				if(this.value	!= date){
-					$(this.container).data('value', value).trigger('change', {});
+					this.value	= date;
+					$.event.trigger( 'change', {}, this.container );
 				}
 			}
 		}
 		return isEnd;
+	}
+	function _basicCalendarSetValue(value){
+		if(!(value instanceof Date))
+			value	= new Date(value);
+		if(isNaN(value.getDate()))
+			throw new Error('invalid date: ', value,', argument: ', arguments[0]);
+		this.select(this._level, value);
 	}
 
 })(jQuery);
