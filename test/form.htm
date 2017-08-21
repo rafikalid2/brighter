@@ -4,6 +4,7 @@
 	<title>BRSOLAB Brighter</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" type="text/css" href="../dest/brighter.css">
+	<meta charset="utf-8">
 	<style type="text/css">
 		body{
 			margin:10px;
@@ -954,63 +955,6 @@ Default data format:
 </code>
 
 
-<h1>Date picker</h1>
-<code>&lt;input
-	type="text"
-	value=""
-	data-datepicker="date"
-	&gt;
-</code>
-
-<code>
-	&lt;label class="input-group"&gt;
-		&lt;input
-			type		= "date"
-			name		= ""
-			value		= "2017-06-01"
-			min			= "2016-04-01"
-			max			= "2018-06-30"
-
-			data-format	= "yyyy"				<i>// years only</i>
-			data-format	= "MM"					<i>// months only</i>
-			data-format	= "dd"					<i>// days only</i>
-
-			data-format	= "hh:mm:ss"			<i>// time</i>
-			data-format	= "hh:mm"				<i>// time</i>
-			data-format	= "hh"					<i>// time</i>
-			data-format	= "mm"					<i>// time</i>
-			data-format	= "ss"					<i>// time</i>
-
-			data-format	= "yyyy/MM"				<i>// years and months only</i>
-			data-format	= "yyyy/MM/dd"			<i>// date only</i>
-			data-format	= "MM/dd"				<i>// months and days</i>
-
-			data-format	= "yyyy/MM/ddThh:mm"	<i>// date time</i>
-
-			readonly		= "false"			<i>// if we can change this value</i>
-			data-today		= "true"			<i>// Enable today button</i>
-			data-level		= "years|months|days|hours"&gt; <i>// visible level</i>
-	&lt;/label&gt;
-</code>
-
-<label class="input-group">
-	<div class="input-date">
-		<input type="text" name="">
-		<span class="icon-calendar"></span>
-		<div class="input-popup date-container">
-			<div class="nowrap text-center">
-				<span class="btn icon-left-open-big pull-left"></span>
-				<span class="btn icon-right-open-big pull-right"></span>
-				<span>22 janvier 2016</span>
-			</div>
-			<!-- dates  -->
-				<div>
-					<span class="btn">2010</span><span class="btn">2011</span><span class="btn">2012</span><span class="btn">2013</span><span class="btn">2014</span><span class="btn">2015</span><span class="btn">2016</span><span class="btn">2017</span><span class="btn">2018</span><span class="btn">2019</span><span class="btn">2020</span>
-				</div>
-		</div>
-	</div>
-</label>
-
 
 
 
@@ -1132,6 +1076,73 @@ Default data format:
 			</div>
 	</div> -->
 
+
+<h1>Date picker</h1>
+créer sur le "simple calendar"
+
+<code>&lt;input
+	type="text"
+	value=""
+	data-datepicker="date"
+	&gt;
+</code>
+
+<code>
+	&lt;label class="input-group"&gt;
+		&lt;input
+			type		= "date"
+			name		= ""
+			value		= "2017-06-01"
+			min			= "2016-04-01"
+			max			= "2018-06-30"
+
+			data-format	= "yyyy"				<i>// years only</i>
+			data-format	= "MM"					<i>// months only</i>
+			data-format	= "dd"					<i>// days only</i>
+
+			data-format	= "hh:mm:ss"			<i>// time</i>
+			data-format	= "hh:mm"				<i>// time</i>
+			data-format	= "hh"					<i>// time</i>
+			data-format	= "mm"					<i>// time</i>
+			data-format	= "ss"					<i>// time</i>
+
+			data-format	= "yyyy/MM"				<i>// years and months only</i>
+			data-format	= "yyyy/MM/dd"			<i>// date only</i>
+			data-format	= "MM/dd"				<i>// months and days</i>
+
+			data-format	= "yyyy/MM/ddThh:mm"	<i>// date time</i>
+
+			readonly		= "false"			<i>// if we can change this value</i>
+			data-today		= "true"			<i>// Enable today button</i>
+			data-level		= "years|months|days|hours"&gt; <i>// visible level</i>
+	&lt;/label&gt;
+</code>
+
+<label class="input-group">
+	<input
+		type	= "date"
+		name	= ""
+		value	= "2018-12-30T12:35:46"
+	>
+</label>
+
+<!-- <label class="input-group">
+	<div class="input-date">
+		<input type="text" name="">
+		<span class="icon-calendar"></span>
+		<div class="input-popup date-container">
+			<div class="nowrap text-center">
+				<span class="btn icon-left-open-big pull-left"></span>
+				<span class="btn icon-right-open-big pull-right"></span>
+				<span>22 janvier 2016</span>
+			</div>
+			dates 
+				<div>
+					<span class="btn">2010</span><span class="btn">2011</span><span class="btn">2012</span><span class="btn">2013</span><span class="btn">2014</span><span class="btn">2015</span><span class="btn">2016</span><span class="btn">2017</span><span class="btn">2018</span><span class="btn">2019</span><span class="btn">2020</span>
+				</div>
+		</div>
+	</div>
+</label> -->
 
 
 <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>

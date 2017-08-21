@@ -1,0 +1,14 @@
+.input-open{
+	position	: relative;
+	z-index		: 900;
+	input[type="text"]{
+		@extend %input-focus;
+	}
+
+	.drop-close, .input-popup{
+		display: block;
+	}
+	.drop-close{
+		z-index: -1;
+	}
+}

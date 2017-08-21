@@ -1,6 +1,6 @@
-[data-calendar], .calendar{
+[data-type="basic-calendar"], .calendar{
 	display	: inline-block;
-	width	: 250px;
+	width	: 250px!important;
 	border	: 1px solid $border-color;
 
 	&:empty{

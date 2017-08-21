@@ -4,12 +4,20 @@
  * 100 time faster than jQuery alternative
  */
 (function($){
-	$.createElement	= function(tagName){
+	$.createElement	= $.ce	= function(tagName){
 		return new DOMElementBuilder(tagName);
 	};
+	$.createFragment= $.cf	= function(){
+		return new DOMFragmentBuilder();
+	}
 
 	function DOMElementBuilder(tagName){
 		this.ele	= document.createElement(tagName);
+		return this;
+	}
+
+	function DOMFragmentBuilder(){
+		this.ele	= document.createDocumentFragment();
 		return this;
 	}
 
@@ -24,6 +32,10 @@
 		},
 		removeClass: function(className){
 			this.ele.classList.remove(className);
+			return this;
+		},
+		className	: function(className){
+			this.ele.setAttribute('class', className);
 			return this;
 		},
 		appendText: function(value){
@@ -56,6 +68,23 @@
 
 		click	: function(callBack){
 			return this.on('click', callBack);
+		}
+	});
+
+	$.extend(DOMFragmentBuilder.prototype, {
+		append	: function(child){
+			this.ele.appendChild(child);
+			return this;
+		},
+		appendTo: function(parent){
+			parent.appendChild(this.ele);
+			return this;
+		},
+		build	: function(){
+			return this.ele;
+		},
+		get		: function(){
+			return this.ele;
 		}
 	});
 

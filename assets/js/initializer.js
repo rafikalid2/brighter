@@ -12,6 +12,8 @@
 		function _initDOM($container){
 			// calendar
 				_initDOMFilter($container, '[data-type="basic-calendar"]:empty', 'calendar');
+			// date picker
+				_initDOMFilter($container, 'input[type="date"]', 'datePicker');
 		}
 
 		function _initDOMFilter($container, selector, jQueryFx){

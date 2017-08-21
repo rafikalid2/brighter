@@ -42,28 +42,7 @@
 				.addClass('calendar')
 				.each(function(){
 					//init options
-						var fOptions = {};
-						for(var i in _defaultOptions){
-							fOptions[i]	= this.getAttribute(i) || this.getAttribute('data-' + i) || options[i] || _defaultOptions[i];
-						}
-					// init value
-						try{
-							// value
-								if(fOptions.value && !(fOptions.value instanceof Date)){
-									if(fOptions.value.match(/^[0-9]+$/))
-										fOptions.value	= new Date(parseInt(fOptions.value));
-									else{
-										if(fOptions.value.startsWith('T'))
-											fOptions.value	= '2017-01-01' + fOptions.value;
-										fOptions.value		= new Date(fOptions.value);
-									}
-								}
-							// readonly
-								if(fOptions.readonly == 'false')
-									fOptions.readonly = false;
-						}catch(e){
-							$.logger.error(e);
-						}
+						var fOptions	= _initOptions.call(this, options);
 					//create element
 						var ele = new BasicCalendar(this, fOptions);
 
@@ -72,6 +51,112 @@
 						$(this).data('br-element', ele);
 				});
 	};
+
+	$.fn.datePicker	= function(options){
+		if(!options)
+			options	= {};
+		return this
+				.empty()
+				.hide()
+				.each(function(){
+					var $this	= $(this);
+					if(!$this.data('br-element')){
+						//init options
+							var fOptions	= _initOptions.call(this, options);
+						//create element
+							var ele = new DatePicker($this, fOptions);
+
+						//add to jQuery
+							$this.data('br-element', ele);
+					}
+				});
+	};
+
+	function _initOptions(options){
+		var fOptions = {};
+		for(var i in _defaultOptions){
+			fOptions[i]	= this.getAttribute(i) || this.getAttribute('data-' + i) || options[i] || _defaultOptions[i];
+		}
+		// init value
+			try{
+				// value
+					if(fOptions.value && !(fOptions.value instanceof Date)){
+						if(fOptions.value.match(/^[0-9]+$/))
+							fOptions.value	= new Date(parseInt(fOptions.value));
+						else{
+							if(fOptions.value.startsWith('T'))
+								fOptions.value	= '2017-01-01' + fOptions.value;
+							fOptions.value		= new Date(fOptions.value);
+						}
+					}
+				// readonly
+					if(fOptions.readonly == 'false')
+						fOptions.readonly = false;
+			}catch(e){
+				$.logger.error(e);
+			}
+		return fOptions;
+	}
+
+/////////////////////////////// date picker ///////////////////////////////
+	function DatePicker($input, options){
+		this._input_0	= $input[0];
+
+		this._init($input, options);
+	}
+
+	$.extend(DatePicker.prototype, {
+		setValue	: _datePickerSetValue,
+		getValue	: _datePickerGetValue,
+
+		_init		: _datePickerInit
+	});
+
+
+	function _datePickerInit($input, options){
+		var self	= this;
+		this.options	= options;
+		// create input
+			var input			= $.ce('input')
+				.attr('type', 'text')
+				.get();
+			this._input			= input;
+			if(options.value)
+				input.value		= $.dateFormat(options.value, options.format);
+		var basicCalendar	= $.ce('div').get();
+		var inputDiv	= $.cf()
+			.append(input)
+			.append(
+				$.ce('span').className('icon-calendar').get()
+			)
+			.append(basicCalendar)
+			.get();
+		// create basic calendar
+			var $bc	= $(basicCalendar)
+				.calendar(options)
+			this._calendar	= $bc.data('br-element');
+		// init popup
+			var popupInterface	= $._inputInitPopup($(input), $bc);
+		// on change
+			$bc.on('change', function(){console.log('--- changed')
+				self.setValue(self._calendar.getValue());
+				popupInterface.close();
+			});
+
+		$input
+			.hide()
+			.after(inputDiv);
+	}
+	function _datePickerSetValue(value){
+		var value	= _parseDate(value);
+		this._calendar.setValue(value);
+		var dt		= $.dateFormat(value, this.options.format);
+		this._input.value	= dt;
+		this._input_0.value	= dt;
+	}
+	function _datePickerGetValue(){
+		return this._calendar.getValue();
+	}
 
 /////////////////////////////// basic calendar ///////////////////////////////
 	function BasicCalendar(container, options){
@@ -139,15 +224,15 @@
 		var options		= this.options;
 		var container	= document.createDocumentFragment();
 		// head
-			var headerBuilder	= $.createElement('div').attr('class','nowrap text-center clearfix');
+			var headerBuilder	= $.ce('div').className('nowrap text-center clearfix');
 			container.append(headerBuilder.get());
 
 			// left button
-				var leftButton	= $.createElement('span')
-					.attr('class', 'btn pull-left')
+				var leftButton	= $.ce('span')
+					.className('btn pull-left')
 					.append(
-						$.createElement('span')
-							.attr('class', 'icon-left-open-big')
+						$.ce('span')
+							.className('icon-left-open-big')
 							.get()
 					)
 					.click(function(){
@@ -158,8 +243,8 @@
 				headerBuilder.append(leftButton);
 
 			// middle button
-				var middleButton		= $.createElement('span')
-						.attr('class','btn')
+				var middleButton		= $.ce('span')
+						.className('btn')
 						.click(function(){
 							self._goUp();
 						})
@@ -167,11 +252,11 @@
 				headerBuilder.append(middleButton);
 				this._titleBtn	= middleButton;
 			//right button
-				var rightButton			= $.createElement('span')
-					.attr('class','btn pull-right')
+				var rightButton			= $.ce('span')
+					.className('btn pull-right')
 					.append(
-						$.createElement('span')
-							.attr('class', 'icon-right-open-big')
+						$.ce('span')
+							.className('icon-right-open-big')
 							.get()
 					)
 					.click(function(){
@@ -181,15 +266,15 @@
 				this._rightButton	= rightButton;
 				headerBuilder.append(rightButton);
 		// middle (content)
-			var contentDiv	= $.createElement('div').attr('class', 'calendar-content').get();
+			var contentDiv	= $.ce('div').className('calendar-content').get();
 			container.appendChild(contentDiv);
 			this.contentDiv	= contentDiv;
 
 		// today button
 			if(options.today){
 				container.append(
-					$.createElement('span')
-						.attr('class', 'btn block')
+					$.ce('span')
+						.className('btn block')
 						.text(i18nToday)
 						.click(function(){
 							self.setValue(new Date());
@@ -238,7 +323,7 @@
 		var currentYear	= startYear;
 		var selectedYear= this.value && this.value.getFullYear();
 		for(var i = 0; i < YEAR_ROW_COUNT; ++i){
-			var row	= $.createElement('div');
+			var row	= $.ce('div');
 			for(var j =0; j < YEAR_PER_ROW; ++j){
 				_addYear(row, currentYear);
 				++currentYear;
@@ -250,8 +335,8 @@
 
 		function _addYear(row, currentYear){
 			row.append(
-				$.createElement('span')
-					.attr('class', selectedYear == currentYear ? 'btn selected': 'btn')
+				$.ce('span')
+					.className(selectedYear == currentYear ? 'btn selected': 'btn')
 					.text(currentYear)
 					.click(function(){
 						currentDate.setFullYear(currentYear);
@@ -266,8 +351,8 @@
 		var self	= this;
 		// slide btns
 			this._slideBtns(true);
-		var container	= $.createElement('div')
-				.attr('class', 'calendar-months');
+		var container	= $.ce('div')
+				.className('calendar-months');
 		var currentMonth;
 		var isCurrentYear;
 		if(this.value){
@@ -276,8 +361,8 @@
 		}
 		i18nMonths.forEach(function(i18nMonth, i){
 			container.append(
-				$.createElement('span')
-					.attr('class', isCurrentYear && currentMonth === i ? 'btn selected' : 'btn')
+				$.ce('span')
+					.className(isCurrentYear && currentMonth === i ? 'btn selected' : 'btn')
 					.text(i18nMonth)
 					.click(function(){
 						currentDate.setMonth(i);
@@ -297,12 +382,12 @@
 		// slide btns
 			this._slideBtns(true);
 			this._setTitle($.dateFormat(visibleDate, i18nMonthYearFormat));
-		var container	= $.createElement('div').attr('class', 'calendar-days');
+		var container	= $.ce('div').className('calendar-days');
 		//add day header
-			var headerRow = $.createElement('div').attr('class', 'nowrap');
+			var headerRow = $.ce('div').className('nowrap');
 			for(var i = 0; i < i18nDaysOfWeek.length; ++i){
 				headerRow.append(
-					$.createElement('b')
+					$.ce('b')
 						.text(i18nDaysOfWeek[i])
 						.get()
 				);
@@ -330,7 +415,7 @@
 				currentDate.setDate(-currentDay + 1);
 		//show dates
 			while(currentDate.getMonth() != nextMonth){
-				var row 	= $.createElement('div').attr('class', 'nowrap');
+				var row 	= $.ce('div').className('nowrap');
 				for(var i = 0; i < 7; ++i)
 					_addDay(row);
 				container.append(row.get());
@@ -340,8 +425,8 @@
 				var cDate		= currentDate.getDate();
 				var currentM	= currentDate.getMonth();
 				var currentY	= currentDate.getFullYear();
-				var dayBuilder	= $.createElement('span')
-						.attr('class', (
+				var dayBuilder	= $.ce('span')
+						.className((
 							selectedYear === currentY
 							&& selectedMonth === currentM
 							&& selectedDay === cDate
@@ -366,14 +451,14 @@
 		// slide btns
 			this._slideBtns(false);
 			this._setTitle($.dateFormat(currentDate, i18nMonthYearDayFormat));
-		var container	= $.createElement('form').attr('class', 'calendar-timer drum-inline-block');
-		//var timerBuilder= $.createElement('div').attr('class', 'tmer-vp');
+		var container	= $.ce('form').className('calendar-timer drum-inline-block');
+		//var timerBuilder= $.ce('div').className('tmer-vp');
 		var format	= this._format;
 		// append hours
 			var hSelect;
 			if(format.hour){
 				var hoursHolderLength	= format.hour.length;
-				hSelect					= $.createElement('select').get();
+				hSelect					= $.ce('select').get();
 					if(format.hour.charAt(0) == 'H'){ // 0 - 24
 						_basicCalendarCreateTimerAddToSelect(hSelect, null, hoursHolderLength, 0, 23, 0);
 					}else{ // 0 - 12
@@ -390,7 +475,7 @@
 			var mSelect;
 			if(format.minute){
 				var holerLength	= format.minute.length;
-				mSelect			= $.createElement('select').get();
+				mSelect			= $.ce('select').get();
 				_basicCalendarCreateTimerAddToSelect(mSelect, null, holerLength, 0, 59, 0);
 				container.append(mSelect);
 			}
@@ -398,7 +483,7 @@
 			var sSelect;
 			if(format.second){
 				var holerLength	= format.second.length;
-				sSelect			= $.createElement('select').get();
+				sSelect			= $.ce('select').get();
 				_basicCalendarCreateTimerAddToSelect(sSelect, null, holerLength, 0, 59, 0);
 				container.append(sSelect);
 			}
@@ -406,13 +491,13 @@
 			var msSelect;
 			if(format.ms){
 				var holerLength	= format.ms.length;
-				msSelect		= $.createElement('select').get();
+				msSelect		= $.ce('select').get();
 				var vMax		= holerLength == 1 ? 9 : ( holerLength == 2 ? 99 : 999);
 				_basicCalendarCreateTimerAddToSelect(msSelect, null, holerLength, 0, vMax, 0);
 				container.append(msSelect);
 			}
 		//add line
-			container.append($.createElement('div').attr('class', 'calendar-timer-lne').get());
+			container.append($.ce('div').className('calendar-timer-lne').get());
 
 		// get container
 			container	= container.get();
@@ -467,7 +552,7 @@
 				if(prefix)
 					tminText = prefix + tminText;
 			// create option
-				$.createElement('option')
+				$.ce('option')
 					.attr('value', i)
 					.text(tminText)
 					.appendTo(selectEle);
@@ -485,7 +570,7 @@
 			if(prefix)
 				tminText = prefix + tminText;
 		// create option
-			$.createElement('option')
+			$.ce('option')
 				.attr('value', value)
 				.text(tminText)
 				.appendTo(selectEle);
@@ -625,11 +710,15 @@
 		return isEnd;
 	}
 	function _basicCalendarSetValue(value){
+		this.select(this._level, _parseDate(value));
+	}
+
+///////////////////////////////////////////////////////////////////////////////
+	function _parseDate(value){
 		if(!(value instanceof Date))
 			value	= new Date(value);
 		if(isNaN(value.getDate()))
 			throw new Error('invalid date: ', value,', argument: ', arguments[0]);
-		this.select(this._level, value);
+		return value;
 	}
-
 })(jQuery);
