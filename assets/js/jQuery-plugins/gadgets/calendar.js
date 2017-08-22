@@ -701,8 +701,9 @@
 
 		if(isEnd){
 			if(!this.options.readonly){
-				if(this.value	!= date){
+				if(this._tvalue	!= date.getTime()){
 					this.value	= date;
+					this._tvalue	= date.getTime();
 					$.event.trigger( 'change', {}, this.container );
 				}
 			}
@@ -711,6 +712,10 @@
 	}
 	function _basicCalendarSetValue(value){
 		this.select(this._level, _parseDate(value));
+		// apply value
+		$(this.contentDiv)
+			.empty()
+			.append(this._createFragment(this.value));
 	}
 
 ///////////////////////////////////////////////////////////////////////////////

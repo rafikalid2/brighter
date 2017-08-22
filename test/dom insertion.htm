@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>BRSOLAB Brighter</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="../dest/brighter.css">
+	<meta charset="utf-8">
+	<style type="text/css">
+		body{
+			margin:10px;
+		}
+		code i{
+			color:GrayText
+		}
+	</style>
+
+	<script type="text/javascript" src="../dest/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript" src="../dest/hammer.2.0.8.min.js"></script>
+	<script type="text/javascript" src="../dest/locales/en.js"></script>
+</head>
+<body>
+<code><i>Create elements 20x faster than jQuery</i>
+<i>Use "Builder" design pattern to make code easy and simple</i>
+	$.createElement (or $.ce)
+		attr
+		addClass
+		removeClass
+		className
+		appendText
+		append
+		appendTo
+		css
+		build (or get)
+		click
+		on <i>// general method to add events</i>
+
+<i>Create document fragment, make insertion 30x faster</i>
+	$.createFragment (or $.cf)
+		append
+		appendTo
+		build  (or get)
+</code>
+<!-- brighter js -->
+	<script type="text/javascript" src="../dest/brighter.js"></script>
+
+
+	<script>
+		function run(count){
+			var dt	= Date.now();
+			console.info('using native')
+			for(var i =0; i< count; ++i){
+				var frag	= document.createDocumentFragment();
+				var dv		= document.createElement('div');
+				dv.className= 'cl1 cl2 cl3';
+				frag.appendChild(dv);
+				var dv2		= document.createElement('div');
+				dv2.className= 'ce ch cj';
+				frag.appendChild(dv2);
+			}
+			console.log('-- finished in ', Date.now() - dt, 'ms');
+
+			console.info('using our builder')
+			dt	= Date.now();
+			for(var i =0; i< count; ++i){
+				$.createFragment()
+					.append(
+						$.createElement('div')
+							.className('cl1 cl2 cl3')
+							.get()
+					)
+					.append(
+						$.createElement('div')
+							.className('ce ch cj')
+							.get()
+					);
+			}
+			console.log('-- finished in ', Date.now() - dt, 'ms');
+
+			//jQuery
+			console.info('using jQuery and other normale methods')
+			dt	= Date.now();
+			for(var i =0; i< count; ++i){
+				$('<div>')
+					.append(
+						$('<div>')
+							.addClass('cl1 cl2 cl3')
+					)
+					.append(
+						$('<div>')
+							.addClass('ce ch cj')
+					);
+			}
+			console.log('-- finished in ', Date.now() - dt, 'ms');
+		}
+
+	</script>
+</body>
+</html>
