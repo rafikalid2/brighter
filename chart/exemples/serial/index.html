@@ -1,6 +1,6 @@
 <html>
     <head>
-        <link rel="stylesheet" href="../../assets/css/brighter-chart.css">
+        <link rel="stylesheet" href="../../dest/css/brighter-chart.css">
         <link rel="stylesheet" href="../index-style.css">
     </head>
     <body>
@@ -9,7 +9,7 @@
         <div class="desc">
             <h1>Documentation : </h1>
             <p>
-                To use the brighter chart API you will need to include the jquey and the jquery-svg API, than add the following lines to your code
+                To use the brighter chart API you will need to include the jquey, than add the following lines to your code
             </p>
             <xmp>
                 <link rel="stylesheet" href="brighter-chart.css">
@@ -66,7 +66,11 @@
             </xmp>
 
             <p>
-                by the style() function you can change the chart style, you can change the offsetTop, offsetRight, offsetBottom and offsetLeft values
+                by the style() function you can change the chart style, you can change<br><br>
+                + <b>offsetTop</b> is the space between the chart and the container top, by default it take 10px<br>
+                + <b>offsetRight</b> the space between the chart and the container right, by defualt it is 80px<br>
+                + <b>offsetBottom</b> the space between the chart and the container bottom, by defualt it is 80px<br>
+                + <b>offsetLeft</b> the space between the chart and the container left, by defualt it is 80px
             </p>
 
             <xmp>
@@ -74,20 +78,22 @@
                         .data(data)
                         .style({offsetRight: 100})
 
-                        .addAxis({field:"date", type:"horizontal", display:false})
-                        .addAxis({field:"distance", type:"vertical", position: "right", titleColor: "#f00"})
-                        .addAxis({field:"latitude", type:"vertical", position: "right", display:false, stepsNumber: 11, offset: 45})
-                        .addAxis({field:"duration", type:"vertical", display:false});
+                        .addAxis({field:"date", type:"horizontal"})
+                        .addAxis({field:"distance", type:"vertical", position: "right", titleColor: "#f00", offsetTitle: 10})
+                        .addAxis({field:"latitude", type:"vertical", position:'right', display:false, stepsNumber: 11, offset: 70})
+                        .addAxis({field:"duration", type:"vertical"});
             </xmp>
             <p>
                 to define an axis use addAxis() function, this function take as argument an object of options which define the axis<br>
                 the options as following :<br><br>
                 + <b>field</b> the value key in array data specified for this axis<br>
                 + <b>type</b> axis type the horizontal one or vertical<br>
-                + <b>position</b> the position is only work if the axis is vertical so you can choose between left or right<br>
-                + <b>color</b> the color of the axis and steps<br>
-                + <b>textColor</b> the color of the axis steps values<br>
-                + <b>offset</b> the values offset, by this attribute you can change the position of values steps<br>
+                + <b>position</b> the position is only work if the axis is vertical so you can choose between left or right, by default it is left<br>
+                + <b>color</b> the color of the axis and steps, #b7b7b7 is the default value<br>
+                + <b>textColor</b> the color of the axis steps values, by default it is black color #000<br>
+                + <b>offset</b> the offset value, by this attribute you can change the position of values steps, default value is 0<br>
+                + <b>offsetTitle</b> the space between the axis and its title, by default this value is 0<br>
+                + <b>titleColor</b> the axis title color, default value is black color #000<br>
                 + <b>display</b> by default this option is true, if you don't want to show the axis so chage it to false<br>
                 + <b>stepsNumber</b> number of values to show in axis<br>
             </p>
@@ -102,18 +108,93 @@
                         .addAxis({field:"latitude", type:"vertical", position: "right", display:false, stepsNumber: 11, offset: 45})
                         .addAxis({field:"duration", type:"vertical"})
 
-                        .addColumn({field: "distance", offset: 5})
-                        .addColumn({field: "latitude", offset: 10})
+                        .addColumn({field: "distance", position: '5 30', offset: 5})
+                        .addColumn({field: "latitude", position: '35 30'})
+                        .addColumn({field: "duration", position: '65 30'});
+            </xmp>
+            <p>
+                the serial chart support two types of graph the column, and line graph, to add an column graph use the addColumn() function,<br>
+                this function take an object of options which define the graph, this options as following<br><br>
+                + <b>field</b> the value key in array data specified for this graph<br>
+                + <b>color</b> the color of the graph, in case is not defined, it will take an random color<br>
+                + <b>border</b> the border color, by default it is #71bcde<br>
+                + <b>opacity</b> the opcaity of the graph, by default it is 1<br>
+                + <b>position</b> the first value is where the graph will start, and second one is where the graph will end, all those value is in percentage, default value is "5 90"<br>
+                + <b>offset</b> is the margin left and right of the graph, by defult it is 0<br>
+                + <b>class</b> to specify an class for all the graph, by default it is "colunms", the graph parts also has an fixed class "column"<br>
+            </p>
+            
+            <xmp>
+                serial.container('#chart')
+                        .data(data)
+                        .style({offsetRight: 140})
+
+                        .addAxis({field:"date", type:"horizontal"})
+                        .addAxis({field:"distance", type:"vertical", position: "right", titleColor: "#f00", offsetTitle: 10})
+                        .addAxis({field:"latitude", type:"vertical", position:'right', display:false, stepsNumber: 11, offset: 70})
+                        .addAxis({field:"duration", type:"vertical"})
+
+                        .addColumn({field: "distance", position: '5 30', offset: 5})
+                        .addColumn({field: "latitude", position: '35 30'})
+                        .addColumn({field: "duration", position: '65 30'})
+
                         .addLine({field: "duration", animate: "dash-line", class: "animate"})
-                        .addLine({field: "distance", joint: "circle", animate: "draw-line", class: "animate dis"});
+                        .addLine({field: "distance", joint: "circle", animate: "draw-line", class: "animate dis"})
+                        .addLine({field: "latitude", joint: "circle"});
+            </xmp>
+            <p>
+                the serial chart support two types of graph the column, and line graph, to add an column graph use the addColumn() function,<br>
+                this function take an object of options which define the graph, this options as following<br><br>
+                + <b>field</b> the value key in array data specified for this graph<br>
+                + <b>color</b> the color of the graph, in case is not defined, it will take an random color<br>
+                + <b>opacity</b> the opcaity of the graph, by default it is 1<br>
+                + <b>strokeWidth</b> this option define the size of the line, by default it is 2<br>
+                + <b>animate</b> this specify an animation for the line, there is two animations "draw-line" and "dash-line" animation, to make this animations works you need to add animate class to the group by using the class option<br>
+                + <b>joint</b> by this options you can change the joint types, the chart propose two types rect or circle joint, by defualt it take "rect" value<br>
+                + <b>class</b> to specify an class for all the graph, by default it is "lines", the graph is one path and has "line" class, the joint also inder an group with class name "points", the joint it self has "point" class<br>
+            </p>
+
+            <p>After finishing the chart configuration you need to build it, so use the build() function as showing next</p>
+            <xmp>
+                serial.container('#chart')
+                        .data(data)
+                        .style({offsetRight: 140})
+
+                        .addAxis({field:"date", type:"horizontal"})
+                        .addAxis({field:"distance", type:"vertical", position: "right", titleColor: "#f00", offsetTitle: 10})
+                        .addAxis({field:"latitude", type:"vertical", position:'right', display:false, stepsNumber: 11, offset: 70})
+                        .addAxis({field:"duration", type:"vertical"})
+
+                        .addColumn({field: "distance", position: '5 30', offset: 5})
+                        .addColumn({field: "latitude", position: '35 30'})
+                        .addColumn({field: "duration", position: '65 30'})
+                        .addLine({field: "duration", animate: "dash-line", class: "animate"})
+                        .addLine({field: "distance", joint: "circle", animate: "draw-line", class: "animate dis"})
+                        .addLine({field: "latitude", joint: "circle"})
+                        .build();
+            </xmp>
+
+            <p>
+                To delete the chart you can use the delete() function as following
+            </p>
+            <xmp>
+                serial.delete();
+            </xmp>
+
+            <p>
+                To make the chart responsive add the following code lines
+            </p>
+            <xmp>
+                $( window ).resize(function() {
+                    serial.delete();
+                    serial.build();
+                });
             </xmp>
 
         </div>
         
-        <script src="../../assets/js/jquery.min.js"></script>
-        <script src="../../assets/js/svg.js"></script>
-
-        <script src="../../assets/js/brighter-chart.js"></script>
+        <script src="../../../core/dest/jquery-3.2.1.min.js"></script>
+        <script src="../../dest/js/brighter-chart.js"></script>
 
         <script src="main.js"></script>
     </body>

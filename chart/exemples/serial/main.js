@@ -62,8 +62,8 @@ serial.container('#chart')
         .style({offsetRight: 140})
 
 		.addAxis({field:"date", type:"horizontal"})
-        .addAxis({field:"distance", type:"vertical", position: "right", titleColor: "#f00"})
-        .addAxis({field:"latitude", type:"vertical", position:'right', display:false, stepsNumber: 11, offset: 70, offsetTitle: 10})
+        .addAxis({field:"distance", type:"vertical", position: "right", titleColor: "#f00", offsetTitle: 10})
+        .addAxis({field:"latitude", type:"vertical", position:'right', display:false, stepsNumber: 11, offset: 70})
         .addAxis({field:"duration", type:"vertical"})
 
         .addColumn({field: "distance", position: '5 30', offset: 5})

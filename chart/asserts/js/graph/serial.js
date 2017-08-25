@@ -341,9 +341,9 @@ class Serial extends Graph{
 			y = (drawableSpace.height + this._style.offsetTop) / 2;
 
 		if(options.position === 'right')
-			x += options.offsetTitle + 10;
+			x += options.offsetTitle + 55;
 		else
-			x -= options.offsetTitle;
+			x -= options.offsetTitle + 45;
 
 		var group = this._svg.group({'transform':"rotate(-90)", 'transform-origin': x+'px '+y+'px'});
 
