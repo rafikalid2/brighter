@@ -4,3 +4,6 @@ core/dest/brighter.css
 core/dest/brighter.css
 core/dest/brighter.js
 core/dest/brighter.js
+
+chart/node_modules/**
+chart/dest/**

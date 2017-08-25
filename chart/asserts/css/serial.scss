@@ -1,0 +1,91 @@
+// animation to move dasharrays of the border
+@-webkit-keyframes moving-dashes {
+    100% {
+        stroke-dashoffset: -30px;
+    }
+}
+@keyframes moving-dashes {
+    100% {
+        stroke-dashoffset: -30px;
+    }
+}
+
+// aniumation to draw line
+@-webkit-keyframes draw {
+    0% {
+        stroke-dashoffset: 500%;
+    }
+    100% {
+        stroke-dashoffset: 0px;
+    }
+}
+@keyframes draw {
+    0% {
+        stroke-dashoffset: 500%;
+    }
+    100% {
+        stroke-dashoffset: 0px;
+    }
+}
+
+// animation to pulsating the points joint
+@-webkit-keyframes pulsating {
+    0% {
+        stroke-opacity: 1;
+        stroke-width: 0px;
+    }
+    100% {
+        stroke-opacity: 0;
+        stroke-width: 50px;
+    }
+}
+@keyframes pulsating {
+    0% {
+        stroke-opacity: 1;
+        stroke-width: 0px;
+    }
+    100% {
+        stroke-opacity: 0;
+        stroke-width: 50px;
+    }
+}
+
+// animations
+.animate {
+	.line {
+		&.dash-line {
+		    stroke-dasharray: 3px 3px;
+		    stroke-linejoin: round;
+		    stroke-linecap: round;
+		    -webkit-animation: moving-dashes 1s linear infinite;
+		    animation: moving-dashes 1s linear infinite;
+		}
+
+		&.draw-line {
+		    stroke-linejoin: round;
+		    stroke-linecap: round;
+		    stroke-dasharray: 500%;
+		    stroke-dasharray: 0 \0; 
+		    stroke-dashoffset: 0 \0;
+		    -webkit-animation: draw 10s;
+		    animation: draw 10s;
+		}
+	}
+
+	&.dis{
+         .points {
+    		.point:nth-child(5){
+    			-webkit-animation: pulsating 1s ease-out infinite;
+    			animation: pulsating 1s ease-out infinite;
+    		}
+    	}
+    }
+}
+
+.columns{
+	.column:hover {
+	    fill: #578ca5;
+	    -webkit-transition: all .3s ease-out;
+	    transition: all .3s ease-out;
+	}
+}

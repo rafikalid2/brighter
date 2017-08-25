@@ -1,0 +1,120 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="../../assets/css/brighter-chart.css">
+        <link rel="stylesheet" href="../index-style.css">
+    </head>
+    <body>
+        <div id="chart"></div>
+
+        <div class="desc">
+            <h1>Documentation : </h1>
+            <p>
+                To use the brighter chart API you will need to include the jquey and the jquery-svg API, than add the following lines to your code
+            </p>
+            <xmp>
+                <link rel="stylesheet" href="brighter-chart.css">
+                <script src="brighter-chart.js"></script>
+            </xmp>
+
+            <p>
+                to create the serial chart, create a new object of serial class
+            </p>
+            <xmp>
+                var serial = new Serial();
+            </xmp>
+
+            <p>
+                the api need a container so specify a container for the chart by the adding the next line
+            </p>
+            <xmp>
+                serial.container('#chart');
+            </xmp>
+
+            <p>
+                the api is based on build design pattern so all functions return the current object
+            </p>
+
+            <xmp>
+                serial.container('#chart')
+                        .data(data)
+                        .style({offsetRight: 100});
+            </xmp>
+            <p>
+                the data() function take as argument an array of data that you want to draw, the data need to be in this form
+            </p>
+            <xmp>
+                data = [
+                    {
+                        "date": "01",
+                        "distance": 227,
+                        "latitude": 280,
+                        "duration": 408
+                    },
+                    {
+                        "date": "02",
+                        "distance": 371,
+                        "latitude": 230,
+                        "duration": 482
+                    },
+                    {
+                        "date": "03",
+                        "distance": 433,
+                        "latitude": 300,
+                        "duration": 562
+                    }
+                ];
+            </xmp>
+
+            <p>
+                by the style() function you can change the chart style, you can change the offsetTop, offsetRight, offsetBottom and offsetLeft values
+            </p>
+
+            <xmp>
+                serial.container('#chart')
+                        .data(data)
+                        .style({offsetRight: 100})
+
+                        .addAxis({field:"date", type:"horizontal", display:false})
+                        .addAxis({field:"distance", type:"vertical", position: "right", titleColor: "#f00"})
+                        .addAxis({field:"latitude", type:"vertical", position: "right", display:false, stepsNumber: 11, offset: 45})
+                        .addAxis({field:"duration", type:"vertical", display:false});
+            </xmp>
+            <p>
+                to define an axis use addAxis() function, this function take as argument an object of options which define the axis<br>
+                the options as following :<br><br>
+                + <b>field</b> the value key in array data specified for this axis<br>
+                + <b>type</b> axis type the horizontal one or vertical<br>
+                + <b>position</b> the position is only work if the axis is vertical so you can choose between left or right<br>
+                + <b>color</b> the color of the axis and steps<br>
+                + <b>textColor</b> the color of the axis steps values<br>
+                + <b>offset</b> the values offset, by this attribute you can change the position of values steps<br>
+                + <b>display</b> by default this option is true, if you don't want to show the axis so chage it to false<br>
+                + <b>stepsNumber</b> number of values to show in axis<br>
+            </p>
+
+            <xmp>
+                serial.container('#chart')
+                        .data(data)
+                        .style({offsetRight: 100})
+
+                        .addAxis({field:"date", type:"horizontal", display:false})
+                        .addAxis({field:"distance", type:"vertical", position: "right", titleColor: "#f00"})
+                        .addAxis({field:"latitude", type:"vertical", position: "right", display:false, stepsNumber: 11, offset: 45})
+                        .addAxis({field:"duration", type:"vertical"})
+
+                        .addColumn({field: "distance", offset: 5})
+                        .addColumn({field: "latitude", offset: 10})
+                        .addLine({field: "duration", animate: "dash-line", class: "animate"})
+                        .addLine({field: "distance", joint: "circle", animate: "draw-line", class: "animate dis"});
+            </xmp>
+
+        </div>
+        
+        <script src="../../assets/js/jquery.min.js"></script>
+        <script src="../../assets/js/svg.js"></script>
+
+        <script src="../../assets/js/brighter-chart.js"></script>
+
+        <script src="main.js"></script>
+    </body>
+</html>
