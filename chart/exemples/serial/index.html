@@ -13,7 +13,7 @@
             </p>
             <xmp>
                 <link rel="stylesheet" href="brighter-chart.css">
-                <script src="brighter-chart.js"></script>
+                <script src="brighter-chart.min.js"></script>
             </xmp>
 
             <p>
@@ -192,9 +192,17 @@
             </xmp>
 
         </div>
+
+        <div id="test">
+            <svg>
+                <rect x="25" y="25" width="150" height="25%" rx="10" ry="10" fill="none" stroke="blue" stroke-width="3" transform="rotate(0, 100, 75)">
+                    <animate attributeName="x" from="0" to="25" dur="0.3s" fill="freeze"/>
+                </rect>
+            </svg>
+        </div>
         
         <script src="../../../core/dest/jquery-3.2.1.min.js"></script>
-        <script src="../../dest/js/brighter-chart.js"></script>
+        <script src="../../dest/js/brighter-chart.min.js"></script>
 
         <script src="main.js"></script>
     </body>

@@ -1,8 +1,4 @@
-﻿/* http://keith-wood.name/svg.html
-   SVG for jQuery v1.5.0.
-   Written by Keith Wood (kbwood{at}iinet.com.au) August 2007.
-   Available under the MIT (http://keith-wood.name/licence.html) license. 
-   Please attribute the author if you use it. */
+﻿'use strict';
 
 (function($) { // Hide scope, no $ conflict
 

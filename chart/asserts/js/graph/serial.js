@@ -88,9 +88,9 @@ class Serial extends Graph{
 			field: options.field,
 			type: "column",
 			color: options.color || this._getRandomColor(),
-			border: options.border || "#71bcde",
+			border: options.border || "#71bcde", // border color
 			opacity: options.opacity || 1,
-			position: position,
+			position: position, // position preset before default value is "5 90"
 			offset: options.offset || 0,
 			class: options.class || "columns",
 		});
@@ -171,7 +171,13 @@ class Serial extends Graph{
 		// store the axis size in it object in _axisList array
 		options['size'] = size;
 	}
-
+	/**
+	 * Prepare steps data and call the _drawSteps() function to draw steps after we call _drawValues to draw the axis values
+	 * this function is called for every axis by the build() function
+	 * this function take as argumnet the axis group and the axis it self in options
+	 * @param  {[svg group]} axisGroup the group wich content the axis
+	 * @param  {[object]} options      the axis object
+	 */
 	_prepareStep(axisGroup, options){
 			// get drawable space
 		var drawableSpace = this._getDrawableSpaceSize(),
@@ -236,7 +242,7 @@ class Serial extends Graph{
 		// call the draw steps function to draw the steps
 		if(options.display)
 			this._drawSteps(axisGroup, {x, y, values, axisStepSize, type: options.type, position: options.position, color: options.color});
-		// call the draw Values to draw th esteps values
+		// call the draw Values to draw the steps values
 		this._drawValues(axisGroup,{
 				x, y, values, axisStepSize, type: options.type, position: options.position,
 				color: options.textColor, offset: options.offset, field: options.field,
@@ -266,6 +272,7 @@ class Serial extends Graph{
 		// this part of code is for the horizontal axis
 		// in this part we will draw the horizontal axis steps
 		if(options.type === 'horizontal'){
+			// draw steps
 			for(var i=0; i<=options.values.length; i++){
 				this._svg.line(group, x,y, x,y+8, style);
 				x += options.axisStepSize;
@@ -274,11 +281,13 @@ class Serial extends Graph{
 		// this part of code is for the vertical axis
 		// in this part we will draw the vertical axis steps
 		else if(options.type === 'vertical'){
+			// check if the axis position is the right so add an style and change x value,
+			// if the positions not defined or it's value is left we don't do nothing
 			if(options.position === 'right'){
 				style['transform'] = 'translate(8 0)';
 				x = this._getDrawableSpaceSize().width + this._style.offsetLeft;
 			}
-
+			// draw steps
 			for(var i=0; i< options.values.length; i++){
 				this._svg.line(group, x,y, x-8,y, style);
 				y -= options.axisStepSize;
@@ -287,7 +296,7 @@ class Serial extends Graph{
 			
 	}
 	/**
-	 * This function draw the value of the steps
+	 * This function draw the value of the steps, and call _drawAxisTitle() to draw the axis title
 	 * @param  {[svg group]} axisGroup svg group which will content all values elements
 	 * @param  {[object]} options x and y values
 	 *                            the array values, axisStepSize, type of the axis, the position of the axis
@@ -297,21 +306,25 @@ class Serial extends Graph{
 		var x = options.x,
 			y = options.y,
 
-			// default style
+			// default style, which commun for all axis types
 			style = {fill: options.color, "text-anchor": "middle", "font-size": 12};
 		
 		// svg group which will content all the values elements
 		var group = this._svg.group(axisGroup);
 
+		// this part of code is for the horizontal axis, so we check the type if it is horizontal
+		// so we define the x value and add an style element
 		if(options.type === 'horizontal'){
 			x += options.axisStepSize / 2;
 			style['alignment-baseline'] = "text-before-edge";
 
+			// draw the stepsValue
 			for(var i=0; i<options.values.length; i++){
 				this._svg.text(group, x,y, options.values[i].toString(), style);
 				x += options.axisStepSize;
 			}
 		}
+		// if the axis type is vertical so we change the x value and add style elements for the vertical axis
 		else if(options.type === 'vertical'){
 
 			x -= options.offset;
@@ -319,34 +332,52 @@ class Serial extends Graph{
 			style['alignment-baseline'] = "middle";
 			style['text-anchor'] = "end";
 
+			// check if the axis position is right, if it is we need to chage the 'text-anchor' value and add 'transform' to the style
+			// and change the x value
 			if(options.position === 'right'){
 				style['text-anchor'] = 'start';
 				style['transform'] = 'translate(24 0)';
+
+				// this case the x will be the size of the horizontal axis + the offset left + the offset between axis if it is defined,
+				// if not it will be the default value which is 0
 				x = this._getDrawableSpaceSize().width + this._style.offsetLeft + options.offset;
 			}
 
+			// draw the values
 			for(var i=0; i<options.values.length; i++){
 				this._svg.text(group, x-12,y, options.values[i].toString(), style);
 				y -= options.axisStepSize;
 			}
 
+			// call _drawAxisTitle() function to draw the axis title 
 			this._drawAxisTitle({field: options.field, x, position: options.position, offsetTitle: options.offsetTitle, titleColor: options.titleColor});
 		}
 			
 	}
+	/**
+	 * this fucntion draw the axis title, this funtion called by _drawValues() function
+	 * and take an options attribute, which is an object of options which define the title position and color ....
+	 * @param  {[object]} options opbject which content all title options
+	 */
 	_drawAxisTitle(options){
 		var drawableSpace = this._getDrawableSpaceSize(),
 			field = options.field,
 			x = options.x,
+
+			// to get the center of the y axis we use the following
 			y = (drawableSpace.height + this._style.offsetTop) / 2;
 
+		// if the axis position is right so we change the x value
 		if(options.position === 'right')
 			x += options.offsetTitle + 55;
+		// if it is not define or it is left so the x value will be as following
 		else
 			x -= options.offsetTitle + 45;
 
+		// create an group for the title an rotate it
 		var group = this._svg.group({'transform':"rotate(-90)", 'transform-origin': x+'px '+y+'px'});
 
+		// draw the title inside the group defined
 		this._svg.text(group, x, y, field.toString(), {'text-anchor': 'middle', fill: options.titleColor});
 	}
 	/**
@@ -405,7 +436,10 @@ class Serial extends Graph{
 			x += stepSize;
 		}
 	}
-
+	/**
+	 * draw an line graph, this function draw an line passed in parameter
+	 * @param  {[object]} graph the graph we want draw
+	 */
 	_drawLine(graph){
 
 		// find axis base, in this case the axis base is the horizontal axis
@@ -443,61 +477,85 @@ class Serial extends Graph{
 		for(var i=0; i<data.length; i++)
 			data [i] = y - ((data[i] - minVal) * unity);
 
-		// prepare the path value
+		// prepare the path value add the first point
 		var path = 'M'+x+','+data[0];
-		for(var i=1; i<data.length ; i++){
-			x += stepSize;
-			path += 'L'+x+','+data[i];
+		// add the rest points
+		for(var i=1, v=x; i<data.length ; i++){
+			v += stepSize;
+			path += 'L'+v+','+data[i];
 		}
 
+		// draw the path
 		this._svg.path(group, path, {fill: 'none', stroke: graph.color, opacity: graph.opacity, class: 'line '+graph.animate, strokeWidth: graph.strokeWidth});
 
-		x = this._style.offsetLeft + stepSize / 2;
-
+		// create the joint points group
 		group = this._svg.group(group, {class: 'points'});
 
 		// draw the joints
 		for(var i=0; i<data.length; i++){
+			// check if the points joint type is rect
 			if(graph.joint === 'rect')
 				this._svg.rect(group, x-5, data[i]-5, 10, 10, {fill: graph.color, stroke: graph.color, class: 'point',});
+
+			// check if the points joint type is circle
 			else if(graph.joint === 'circle')
 				this._svg.circle(group, x, data[i], 8, {fill: graph.color, stroke: graph.color, class: 'point',});
 			x += stepSize;
 		}
 	}
+	/**
+	 * this function draw key for all graphs of the chart
+	 * this fucntion is called by the build() function
+	 * @return {[type]} [description]
+	 */
 	_drawChartKey(){
 
 		var x = 0,
 			y = this._getSvgHeight() - 30;
 
+		// create group which will content the key
 		var group = this._svg.group();
 
+		//loop for all graphs of the chart
 		for(var i=0; i<this._graphList.length; i++){
 
+			// get the ieme graph
 			var graph = this._graphList[i];
 
+			// if the graph type is column
 			if(graph.type === 'column'){
+				// draw the rect for the column graph with the same color
 				this._svg.rect(group, x, y, 35, 15, {fill: graph.color, stroke: graph.border});
-				x += 40;
+				x += 40; // space between the rect and text
+				//draw the text
 				this._svg.text(group, x, y+9, graph.field.toString(), {"alignment-baseline": "middle", "font-size": 14});
-				x+= 70;
+				x+= 70; // space between the text and the next graph key
 			}
+			// if the graph type is line
 			else if(graph.type === 'line'){
+				// draw the line
 				this._svg.line(group, x, y+9, x+35, y+9, {stroke: graph.color, strokeWidth: graph.strokeWidth});
 
+				// check the type of the joint and draw it in middle of the line
 				if(graph.joint === 'rect')
+					// draw rect joint in middle of the line
 					this._svg.rect(group, x+14, y+5, 8, 8, {stroke: graph.color, fill: graph.color});
+				// if the joint is circle draw it in center of the line
 				else if(graph.joint === 'circle')
 					this._svg.circle(group, x+18, y+9, 5, {stroke: graph.color, fill: graph.color});
 
-				x += 40;
+				x += 40; // space between the line and text
+				// draw the text
 				this._svg.text(group, x, y+9, graph.field.toString(), {"alignment-baseline": "middle", "font-size": 14});
-				x+= 70;
+				x+= 70; // space between the text and next graph key
 			}
 		}
 
+		// get size to move the group key, this code is to make the key group in center of the chart
+		// so we need the translate value
 		var xtranslate = (this._getSvgWidth() - group.getBBox().width) / 2;
 
+		// translate the group with the xtranslate value
 		this._svg.configure(group, {'transform': 'translate('+xtranslate+')'});
 	}
 	/**
