@@ -1,17 +1,21 @@
 .wysiwyg .menu {
-  background: #99c7b9;
+  background: #f0f0f0;
   border-radius: 10px 10px 0 0; }
   .wysiwyg .menu .toolbar {
-    border-bottom: 1px solid #c3ded6;
-    height: 40px; }
-  .wysiwyg .menu .menubtn {
-    height: 40px; }
+    padding: 8px; }
+    .wysiwyg .menu .toolbar .btns-group {
+      margin: 0 3px; }
 
 .wysiwyg .zonetext {
-  height: 500px;
+  min-height: 500px;
   padding: 5px;
-  border: 3px solid #99c7b9;
+  border: 3px solid #f0f0f0;
   border-radius: 0 0 10px 10px;
   border-top: none; }
   .wysiwyg .zonetext:focus {
     outline: none; }
+  .wysiwyg .zonetext table {
+    display: inline-block; }
+    .wysiwyg .zonetext table td {
+      border: 1px solid #000;
+      min-width: 10px; }

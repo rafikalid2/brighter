@@ -5,7 +5,7 @@ var order = require('gulp-order');
 
 gulp.task('concat', function(){
 	gulp.src('src/js/**/*.js')
-	.pipe(order(['wysiwyg.js', 'config.js']))
+	.pipe(order(['wysiwyg-main.js', 'config.js', 'jquery-fn.js']))
 	.pipe(concat('wysiwyg.js'))
 	.pipe(gulp.dest('dest/js'));
 });

@@ -1,0 +1,37 @@
+$bg-color : #f0f0f0; //#99c7b9;
+
+.wysiwyg{
+
+	.menu{
+		background: $bg-color;
+		border-radius: 10px 10px 0 0;
+		
+		// the toolbar div inside menu 
+		.toolbar{
+			padding: 8px;
+
+			.btns-group{
+				margin: 0 3px;
+			}
+		}
+	}
+
+	.zonetext{
+		min-height: 500px;
+		padding: 5px;
+		border: 3px solid $bg-color;
+		border-radius: 0 0 10px 10px;
+		border-top: none;
+		&:focus{
+			outline: none;
+		}
+
+		table{
+				display: inline-block;
+			td{
+				border: 1px solid #000;
+				min-width: 10px;
+			}
+		}
+	}
+}

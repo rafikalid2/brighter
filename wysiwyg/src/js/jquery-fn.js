@@ -1,46 +1,36 @@
-$.fn.wysiwyg = function(options = {}){
+$.fn.wysiwyg = function(options){
 
-	var width = options.width || '100%';
+	// if the options is empty or undefined, create an empty object
+	if(!options)
+		options = {};
+
+	// get the wysiwyg type if defined by user, if not set it to basic
+	var type = options.type || 'basic';
+
+	// check if the user specified an container, if not throw new Error
+	// this => reference the container
+	if(!this.length)
+		throw new Error('No container specified! could not create wysiwyg');
 
 	// add wysiwyg class to the container
 	this.addClass('wysiwyg');
 
-	this.css('width', width+'px');
-
-	// create the menu div and set it menu class
-	var menu = $('<div>').addClass('menu');
-
-	// create the toolbar div and add toolbar class to it
-	// and append it to menu div
-	var toolbar = $('<div>').addClass('toolbar').appendTo(menu);
-
-	// create the menu btn container and add class to it
-	// and append it to menu div
-	var menubtn = $('<div>').addClass('menubtn').appendTo(menu);
-
-	// create the editable div, where the use can write
-	var zonetext = $('<div>').attr({
-		contenteditable: 'true',
-		class: 'zonetext'
-	});
-
-
-	_drawMenu({menubtn, toolbarbtn});
-
-
-	// append the menu and zonetext to the DOM
-	this.append([menu, zonetext]);
-
-
+	// create new Wysiwyg object
+	var wysi = new Wysiwyg(type);
+	console.log(wysi);
+	
+	// build the wysiwyg, this function take the conatainer
+	wysi._build(this);
 }
+
 
 /**
  * this function is to extned two object
  * @param  {[object]} child the object child 
  * @param  {[object]} parent  the object parent to extend
  */
-var extendClass = function(parent, child) {
-    var base = function() {};
-    base.prototype = parent.prototype;
-    child.prototype = new base();
-}
+// var extendClass = function(parent, child) {
+//     var base = function() {};
+//     base.prototype = parent.prototype;
+//     child.prototype = new base();
+// }

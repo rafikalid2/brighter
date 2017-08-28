@@ -1,18 +1,22 @@
 <html>
 	<head>
 		<link rel="stylesheet" href="../dest/css/wysiwyg.css">
+		<link rel="stylesheet" href="../dest/css/brighter.css">
+		<link rel="stylesheet" href="../dest/css/font-awesome.css">
 	</head>
 
-	<body>
+	<body style="padding: 10px">
 		
 		<div id="wysi"></div>
 
 
 		<script src="../../core/dest/jquery-3.2.1.min.js"></script>
+		<script src="../dest/js/locales/en.js"></script>
+		<script src="../dest/js/brighter.js"></script>
 		<script src="../dest/js/wysiwyg.js"></script>
 
 		<script>
-			$('#wysi').wysiwyg();
+			$('#wysi').wysiwyg({type: 'full'});
 		</script>
 	</body>
 </html>
