@@ -1,102 +1,177 @@
-Wysiwyg.prototype.tools = {
-	b: {
-		cmd: 'bold',
-		icon: 'bold'
-	},
-	i : {
-		cmd: 'italic',
-		icon: 'italic'
-	},
-	u: {
-		cmd: 'underline',
-		icon: 'underline'
-	},
-	abc: {
-		cmd: 'strikeThrough',
-		icon: 'strikethrough'
-	},
+function Wysiwyg(type){
+	// this div will content all the elements
+	this._container = $('<div>').addClass('wysi');
 
+	// type of the wysiwyg
+	this._type = type;
+}
 
-	l: {
-		cmd: 'justifyLeft',
-		icon: 'align-left'
-	},
-	c: {
-		cmd: 'justifyCenter',
-		icon: 'align-center'
-	},
-	r: {
-		cmd: 'justifyRight',
-		icon: 'align-right'
-	},
-	j: {
-		cmd: 'justifyFull',
-		icon: 'align-justify'
-	},
+Wysiwyg.prototype._build = function(context){
+	// create the menu container
+	var toolbar = this._createMenu();
 
+	// create the menu buttons
+	this._createMenuButtons(toolbar);
 
-	ic: {
-		cmd: 'subScript',
-		icon: 'subscript'
-	},
-	ex: {
-		cmd: 'superScript',
-		icon: 'superscript'
-	},
+	// create the zone text
+	var editor = this._createEditor();
 
-	al: { // add link
-		cmd: 'link',
-		icon: 'chain'
-	},
-	rl: { // remove link
-		cmd: 'unlink',
-		icon: 'chain-broken'
-	},
+	// append the container to the context DOM
+	context.append(this._container);
 
+	this._uploadPic(editor);
+}
 
-	undo: {
-		cmd: 'undo',
-		icon: 'undo'
-	},
-	redo: {
-		cmd: 'redo',
-		icon: 'repeat'
-	},
-
-
-	ulst: {
-		cmd: 'insertUnorderedList',
-		icon: 'list-ul'
-	},
-	olst: {
-		cmd: 'insertOrderedList',
-		icon: 'list-ol'
-	},
-
-	fnt: {
-		src : 'fonts',
-		cmd: 'fontName'
-	},
-	sz: {
-		src : 'size',
-		cmd: 'fontSize'
+/**
+ * execute a commande passed by param
+ * @param  {[string]} command command to execute
+ * @param  {[]} option options specify for this command 
+ * @return {[bool]}    return true if the command executed succefully and false if not
+ */
+Wysiwyg.prototype._executeCommand = function (command, option){
+	try{
+		document.execCommand(command, false, option);
+		return true;
+	}catch(x){
+		console.error(x);
 	}
+	return false;
+}
+Wysiwyg.prototype._config = {
 
+	tools : {
+				b: {
+					cmd: 'bold',
+					icon: 'bold'
+				},
+				i : {
+					cmd: 'italic',
+					icon: 'italic'
+				},
+				u: {
+					cmd: 'underline',
+					icon: 'underline'
+				},
+				abc: {
+					cmd: 'strikeThrough',
+					icon: 'strikethrough'
+				},
+
+
+				l: {
+					cmd: 'justifyLeft',
+					icon: 'align-left'
+				},
+				c: {
+					cmd: 'justifyCenter',
+					icon: 'align-center'
+				},
+				r: {
+					cmd: 'justifyRight',
+					icon: 'align-right'
+				},
+				j: {
+					cmd: 'justifyFull',
+					icon: 'align-justify'
+				},
+
+
+				ic: {
+					cmd: 'subScript',
+					icon: 'subscript'
+				},
+				ex: {
+					cmd: 'superScript',
+					icon: 'superscript'
+				},
+
+				al: { // add link
+					cmd: 'createLink',
+					icon: 'link'
+				},
+				rl: { // remove link
+					cmd: 'unlink',
+					icon: 'chain-broken'
+				},
+
+
+				undo: {
+					cmd: 'undo',
+					icon: 'undo'
+				},
+				redo: {
+					cmd: 'redo',
+					icon: 'repeat'
+				},
+
+
+				ulst: {
+					cmd: 'insertUnorderedList',
+					icon: 'list-ul'
+				},
+				olst: {
+					cmd: 'insertOrderedList',
+					icon: 'list-ol'
+				},
+
+				fnt: {
+					cmd: 'fontName'
+				},
+				sz: {
+					cmd: 'fontSize'
+				},
+
+				indent: {
+					cmd: 'indent',
+					icon: 'indent'
+				},
+				outdent: {
+					cmd: 'outdent',
+					icon: 'outdent'
+				},
+
+				img: {
+					cmd: 'insertImage',
+					icon: 'photo'
+				},
+
+				fc: { // font color
+					cmd: 'foreColor',
+					icon: 'font'
+				},
+				bc: { // back color
+					cmd: 'backColor',
+					icon: 'font'
+				}
+	},
+
+	fonts: 	{
+		'Arial':'arial, helvetica, sans-serif',
+		'Arial Black':'arial black, avant garde',
+		'Andale Mono':'andale mono, times',
+		'Book Antiqua':'book antiqua, palatino',
+		'Comic Sans MS':'comic sans ms, sans-serif',
+		'Courier New':'courier new, courier',
+		'Georgia':'georgia, palatino',
+		'Helvetica':'helvetica',
+		'Impact':'impact, chicago',
+		'Symbol':'symbol',
+		'Tahoma':'tahoma, arial, helvetica, sans-serif',
+		'Terminal':'terminal, monaco',
+		'Times New Roman':'times new roman, times',
+		'Trebuchet MS':'trebuchet ms, geneva',
+		'Verdana':'verdana, geneva',
+		'Webdings':'webdings',
+		'Wingdings':'wingdings, zapf dingbats'
+	},
+	
+	typeList: {
+		basic: 'undo,redo|fnt|sz|b,i,u,abc|fc|bc|l,c,r,j',
+		full: 'undo,redo|fnt|sz|b,i,u,abc|fc|bc|l,c,r,j|al,rl|ic,ex|ulst,olst|indent,outdent|img'
+	},
+
+	colors: ['000','930','330','030','036','000080','339','333','800000','f60','808000','008000','008080','00f','669','808080','f00','f90','9c0','396','3cc','36f','800080','999','f0f','fc0','0f0','0ff','0cf','936','f9c','fc9','ff9','cfc','cff','9cf','c9f','795548','8ba1d4','fff']
 };
-
-// fonts-familly
-Wysiwyg.prototype.fonts={'Andale Mono':'andale mono, times','Arial':'arial, helvetica, sans-serif','Arial Black':'arial black, avant garde','Book Antiqua':'book antiqua, palatino','Comic Sans MS':'comic sans ms, sans-serif','Courier New':'courier new, courier','Georgia':'georgia, palatino','Helvetica':'helvetica','Impact':'impact, chicago','Symbol':'symbol','Tahoma':'tahoma, arial, helvetica, sans-serif','Terminal':'terminal, monaco','Times New Roman':'times new roman, times','Trebuchet MS':'trebuchet ms, geneva','Verdana':'verdana, geneva','Webdings':'webdings','Wingdings':'wingdings, zapf dingbats'};
-// characters
-Wysiwyg.prototype.chars='@€ÁáÂâÆæÅåÃãä¸¢©®™¤°÷×↔⊕⊗↵⇐⇑⇒⇓⇔∀∃∈∉∋√≤≥∧∨∩∪∠√∏∑∫∴⊄⊆⊇⊥‰≈←↑→↓±ÉÊÈÐðË€¥£ƒ½¼¾¿«»≡≠¯µØ¶ßŠš§Þþ¨℘;ℜℵ∂∅∇◊♠♣♥♦ΑαΒβΓγΔδΕεΖζΗðΘθϑΙιΚκΛλΜμΝνΞξΟοΠπϖΡρΣσςΤτΥυϒΦφΧχΨψΩ';
-// colors
-Wysiwyg.prototype.colors=['000','030','060','090','0C0','0F0','300','330','360','390','3C0','3F0','600','630','660','690','6C0','6F0','003','033','063','093','0C3','0F3','303','333','363','393','3C3','3F3','603','633','663','693','6C3','6F3','006','036','066','096','0C6','0F6','306','336','366','396','3C6','3F6','606','636','666','696','6C6','6F6','009','039','069','099','0C9','0F9','309','339','369','399','3C9','3F9','609','639','669','699','6C9','6F9','00C','03C','06C','09C','0CC','0FC','30C','33C','36C','39C','3CC','3FC','60C','63C','66C','69C','6CC','6FC','00F','03F','06F','09F','0CF','0FF','30F','33F','36F','39F','3CF','3FF','60F','63F','66F','69F','6CF','6FF','900','930','960','990','9C0','9F0','C00','C30','C60','C90','CC0','CF0','F00','F30','F60','F90','FC0','FF0','903','933','963','993','9C3','9F3','C03','C33','C63','C93','CC3','CF3','F03','F33','F63','F93','FC3','FF3','906','936','966','996','9C6','9F6','C06','C36','C66','C96','CC6','CF6','F06','F36','F66','F96','FC6','FF6','909','939','969','999','9C9','9F9','C09','C39','C69','C99','CC9','CF9','F09','F39','F69','F99','FC9','FF9','90C','93C','96C','99C','9CC','9FC','C0C','C3C','C6C','C9C','CCC','CFC','F0C','F3C','F6C','F9C','FCC','FFC','90F','93F','96F','99F','9CF','9FF','C0F','C3F','C6F','C9F','CCF','CFF','F0F','F3F','F6F','F9F','FCF','FFF'];
-
-Wysiwyg.prototype.size = {1:1,2:2,3:3,4:4,5:5,6:6,7:7};
-
-Wysiwyg.prototype.typeList = {
-	'basic': 'undo|redo!fnt!sz!b|i|u|abc!l|c|r|j',
-	'full': 'undo|redo!fnt!sz!b|i|u|abc!l|c|r|j!al!ic|ex!ulst|olst'
-}		
 
 $.fn.wysiwyg = function(options){
 
@@ -134,13 +209,83 @@ $.fn.wysiwyg = function(options){
 //     base.prototype = parent.prototype;
 //     child.prototype = new base();
 // }
-Wysiwyg.prototype._menu = function(){
-	var toolbar = this._drawMenu();
-	this._drawBtn(toolbar);
+Wysiwyg.prototype._uploadPic = function(editor){
+
+	editor.on('dragenter', function (e){
+	    $(this).addClass('active');
+	});
+	editor.on('dragleave', function(e){
+		$(this).removeClass('active');
+	});
+
+	var context = this;
+
+	editor.on('drop', function(e){
+		// get files selected (draged)
+	   	var files = e.originalEvent.dataTransfer.files;
+
+	   	// focus in the editor
+	   	$(this).trigger('focus');
+
+	   	// handle files
+	   	_handleFiles(this, context, files);
+
+	   	if(editor.hasClass('error'))
+	   		setTimeout(function(){
+	   			editor.removeClass('error');
+	   		},2000);
+
+	   	// remove active calss of editor
+	    $(this).removeClass('active');
+	});
+
+	// stop brwser to open the file whene it is droping outside the editor
+	$(document).on('dragenter', function (e){
+	    e.stopPropagation();
+	    e.preventDefault();
+	});
+	$(document).on('dragover', function (e){
+	  	e.stopPropagation();
+	  	e.preventDefault();
+	});
+	$(document).on('drop', function(e){
+		e.stopPropagation();
+		e.preventDefault();
+	});
+
+	/**
+	 * handle the files selectioned,
+	 * this function take the context and files array
+	 * @param  {[this]} context 
+	 * @param  {[array]} files array of files selected
+	 */
+	function _handleFiles(editor, context, files){
+		// loop for the files
+		for(var i=0; i<files.length; i++){
+
+			// check file if it is an image
+			if(!files[i].type.match(/.(jpg|jpeg|png|gif)$/)){
+		      $(editor).addClass('error');
+		      //console.error('File selected is not an image');
+		      continue;
+		    }
+		    
+			var reader = new FileReader();
+ 			
+ 			reader.onload = function (event) {
+		    	context._executeCommand('insertImage', event.target.result);
+		    }
+
+            // Read in the image file as a data URL.
+            reader.readAsDataURL(files[i]);
+		}
+	}
 }
-
-
-Wysiwyg.prototype._drawMenu = function(){
+/**
+ * this function create a menu container
+ * @return {[div]} return the div will content the buttons
+ */
+Wysiwyg.prototype._createMenu = function(){
 	// create the menu div and set it class
 	var menu = $('<div>').addClass('menu');
 
@@ -149,136 +294,230 @@ Wysiwyg.prototype._drawMenu = function(){
 	var toolbar = $('<div>').addClass('toolbar').appendTo(menu);
 
 	// return the menu div
-	this._base.append(menu);
+	this._container.append(menu);
 
+	// return the container will content the buttons
 	return toolbar;
 }
-Wysiwyg.prototype._drawBtn = function(toolbar){
-	// split the tool bar config to get the btns group
-	var btns = this.typeList[this._type].split('!');
+
+/**
+ * this function create the menu buttons and append it to the toolbar
+ * @param  {[div]} toolbar the container will content all the buttons
+ * @return {[boolean]}         return true if the buttons created succefully
+ */
+Wysiwyg.prototype._createMenuButtons = function(toolbar){
+	// split the string configuration to get the buttons to create
+	// this part of code split the buttons by groups
+	var btns = this._config.typeList[this._type].split('|');
+
 	// array will content the buttons
 	var btn = [];
 
 	// split btns group to get btn
 	for(var i=0; i<btns.length; i++)
-		btn[i] = btns[i].split('|');
+		btn[i] = btns[i].split(',');
 
-	// draw buttons
+	// create buttons
 	for(var i=0; i<btn.length; i++){
 
-		if(btn[i].length === 1 && this.tools[btn[i][0]].src){
-			var tool = this.tools[btn[i][0]];
-			var fonts = Object.keys(this[tool.src]);
-			var values = Object.values(this[tool.src]);
-			var select = $('<select>');
-			for(var j in fonts){
-				select.append(
-					$('<option>').text(fonts[j])
-					.val(values[j])
-				);
+		var group = $('<span>').addClass('btns-group');
+
+		for(var j=0; j<btn[i].length; j++){
+
+			// the buttons we want to create
+			var b = btn[i][j];
+
+			// get the tool from _config tools
+			var tool = this._config.tools[b];
+
+			// this part of code create a select of the font family
+			if(b === 'fnt'){
+				// call _createFontFamilySelect(), this function create an font-family select and return it
+				// after we append it to the toolbar
+				_createFontFamilySelect(this).appendTo(toolbar);
 			}
 
-			select.change(this._executeCommand.bind(this, tool.cmd, select.val()));
-
-			toolbar.append(select);
-		}
-		else{
-			// create the group buttons span
-			var btns_group = $('<span>').addClass('btns-group');
-
-			// create each one btn and append it to the btns_group
-			for(var j=0; j<btn[i].length; j++){
-
-				var tool = this.tools[btn[i][j]];
-				var self = this;
-
-				// create the button
-				var b = $('<span>').addClass('btn fa fa-'+tool.icon);
-
-				// if the btn command is a function execute this part of code
-				if(typeof tool.cmd === 'function')
-					b.click(tool.cmd);
-				// this part will execute if the command is not a function, it is just a string cmd
-				else
-					b.click(this._executeCommand.bind(this, tool.cmd));
-				
-				// append the button to the group buttons
-				b.appendTo(btns_group);
+			// this part of code create a select for the font size
+			else if(b === 'sz'){
+				_createFontSizeSelect(this).appendTo(toolbar);
 			}
-			// append the group buttons to the toolbar
-			toolbar.append(btns_group);
+
+			else if(b === 'al'){
+				_createAddLinkButton(this, tool.icon).appendTo(toolbar);
+			}
+
+			else if(b === 'fc' || b === 'bc'){
+				_createColorPalett(this, tool).appendTo(toolbar);
+			}
+
+			// this part create the others buttons
+			else{
+
+				// create button for this tool
+				$('<span>').addClass('btn fa fa-'+tool.icon)
+							.click(this._executeCommand.bind(this, tool.cmd)) // add  event click for this button
+							.appendTo(group);
+			}
 		}
+
+		// this part of code add the group span to the toolbar if it has children, if not do nothing
+		// this will work if children().length > 0
+		if(group.children().length)
+			group.appendTo(toolbar);
 	}
-	var self = this;
-	toolbar.append(
-			$('<span class="btn">').text('tab')
-									.click(function(){
-										var tab = createTab(4,4);
-										self._executeCommand('insertHTML', tab);
-									})
-	);
-}
 
-function createTab(line, col){
-	var tab = '<table>';
+	/**
+	 * this function create font family select and set the change event for it
+	 * @param  {[this]} context the context where the fucntion called in all case it is (this)
+	 * @return {[select]} return the select created
+	 */
+	function _createFontFamilySelect(context){ // get context => this
+		// this select will content all the fonts family
+		var select = $('<select>').addClass('font-family-select');
 
-	for(var i=0; i<line; i++){
-		tab += '<tr>';
+		// the fonts family defined in _config which is provided with the API
+		var fonts = context._config.fonts;
 
-		for(var j=0; j<col; j++){
-			tab += '<td></td>';
+		// create the options and append it to the select
+		for(var i in fonts)
+			$('<option>').text(i)
+						.val(fonts[i])
+						.css('font-family', fonts[i])
+						.appendTo(select);
+
+		// add event listener to the select
+		// when the select text change execute the command with the selected value
+		select.change(function(event){
+			context._executeCommand('fontName', event.target.value);
+		});
+
+		// return the select created
+		return select;
+	}
+
+	/**
+	 * create font size select and set event change to it
+	 * @param  {[this]} context the context where the fucntion called in all case it is (this)
+	 * @return {[select]}       return the select created
+	 */
+	function _createFontSizeSelect(context){
+		// this select will content the font size
+		var select = $('<select>').addClass('font-size-select');
+
+		// create the options and append it to the select
+		for(var i=9; i<=60; i+=5)
+			$('<option>').text(i).appendTo(select);
+
+		// set change event to the select
+		// in this part of code we execute the command which add size attribute to the selection
+		// after we get that selection by the attribute using selector and we change it's font size
+		select.change(function(event){
+			var value = event.target.value;
+			context._executeCommand('fontSize', 7);
+
+			// get the selection by size attribut and change it's font size
+			$('[size = 7]').css('font-size', value).removeAttr('size');
+		})
+
+		// return the select 
+		return select;
+	}
+	/**
+	 * Create add link button and set event click for the valid button
+	 * @param  {[this]} context the context where the fucntion called in all case it is (this)
+	 * @param  {[string]} icon  font-awesome class name for the tool icon
+	 * @return {[label]}        return an label which content all elements created
+	 */
+	function _createAddLinkButton(context, icon){
+		// create the coantainer
+		var drop_down = $('<label class="drop-down btns-group">').append('<input type="checkbox"><span class="drop-close"></span>')
+					.append($('<span class="btn fa fa-'+icon+'">'));
+
+		// create drop down body
+		var ul = $('<ul>').appendTo(drop_down);
+		// add input text to the drop down body
+		var input = $('<input type="text">').val('http://').appendTo(ul);
+		// create validate button
+		var validButton = $('<span>').text('add').addClass('btn add-link').appendTo(ul);
+
+		// add event listener to validate button
+		validButton.click(function(event){
+			// if the input is empty so call unlick commmand
+			if(input.val() === '')
+				context._executeCommand('unlink');
+
+			// if not create new link
+			else
+				context._executeCommand('createLink', input.val());
+			input.val('http://');
+		})
+
+		// return the drop down
+		return drop_down;
+	}
+	/**
+	 * this function create the color palett for fontColor and backColor buttons
+	 * @param  {[this]} context the context where the fucntion called in all case it is (this)
+	 * @param  {[object]} tool  tool object
+	 * @return {[label]}        return the drop down created
+	 */
+	function _createColorPalett(context, tool){
+		// create the drop down
+		var drop_down = $('<label class="drop-down btns-group colors-palett">').append('<input type="checkbox"><span class="drop-close"></span>');
+		// create the button showing in toolbar
+		var btn = $('<span class="btn '+tool.cmd+'">').appendTo(drop_down);
+		// create the icon and add it to btn
+		var icon = $('<i>').addClass('fa fa-'+tool.icon).appendTo(btn);
+
+		// create dorp down body
+		var ul = $('<ul>').appendTo(drop_down);
+
+		// get colors to create, this colors is defined in config file
+		var colors = context._config.colors;
+
+		for(var i in colors){
+			// create an span which will content the color, set it's background to the color
+			var c = $('<span>').css('background', '#'+colors[i]).addClass('colors-item').attr('data-color', colors[i]);
+
+			// this code work for the forecolor
+			if(tool.cmd === 'foreColor'){
+				c.click(function(event){
+					// get the color clicked
+					var color = '#'+$(event.target).attr('data-color');
+					// execute the command and cahnge the color for the selection
+					context._executeCommand(tool.cmd, color);
+					// change the border-color and color for the forecolor button
+					icon.css('border-color', color).css('color', color);
+				});
+			}
+			// this code for backcolor
+			else if(tool.cmd === 'backColor'){
+				c.click(function(event){
+					// get color clicked
+					var color = '#'+$(event.target).attr('data-color');
+					// execute the command and cahnge the color for the selection
+					context._executeCommand(tool.cmd, color);
+					// change the background color for the button
+					btn.css('background', color);
+				});
+			}
+			// append the span to the ul (drop down body)
+			c.appendTo(ul);
 		}
-		tab += '</tr>'
+
+		// return the drop down
+		return drop_down;
 	}
-
-	tab += '</table>';
-
-	return tab;
 }
-function Wysiwyg(type){
-	// this div will content all the elements
-	this._base = $('<div>').addClass('wysi');
-	// type of the wysiwyg
-	this._type = type;
-}
-
-Wysiwyg.prototype._build = function(container){
-	// create the menu and all elements
-	this._menu();
-	// create the zone text
-	this._zoneText();
-
-	// add the _base to the container
-	container.append(this._base);
-}
-/**
- * execute a commande passed by param
- * @param  {[string]} command command to execute
- * @param  {[]} option options specify for this command 
- * @return {[bool]}    return true if the command executed succefully and false if not
- */
-Wysiwyg.prototype._executeCommand = function (command, option, event){
-
-	if(command === 'fontName' || command === 'fontSize')
-		option = event.target.value;
-	try{
-		document.execCommand(command, false, option);
-		return true;
-	}catch(x){
-		console.error(x);
-	}
-	return false;
-}
-Wysiwyg.prototype._zoneText = function(){
-	this._drawZoneText();
-};
-
-Wysiwyg.prototype._drawZoneText = function(){
+Wysiwyg.prototype._createEditor = function(){
 	// create the editable div, where the use can write
-	var zoneText = $('<div>').attr({
+	var editor = $('<div>').attr({
 		contenteditable: 'true',
-		class: 'zonetext'
+		class: 'editor',
+		id: 'editor'
 	});
 
-	this._base.append(zoneText);
+	this._container.append(editor);
+
+	return editor;
 }

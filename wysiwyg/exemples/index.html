@@ -1,5 +1,7 @@
+<!doctype html>
 <html>
 	<head>
+		<meta charset="UTF-8">
 		<link rel="stylesheet" href="../dest/css/wysiwyg.css">
 		<link rel="stylesheet" href="../dest/css/brighter.css">
 		<link rel="stylesheet" href="../dest/css/font-awesome.css">
@@ -16,7 +18,9 @@
 		<script src="../dest/js/wysiwyg.js"></script>
 
 		<script>
+			var dt = Date.now();
 			$('#wysi').wysiwyg({type: 'full'});
+			console.log('Time :', Date.now() - dt, 'ms');
 		</script>
 	</body>
 </html>

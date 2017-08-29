@@ -1,21 +1,64 @@
 .wysiwyg .menu {
   background: #f0f0f0;
-  border-radius: 10px 10px 0 0; }
+  border-radius: 7px 7px 0 0; }
   .wysiwyg .menu .toolbar {
-    padding: 8px; }
+    padding: 10px 5px; }
     .wysiwyg .menu .toolbar .btns-group {
-      margin: 0 3px; }
+      margin: 2px; }
+    .wysiwyg .menu .toolbar select {
+      vertical-align: middle;
+      height: 26px;
+      margin: 2px;
+      padding: 0; }
+    .wysiwyg .menu .toolbar .drop-down ul {
+      width: auto;
+      padding: 5px;
+      margin-top: 2px; }
+      .wysiwyg .menu .toolbar .drop-down ul .add-link {
+        margin-top: 2px;
+        float: right;
+        border-radius: 3px; }
+    .wysiwyg .menu .toolbar .colors-palett .btn {
+      padding: 3.5px 10px; }
+      .wysiwyg .menu .toolbar .colors-palett .btn.foreColor i {
+        border-bottom: 2px solid #000;
+        padding: 0 2px; }
+    .wysiwyg .menu .toolbar .colors-palett ul {
+      width: 140px; }
+      .wysiwyg .menu .toolbar .colors-palett ul .colors-item {
+        width: 12px;
+        height: 12px;
+        display: inline-block;
+        margin: 2px; }
+        .wysiwyg .menu .toolbar .colors-palett ul .colors-item:last-child {
+          border: 1px solid #999; }
 
-.wysiwyg .zonetext {
+.wysiwyg .editor {
   min-height: 500px;
   padding: 5px;
-  border: 3px solid #f0f0f0;
-  border-radius: 0 0 10px 10px;
-  border-top: none; }
-  .wysiwyg .zonetext:focus {
+  border: 2px solid #f0f0f0;
+  border-radius: 0 0 10px 10px; }
+  .wysiwyg .editor:focus {
     outline: none; }
-  .wysiwyg .zonetext table {
+  .wysiwyg .editor table {
     display: inline-block; }
-    .wysiwyg .zonetext table td {
+    .wysiwyg .editor table td {
       border: 1px solid #000;
       min-width: 10px; }
+  .wysiwyg .editor.active {
+    border: 2px dashed #0B85A1; }
+  .wysiwyg .editor.error {
+    -webkit-animation: border_error 2s;
+    animation: border_error 2s; }
+
+@-webkit-keyframes border_error {
+  0% {
+    border-color: #f00; }
+  100% {
+    border-color: #f0f0f0; } }
+
+@keyframes border_error {
+  0% {
+    border-color: #f00; }
+  100% {
+    border-color: #f0f0f0; } }

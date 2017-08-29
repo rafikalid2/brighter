@@ -1,27 +1,69 @@
 $bg-color : #f0f0f0; //#99c7b9;
+$btn-margin: 2px;
 
 .wysiwyg{
 
 	.menu{
 		background: $bg-color;
-		border-radius: 10px 10px 0 0;
+		border-radius: 7px 7px 0 0;
 		
 		// the toolbar div inside menu 
 		.toolbar{
-			padding: 8px;
+			padding: 10px 5px;
 
 			.btns-group{
-				margin: 0 3px;
+				margin: $btn-margin;
+			}
+			select{
+				vertical-align: middle;
+				height: 26px;
+				margin: $btn-margin;
+				padding: 0;
+			}
+			.drop-down ul{
+				width: auto;
+				padding: 5px;
+				margin-top: 2px;
+
+				.add-link{
+					margin-top: 2px;
+					float: right;
+					border-radius: 3px;
+				}
+			}
+			.colors-palett{
+				.btn{
+
+					padding: 3.5px 10px;
+
+					&.foreColor{
+						i{
+							border-bottom: 2px solid #000;
+							padding: 0 2px;
+						}
+					}
+				}
+				ul{
+					width: 140px;
+
+					.colors-item{
+						width: 12px; height: 12px;
+						display: inline-block;
+						margin: 2px;
+						&:last-child{
+							border: 1px solid #999;
+						}
+					}
+				}
 			}
 		}
 	}
 
-	.zonetext{
+	.editor{
 		min-height: 500px;
 		padding: 5px;
-		border: 3px solid $bg-color;
+		border: 2px solid $bg-color;
 		border-radius: 0 0 10px 10px;
-		border-top: none;
 		&:focus{
 			outline: none;
 		}
@@ -33,5 +75,21 @@ $bg-color : #f0f0f0; //#99c7b9;
 				min-width: 10px;
 			}
 		}
+		&.active{
+			border: 2px dashed #0B85A1;
+		}
+		&.error{
+			-webkit-animation: border_error 2s;
+			animation: border_error 2s;
+		}
 	}
+}
+
+@-webkit-keyframes border_error{
+	0% {border-color: #f00;}
+	100% {border-color: $bg-color;}
+}
+@keyframes border_error{
+	0% {border-color: #f00;}
+	100% {border-color: $bg-color;}
 }

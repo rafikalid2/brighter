@@ -1,13 +1,12 @@
-Wysiwyg.prototype._zoneText = function(){
-	this._drawZoneText();
-};
-
-Wysiwyg.prototype._drawZoneText = function(){
+Wysiwyg.prototype._createEditor = function(){
 	// create the editable div, where the use can write
-	var zoneText = $('<div>').attr({
+	var editor = $('<div>').attr({
 		contenteditable: 'true',
-		class: 'zonetext'
+		class: 'editor',
+		id: 'editor'
 	});
 
-	this._base.append(zoneText);
+	this._container.append(editor);
+
+	return editor;
 }
