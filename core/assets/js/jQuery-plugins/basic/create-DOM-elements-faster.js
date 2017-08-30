@@ -23,7 +23,12 @@
 
 	$.extend(DOMElementBuilder.prototype, {
 		attr	: function(attrName, attrValue){
-			this.ele.setAttribute(attrName, attrValue);
+			if(typeof attrName == 'object'){
+				for(var i in attrName)
+					this.ele.setAttribute(i, attrName[i]);
+			}else{
+				this.ele.setAttribute(attrName, attrValue);
+			}
 			return this;
 		},
 		addClass: function(className){
