@@ -20,6 +20,8 @@ Wysiwyg.prototype._build = function(context){
 	context.append(this._container);
 
 	this._uploadPic(editor);
+
+	$(editor).click(this._selection.bind(this, toolbar));
 }
 
 /**

@@ -20,6 +20,8 @@ Wysiwyg.prototype._build = function(context){
 	context.append(this._container);
 
 	this._uploadPic(editor);
+
+	$(editor).click(this._selection.bind(this, toolbar));
 }
 
 /**
@@ -352,11 +354,7 @@ Wysiwyg.prototype._createMenuButtons = function(toolbar){
 
 			// this part create the others buttons
 			else{
-
-				// create button for this tool
-				$('<span>').addClass('btn fa fa-'+tool.icon)
-							.click(this._executeCommand.bind(this, tool.cmd)) // add  event click for this button
-							.appendTo(group);
+				_createOtherButtons(this, tool).appendTo(group);
 			}
 		}
 
@@ -373,7 +371,7 @@ Wysiwyg.prototype._createMenuButtons = function(toolbar){
 	 */
 	function _createFontFamilySelect(context){ // get context => this
 		// this select will content all the fonts family
-		var select = $('<select>').addClass('font-family-select');
+		var select = $('<select>').addClass('font-family-select').attr('id', 'font-family-select');
 
 		// the fonts family defined in _config which is provided with the API
 		var fonts = context._config.fonts;
@@ -402,7 +400,7 @@ Wysiwyg.prototype._createMenuButtons = function(toolbar){
 	 */
 	function _createFontSizeSelect(context){
 		// this select will content the font size
-		var select = $('<select>').addClass('font-size-select');
+		var select = $('<select>').addClass('font-size-select').attr('id', 'font-size-select');
 
 		// create the options and append it to the select
 		for(var i=9; i<=60; i+=5)
@@ -413,10 +411,11 @@ Wysiwyg.prototype._createMenuButtons = function(toolbar){
 		// after we get that selection by the attribute using selector and we change it's font size
 		select.change(function(event){
 			var value = event.target.value;
+			//execute this line to add size 7 to the selection
 			context._executeCommand('fontSize', 7);
 
 			// get the selection by size attribut and change it's font size
-			$('[size = 7]').css('font-size', value).removeAttr('size');
+			$('[size = 7]').css('font-size', value+'px').removeAttr('size');
 		})
 
 		// return the select 
@@ -507,6 +506,75 @@ Wysiwyg.prototype._createMenuButtons = function(toolbar){
 
 		// return the drop down
 		return drop_down;
+	}
+
+	function _createOtherButtons(context, tool){
+
+		return $('<span>').addClass('btn fa fa-'+tool.icon).attr('id', tool.cmd)
+					.click(function(){ // add  event click for this button
+						// execute the command
+						var res = context._executeCommand(tool.cmd);
+						console.log(res);
+						if( res && (tool.cmd ===  'bold' || tool.cmd === 'italic' || tool.cmd === 'underline' || tool.cmd === 'strikeThrough')){
+							var bt = $(this);
+
+							if(bt.hasClass('active'))
+								bt.removeClass('active');
+							else
+								bt.addClass('active');
+						}
+					})
+					.appendTo(group);
+	}
+}
+Wysiwyg.prototype._selection = function(toolbar){
+	try{
+
+		// remove .active class for all buttons
+		toolbar.find('.active').removeClass('active');
+
+		var style = window.getComputedStyle(document.getSelection().anchorNode.parentNode);
+
+		// //font family
+		// 	var a = style.fontFamily;
+		// 	$('#font-family-select').val(a);
+		// 	console.log(a);
+		//	$tools.find('.fnt').text(style.fontFamily.split(',')[0].trim());
+		// //font size
+		// 	$tools.find('.sze').text(style.fontSize.replace('px',' '));
+		//bold
+			if(style.fontWeight == 'bold' || style.fontWeight == 700)
+				toolbar.find('#bold').addClass('active');
+		//italic
+			if(style.fontStyle == 'italic')
+				toolbar.find('#italic').addClass('active');
+		//underline
+			var _textDecoration = style.webkitTextDecorationsInEffect || style.textDecoration;
+			if(_textDecoration.indexOf('underline')>-1)
+				toolbar.find('#underline').addClass('active');
+		//line-through
+			if(_textDecoration.indexOf('line-through')>-1)
+				toolbar.find('#strikeThrough').addClass('active');
+		//text align
+			a= style.textAlign.replace('-moz-','');
+			toolbar.find(
+				a == 'center'? '#justifyCenter'
+				:(
+					a=='right'?'#justifyRight'
+					:(
+						a=='justify'?'#justifyFull'
+						:'#justifyLeft'
+					)
+				)
+			).addClass('active');
+		//sub
+			if(style.top && style.top.startsWith('-'))
+				toolbar.find('#subScript').addClass('active');
+		//sup
+			else if(style.bottom && style.bottom.startsWith('-'))
+				toolbar.find('#superScript').addClass('active');
+	}catch(err){
+		console.error(err);
 	}
 }
 Wysiwyg.prototype._createEditor = function(){

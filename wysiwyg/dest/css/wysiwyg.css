@@ -48,8 +48,8 @@
   .wysiwyg .editor.active {
     border: 2px dashed #0B85A1; }
   .wysiwyg .editor.error {
-    -webkit-animation: border_error 2s;
-    animation: border_error 2s; }
+    -webkit-animation: border_error 1s;
+    animation: border_error 1s; }
 
 @-webkit-keyframes border_error {
   0% {

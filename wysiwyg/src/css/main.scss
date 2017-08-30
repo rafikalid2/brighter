@@ -79,8 +79,8 @@ $btn-margin: 2px;
 			border: 2px dashed #0B85A1;
 		}
 		&.error{
-			-webkit-animation: border_error 2s;
-			animation: border_error 2s;
+			-webkit-animation: border_error 1s;
+			animation: border_error 1s;
 		}
 	}
 }
