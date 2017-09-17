@@ -1,0 +1,4 @@
+
+	// set as global
+		return $$;
+});
