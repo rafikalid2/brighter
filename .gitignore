@@ -7,3 +7,4 @@ core/dest/brighter.js
 
 chart/node_modules/**
 chart/dest/**
+brighter/dest/brighter.js
