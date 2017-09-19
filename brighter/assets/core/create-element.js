@@ -22,15 +22,12 @@ function $$(expression){
 		else if(typeof expression == 'string'){
 			result	= [document.createElement(expression)];
 		}
-		else if(typeof expression == 'function')
-			{throw new Error('---- document ready is not yeat implemented!')}
-		else if(
-			expression instanceof HTMLElement
-			|| expression instanceof SVGElement
-		)
+		else if(typeof expression == 'function'){
+			$$(window).on('load', expression);
+		}else if(expression.nodeType)// HTML or SVG element
 			result	= [expression];
 		else if(expression instanceof $$)
-			result	= expression;
+			result	= expression.duplicate();
 		else
 			throw new Error('insupported argument')
 	// make list as brighter object

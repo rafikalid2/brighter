@@ -16,7 +16,9 @@
 
 // gestion des elements
 	$$(..)[x]	// get element with index x
-	$$(..).push(element)	// push an element to the list, element could be HTMLElement or Brighter-object
+	$$(..)
+		.push(element)	// push an element to the list, element could be HTMLElement, SVG element or Brighter-object or event list of elements
+		.add(element)	// alias
 
 
 // gestion des attribut

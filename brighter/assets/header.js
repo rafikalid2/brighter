@@ -22,6 +22,8 @@
 
 	// extend Array prototype
 		classExtend(Array, $$);
+	// racourcis vers $$.prototype
+		var $$prototype	= $$.prototype;
 
 	/**
 	 * params
