@@ -54,9 +54,24 @@
 
 // forEach
 	$$prototype.forEach		= $$prototype.each	= function(callBack){
-		var i=0, c= this.length;
+		var i, c= this.length;
 		for(i=0; i<c ; ++i){
 			if(callBack(this[i], i) === false)
+				break;
+		}
+		return this;
+	};
+
+// each tag (tag only, exclude attributeNode, commentNode, textNode, ...)
+	$$.prototype.eachTag	= function(callBack){
+		var i, c= this.length, ele;
+		for(i=0; i<c; ++i){
+			ele	= this[i];
+			if(
+				ele
+				&& ele.nodeType == 1
+				&& callBack(ele, i) === false
+			)
 				break;
 		}
 		return this;
