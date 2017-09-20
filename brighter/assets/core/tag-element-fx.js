@@ -23,10 +23,14 @@
 /**
  * classes
  */
- $$prototype.className		= function(className){
- 	return this.setAttribute('class', className);
+ $$prototype.className		= function(className){return this.setAttribute('class', className);};
+ $$prototype.addClass		= function(className){
+ 	if(className){
+	 	className	= className.split(' ');
+	 	this.eachTag(ele =>{});
+ 		
+ 	}
  };
- $$prototype.addClass		= function(className){};
  $$prototype.removeClass	= $$prototype.rmClass	= function(className){};
  $$prototype.hasClass		= function(){};
  $$prototype.toggleClass	= function(){};
