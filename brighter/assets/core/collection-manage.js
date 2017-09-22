@@ -1,3 +1,17 @@
+
+
+// fonction hiritees et utiliser directement depuis la class Array
+	// Array.prototype.every((ele, index) => true || false)		returns true if all elements passed the test
+	// Array.prototype.some((ele, index) => true || false)		returns true if at least one element passes the test 
+	// 
+	// Array.prototype.map(ele => {return img})
+	// Array.prototype.reduce()
+	// Array.prototype.reduceRight()
+	// 
+	// Array.prototype.pop
+	// Array.prototype.shift
+
+
 // add element to collection
 	$$prototype.push = $$prototype.add = function(){
 		// control
@@ -82,4 +96,68 @@
 		var filtered	= Array.prototype.filter.apply(this, arguments);
 		filtered.__proto__	= $$prototype;
 		return filtered;
+	};
+
+// sort
+	$$prototype.sort	= function(){
+		Array.prototype.sort.apply(this, arguments);
+		return this;
+	};
+// reverse
+	$$prototype.reverse	= function(){
+		Array.prototype.reverse.apply(this, arguments);
+		return this;
+	};
+/**
+ * make a test on every element in the array
+ * 	every((ele, index) =>{
+ * 		return true||false;
+ * 	})
+ *
+ * @return {boolean} if all elements in the array passed successfuly the test
+ */
+ 	// $$prototype.every	= native fx (Array.prototype.every)
+ 	// 
+
+/**
+ * get element from position
+ */
+ 	$$.prototype.eq	= function(index){
+ 		var result	= this.length? [this[index < 0 ? this.length + index : index]] : [];
+		result.__proto__ = $$prototype;
+		return result;
+ 	};
+// first
+	$$prototype.first	= function(){ return this.eq(0); };
+// last
+	$$prototype.last	= function(){ return this.eq(-1); };
+//first tag
+	$$prototype.getFirstTag	= function(){
+		var i, c = this.length;
+		for(i=0; i<c; ++i){
+			if(this[i].nodeType == 1)
+				return this[i];
+		}
+		return undefined;
+	};
+	$$prototype.firstTag	= function(){
+		var ele			= this.getFirstTag();
+		ele				= ele ? [ele] : [];
+		ele.__proto__	= $$prototype;
+		return ele;
+	};
+// last tag
+	$$prototype.getLastTag= function(){
+		var i;
+		for(i = this.length - 1; i>=0; --i){
+			if(this[i].nodeType == 1)
+				return this[i];
+		}
+		return undefined;
+	};
+	$$prototype.lastTag	= function(){
+		var ele			= this.getLastTag();
+		ele				= ele ? [ele] : [];
+		ele.__proto__	= $$prototype;
+		return ele;
 	};
