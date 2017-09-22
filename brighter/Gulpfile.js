@@ -8,6 +8,7 @@ var order	= require('gulp-order');
 // order
 	var concatOrder	= [
 				'header.js',
+				'plugin.js',
 				'**/*.js',
 				'footer.js'
 			];
@@ -16,7 +17,7 @@ var order	= require('gulp-order');
 		gulp.src('assets/**/*.js')
 			.pipe(order(concatOrder))
 			// .on('error',gutil.log)
-			.pipe(concat('brighter.js', {newLine: ';'}))
+			.pipe(concat('brighter.js', {newLine: ";\n"}))
 			// .on('error',gutil.log)
 			.pipe(gulp.dest('./dest/'));
 	});

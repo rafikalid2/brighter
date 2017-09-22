@@ -24,6 +24,8 @@
 		classExtend(Array, $$);
 	// racourcis vers $$.prototype
 		var $$prototype	= $$.prototype;
+	// BRIGHTER unique identifier
+		var BRIGHTER_ID	= '$$' + Math.random().toString(16).substr(2,4);
 
 	/**
 	 * params

@@ -1,2 +1,4 @@
-// main asert
-	$$.assert	= function(expression){};
+// main assert
+	$$.plugin('assert', _$$Assert);
+
+	function _$$Assert(expression){}
