@@ -15,19 +15,39 @@ $$.plugin({
 		rmClass			: _elementClassRemove,
 	// hasClass('cl1', 'cl2', ...)
 		hasClass		: function(){
-			var hasClass	= true;
-			if(arguments.length){
-				var i, c = arguments.length;
-				this.eachTag(ele =>{
-					for(i=0; i<c; ++i){
-						if(!ele.classList.contains(arguments[i])){
-							hasClass	= false;
-							return false;// break the two loops
+			var i, hasClass, c = arguments.length;
+			// return an array
+			if(this._all){
+				if(c)
+					hasClass	= this.map(ele=>{
+						if(ele.nodeType != 1) // not a tag
+							return undefined;
+						else{
+							for(i=0; i<c; ++i){
+								if(!ele.classList.contains(arguments[i]))
+									return false;
+							}
+							return true;
 						}
-					}
-				});
-			}else{
-				hasClass	= false;
+					});
+				else
+					hasClass	= this.map(ele => ele.nodeType != 1 ? false : undefined);
+			}
+			// if elements has all those classes
+			else{
+				hasClass	= true;
+				if(c){
+					this.eachTag(ele =>{
+						for(i=0; i<c; ++i){
+							if(!ele.classList.contains(arguments[i])){
+								hasClass	= false;
+								return false;// break the two loops
+							}
+						}
+					});
+				}else{
+					hasClass	= false;
+				}
 			}
 			return hasClass;
 		},

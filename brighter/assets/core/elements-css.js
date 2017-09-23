@@ -52,5 +52,14 @@ $$.plugin({
 						ele.style[i]	= arg[i];
 				});
 			}
+		return this;
+	},
+	// remove css property
+	rmCss	: function(){
+		var i, c= arguments.length;
+		return this.eachTag(ele => {
+			for(i=0; i<c; ++i)
+				ele.removeProperty(arguments[i]);
+		});
 	}
 });
