@@ -13,12 +13,7 @@
 		var ele, result;
 		// if returns all elements data as list
 		if(this._all){
-			result	= this.map(ele => {
-				if(ele.nodeType !=1 )
-					return undefined;
-				else
-					return _elementDataGet(ele, BRIGHTER_USER_DATA_KEY);
-			});
+			result	= this.mapTags(ele => _elementDataGet(ele, BRIGHTER_USER_DATA_KEY));
 		}
 		// return the first element data
 		else{

@@ -1,6 +1,11 @@
 $$.plugin({
-	// set class
-		className		: function(className){return this.setAttribute('class', className);},
+	/**
+	 * className()				: get the className of the fist eleemnt
+	 * className(className)		: set the className of the fist eleemnt
+	 * all.className()			: get all elements className as a list
+	 * all.className(className)	: set the className of all elements
+	 */
+		className		: function(className){return _elementsAttr.call(this, 'class', className);},
 	// addClass('cl1', 'cl2', ...)
 		addClass		: function(){
 		 	if(arguments.length){
@@ -13,25 +18,24 @@ $$.plugin({
 	// removeClass('cl1', 'cl2', ...)
 		removeClass		: _elementClassRemove,
 		rmClass			: _elementClassRemove,
-	// hasClass('cl1', 'cl2', ...)
+	/**
+	 * hasClass('cl1', 'cl2', ...)	: if all elements have those classes
+	 * all.hasClass('cl1', ...)		: return an array of if each element has those classes
+	 */
 		hasClass		: function(){
 			var i, hasClass, c = arguments.length;
 			// return an array
 			if(this._all){
 				if(c)
-					hasClass	= this.map(ele=>{
-						if(ele.nodeType != 1) // not a tag
-							return undefined;
-						else{
-							for(i=0; i<c; ++i){
-								if(!ele.classList.contains(arguments[i]))
-									return false;
-							}
-							return true;
+					hasClass	= this.mapTags(ele=>{
+						for(i=0; i<c; ++i){
+							if(!ele.classList.contains(arguments[i]))
+								return false;
 						}
+						return true;
 					});
 				else
-					hasClass	= this.map(ele => ele.nodeType != 1 ? false : undefined);
+					hasClass	= this.mapTags(ele => false);
 			}
 			// if elements has all those classes
 			else{

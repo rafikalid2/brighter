@@ -5,22 +5,25 @@
  *
  * 	- $$()						: create document fragment
  * 	- $$(HTML or SVG element or $$ element)	: add it
- * 	- $$(elementName)			: create HTML or SVG element
+ * 	- $$(elementName)			: create HTML element
+ * 	- $$(elementName, namespace): create HTML element with namespace
  * 	- $$(function)				: add this function to be executed when the window is loaded
  *
  * other usecases:
- * 	- $$('div', 5)	 create 5 divs
  * 	- $$.create('div#jks.cc.hello')
  */
 
-function $$(expression){
+function $$(expression, namespace){
 	var result;
 	// create empty document fragment
 		if(!expression)
 			result	= [document.createDocumentFragment()];
 	// create HTML or SVG element
 		else if(typeof expression == 'string'){
-			result	= [document.createElement(expression)];
+			if(namespace && (typeof namespace == 'string'))
+				result	= [document.createElementNS(namespace)];
+			else
+				result	= [document.createElement(expression)];
 		}
 		else if(typeof expression == 'function'){
 			$$(window).on('load', expression);
@@ -38,7 +41,5 @@ function $$(expression){
 
 // create SVG element
 	$$.svg	= function(tagName){
-		var result	= [document.createElementNS(svgNS, tagName)];
-		result.__proto__	= $$.prototype;
-		return result;
+		return $$(tagName, svgNS);
 	};

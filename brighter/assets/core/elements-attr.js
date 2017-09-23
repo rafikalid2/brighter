@@ -1,20 +1,28 @@
 
 $$.plugin({
-	// setAttribute
+	// setAttribute		: set attr of the first element
+	// all.setAttribute	: set attribute of all elements
 	setAttribute	: function(attrName, attrValue){
-		return this.eachTag(ele=> ele.setAttribute(attrName, attrValue));
+		return _elementsAttr.call(this, attrName, attrValue);
 	},
 	// get or set attributes
-	// @param attr
-	// 		- {string} 	: attribute name
-	// 		- obj		: attributes list
-	attr			: function(attr){
-		var ele, resut;
+	// attr('attrName')		// get attrubute value
+	// attr({key: value})	// set attributes
+	// attr(namespace, {key: value})	// set attributes with namespace
+	attr			: function(){
+		var ele, resut, attr, namespace;
+		// arguments
+			if(arguments.length ==1)
+				attr		= arguments[0];
+			else if(arguments.length == 2){
+				namespace	= arguments[0];
+				attr		= arguments[1];
+			}
 		if(attr){
 			// get value
 				if(typeof attr == 'string'){
 					if(this._all){ // "all" is specified for the current object (.all.attr(...))
-						result	= this.map(ele => ele.nodeType != 1 && ele.getAttribute(attr));
+						result	= this.mapTags(ele => ele.getAttribute(attr));
 					}else{
 						ele	= this.getFirstTag();
 						if(ele)
@@ -24,10 +32,16 @@ $$.plugin({
 				}
 			// set values
 				else{
-					this.eachTag(ele => {
-						for(var i in attr)
-							ele.setAttribute(i, attr[i]);
-					});
+					if(namespace)
+						this.eachTag(ele => {
+							for(var i in attr)
+								ele.setAttributeNS(namespace, i, attr[i]);
+						});
+					else
+						this.eachTag(ele => {
+							for(var i in attr)
+								ele.setAttribute(i, attr[i]);
+						});
 				}
 		}
 		return this;
@@ -38,19 +52,15 @@ $$.plugin({
 		// returns an array
 		if(this._all){
 			if(c)
-				hasAttr	= this.map(ele=>{
-					if(ele.nodeType != 1)// node a tag
-						return undefined;
-					else{
-						for(i=0; i<c; ++i){
-							if(!ele.hasAttribute(arguments[i]))
-								return false;
-						}
-						return true;
+				hasAttr	= this.mapTags(ele=>{
+					for(i=0; i<c; ++i){
+						if(!ele.hasAttribute(arguments[i]))
+							return false;
 					}
+					return true;
 				});
 			else
-				hasClass	= this.map(ele => ele.nodeType != 1 ? false : undefined);
+				hasClass	= this.mapTags(ele => false);
 		}
 		// test if all elements has those attributes
 		else{
@@ -86,4 +96,32 @@ $$.plugin({
 			});
 		}
 		return this;
+	}
+// set/get attribute
+	function _elementsAttr(attr, attrValue){
+		var result, frstElement;
+		// insert
+		if(attrValue){
+			if(this._all)
+				this.eachTag(ele => {
+					ele.setAttribute(attr, attrValue);
+				});
+			else{
+				frstElement	= this.getFirstTag();
+				if(frstElement)
+					frstElement.setAttribute(attr, attrValue);
+			}
+			result	= this;
+		}
+		// get
+		else{
+			if(this._all)
+				result	= this.mapTags(ele => ele.getAttribute(attr));
+			else{
+				frstElement	= this.getFirstTag();
+				if(frstElement)
+					result	= frstElement.getAttribute(attr);
+			}
+		}
+		return result;
 	}

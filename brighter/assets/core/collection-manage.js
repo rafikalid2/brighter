@@ -128,6 +128,14 @@ $$.plugin({
 			ele				= ele ? [ele] : [];
 			ele.__proto__	= $$prototype;
 			return ele;
+		},
+	/**
+	 * map tags
+	 * this is equivalent to Array.prototype.map, the difference is that this function returns
+	 * "undefined" for non tag values
+	 */
+		mapTags		: function(callBack){
+			this.map(ele => (ele.nodeType == 1 ? callBack(ele) : undefined))
 		}
 });
 // add element to collection

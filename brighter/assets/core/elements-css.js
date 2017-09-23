@@ -20,17 +20,12 @@ $$.plugin({
 					}
 				// if "all" is specified, get all computed styles inside a list
 				if(this._all){
-					computedStyle	= this.map(ele => {
-						var result;
-						if(ele.nodeType != 1) // not a tag
-							result	= undefined;
-						else{
-							result	= window.getComputedStyle(ele, arg);// on peu ajouter le pseudo aussi
-							//get specifique property if required
-								if(arg2){
-									result	= result.getPropertyValue(arg2);
-								}
-						}
+					computedStyle	= this.mapTags(ele => {
+						var result	= window.getComputedStyle(ele, arg);// on peu ajouter le pseudo aussi
+						//get specifique property if required
+							if(arg2){
+								result	= result.getPropertyValue(arg2);
+							}
 						return result;
 					});
 				}else{
