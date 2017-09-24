@@ -27,25 +27,25 @@
 				// GET: next fx will return value for each element as a list
 				// SET: next fx will make copy of inserted value for each element in the list
 
-		.setAttribute('attrName', 'attrValue')
-		.attr('attrName'); // get attr name value
-		.attr({key:value}); // set attributes
+		// .setAttribute('attrName', 'attrValue')
+		// .attr('attrName'); // get attr name value
+		// .attr({key:value}); // set attributes
 
 		.val() // get or set value
 		.value()//alias for "val"
 		.val((ele, value)=>{})// get value for each element
 
-		.css()		// get computed style
-		.css('key')	// get computed style value
-		.css({key:value})	// set css
+		// .css()		// get computed style
+		// .css('key')	// get computed style value
+		// .css({key:value})	// set css
 
-		.className()	// get the className
-		.className('classes')// set classes
-		.addClass('class')
-		.rmClass('className')
-		.removeClass('className')// alias of rmClass
-		.hasClass('className')
-		.toggleClass('className')
+		// .className()	// get the className
+		// .className('classes')// set classes
+		// .addClass('class')
+		// .rmClass('className')
+		// .removeClass('className')// alias of rmClass
+		// .hasClass('className')
+		// .toggleClass('className')
 
 		.height() // get or set
 		.width()	// get or set

@@ -1,0 +1,215 @@
+(function(){
+	/**
+	 * uniteless attributes
+	 */
+ 	var _cssUniteLess= {
+		animationIterationCount		: 1,
+		'animation-iteration-count'	: 1,
+		columnCount					: 1,
+		'column-count'				: 1,
+		fillOpacity					: 1,
+		'fill-opacity'				: 1,
+		flexGrow					: 1,
+		'flex-grow'					: 1,
+		flexShrink					: 1,
+		'flex-shrink'				: 1,
+		fontWeight					: 1,
+		'font-weight'				: 1,
+		lineHeight					: 1,
+		'line-height'				: 1,
+		opacity						: 1,
+		order						: 1,
+		orphans						: 1,
+		widows						: 1,
+		zIndex						: 1,
+		zoom						: 1
+	},
+
+
+
+	/**
+	 * modify the style of the selected items
+	 * 	.css()				// get computed style of the first tag
+	 * 	.css(':after')		// get pseudo element computed style of the first tag
+	 * 	.css('styleAttr')	// returns the computed value of the first tag, if "all" is set, return a list of all elements
+	 * 	.css(':after', 'styleAttr')
+	 *  .all.css(...)		// return a list mapping all elements with previous options
+	 * 
+	 * 	.css({key: value})	// set thos attributes to all selected tags
+	 */
+	$$.plugin({
+		css	: function(arg, arg2){
+			var i, ele, computedStyle;
+			// if get the computed style
+				if(!arg || (typeof arg	== 'string')){
+					// if we want the element or its pseudo-element
+						if(!arg)
+							arg	= null;
+						else if(arg.charAt(0) != ':'){
+							arg2	= arg;
+							arg		= null;
+						}
+					// if "all" is specified, get all computed styles inside a list
+					if(this._all){
+						computedStyle	= this.mapTags(ele => {
+							var result	= window.getComputedStyle(ele, arg);// on peu ajouter le pseudo aussi
+							//get specifique property if required
+								if(arg2){
+									result	= result.getPropertyValue(arg2);
+								}
+							return result;
+						});
+					}else{
+						var ele	= this.getFirstTag();
+						if(ele){
+							computedStyle	= window.getComputedStyle(ele, arg);// on peu ajouter le pseudo aussi
+							//get specifique property if required
+								if(arg2){
+									computedStyle	= computedStyle.getPropertyValue(arg2);
+								}
+						}
+					}
+					return computedStyle;
+				}
+			// else if set style attribute
+				else{
+					// add px if required
+						for(i in arg){
+							if((typeof arg[i] == 'number') && !_cssUniteLess[i])
+								arg[i]	+= 'px';
+						}
+					// apply to all elements
+					$.eachTag(ele =>{
+						for(i in arg)
+							ele.style[i]	= arg[i];
+					});
+				}
+			return this;
+		},
+		// remove css property
+		rmCss	: function(){
+			var i, c= arguments.length;
+			return this.eachTag(ele => {
+				for(i=0; i<c; ++i)
+					ele.removeProperty(arguments[i]);
+			});
+		}
+		/**
+		 * width()
+		 * all.width()
+		 * width(width)
+		 * all.width(width)
+		 */
+		width	: function(width){ return this.css(width && {width: width} || 'width'); },
+		/**
+		 * height()
+		 * all.height()
+		 * height(height)
+		 * all.height(height)
+		 */
+		height	: function(height){ return this.css(height && {height: height} || 'height'); },
+		/**
+		 * offsetWidth()
+		 * all.offsetWidth()
+		 */
+		offsetWidth: function(){ return _elementsAttr.call(this, 'offsetWidth'); },
+		/**
+		 * offsetHeight()
+		 * all.offsetHeight()
+		 */
+		offsetHeight: function(){ return _elementsAttr.call(this, 'offsetHeight'); },
+		/**
+		 * set/get the style.position
+		 */
+		position	: function(position){ return this.css(position && {position: position} || 'position'); }
+		/**
+		 * get coordination relative to the offset parent or to the document
+		 * offset(true?)
+		 * all.offset(true?)
+		 */
+		offset		: function(isRelativeToDocument){
+			var result, ele;
+			if(this._all){
+				result	= this.mapTags(ele => _getElementOffset(ele, isRelativeToDocument));
+			}else{
+				ele	= this.getFirstTag();
+				if(ele)
+					result	= _getElementOffset(ele, isRelativeToDocument);
+			}
+			return result;
+		}
+		offsetLeft	: function(isRelativeToDocument){ _offsetTopLeft.call(this, 'offsetLeft', isRelativeToDocument); },
+		offsetTop	: function(isRelativeToDocument){ _offsetTopLeft.call(this, 'offsetTop', isRelativeToDocument); },
+
+		/////
+		// SCROLL
+		/////
+		scrollTop	: function(value, animate){
+			//TODO animation
+			return _elementsAttr.call(this, 'scrollTop', value);
+		},
+		scrollTop	: function(value, animate){
+			//TODO animation
+			return _elementsAttr.call(this, 'scrollLeft', value);
+		},
+		scrollHeight: function(){ return _elementsAttr.call(this, 'scrollHeight'); },
+		scrollWidth	: function(){ return _elementsAttr.call(this, 'scrollWidth'); },
+		/**
+		 * scroll(callBack, optionalBollAnimate)			: listener onscroll
+		 * scroll(y, optionalBollAnimate)					: equivalent to scrollTop(y)
+		 * scroll(x, y, optionalBollAnimate)				: scroll to (x, y)
+		 * scroll({top: y, left: x}, optionalBollAnimate)	: scroll to (x, y)
+		 */
+		scroll		: function(arg){
+			// TODO
+		}
+	});
+
+	// offset
+	function _getElementOffset(ele, isRelativeToDocument){
+		var result;
+		if(isRelativeToDocument){
+			result	= {
+				top	: 0,
+				left: 0
+			};
+			do{
+				if(!isNaN(ele.offsetTop))
+					result.top	+= ele.offsetTop;
+				if(!isNaN(ele.offsetLeft))
+					result.left	+= ele.offsetLeft;
+			}while(ele	= ele.offsetParent);
+		}else{
+			result	= {
+				top	: ele.offsetTop,
+				left: ele.offsetLeft
+			};
+		}
+		return result;
+	}
+	// offset top/left
+	function _offsetTopLeft(topOrLeft, isRelativeToDocument){
+		var result, ele;
+		if(this._all){
+			result	= this.mapTags(ele => _getElementOffsetOf(ele, topOrLeft, isRelativeToDocument));
+		}else{
+			ele	= this.getFirstTag();
+			if(ele)
+				result	= _getElementOffsetOf(ele, topOrLeft, isRelativeToDocument);
+		}
+		return result;
+	}
+	function _getElementOffsetOf(ele, topOrLeft, isRelativeToDocument){
+		var result;
+		if(isRelativeToDocument){
+			result	= 0;
+			do{
+				if(!isNaN(ele[topOrLeft]))
+					result	+= ele[topOrLeft];
+			}while(ele	= ele.offsetParent);
+		}else{
+			result	= ele[topOrLeft];
+		}
+		return result;
+	}
+})();

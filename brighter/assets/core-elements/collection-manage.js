@@ -74,8 +74,17 @@ $$.plugin({
 			return this;
 		},
 	// filter
-		filter		: function(){
-			var filtered	= Array.prototype.filter.apply(this, arguments);
+		filter		: function(filterArg){
+			var filtered;
+			// function
+			if(typeof filterArg == 'function')
+				filtered	= Array.prototype.filter.call(this, filterArg);
+			// selector
+			else if(typeof filterArg == 'string')
+				filtered	= Array.prototype.filter.call(this, ele => (ele.nodeType == 1 && _ElementMatches(ele, filterArg)));
+			// incorrect argument
+			else
+				throw new Error('incorrect argument');
 			filtered.__proto__	= $$prototype;
 			return filtered;
 		},
