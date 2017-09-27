@@ -14,6 +14,9 @@
 		value			: _value,
 		value			: _value // alias
 
+		//TODO
+		//defaultValue
+
 		/**
 		 * valueResolver()				: get the value resolver of the first tag
 		 * valueResolver(resolver)		: set tht value resolver of the first tag
