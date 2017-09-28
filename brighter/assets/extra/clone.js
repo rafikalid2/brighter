@@ -10,9 +10,9 @@
  * jquery copy only normal object and arrays, and it'is slow on array copy
  */
 
-$$.plugin({
+$$.plugin(true,{
 	clone	: _clone
-},true);
+});
 
 function _clone(obj, isDeep){
 	var clone, key;

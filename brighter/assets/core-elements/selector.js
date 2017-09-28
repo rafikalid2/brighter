@@ -1,6 +1,6 @@
 // root plugins
 // that's why we added "true" argument
-$$.plugin({
+$$.plugin(true,{
 	// select one element
 	// using CSS selector
 	// if multiple arguments are given, use the first matched one
@@ -35,4 +35,4 @@ $$.plugin({
 			result.__proto__ = $$.prototype;
 			return result;
 		}
-}, true);
+});

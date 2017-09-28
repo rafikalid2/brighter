@@ -12,7 +12,7 @@
 		 * .all.value(value)		: set all tags values
 		 */
 		value			: _value,
-		value			: _value // alias
+		val				: _value, // alias
 
 		//TODO
 		//defaultValue

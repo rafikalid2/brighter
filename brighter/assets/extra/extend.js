@@ -2,9 +2,9 @@
 // make it public
 // [target] $$.extend(target, obj1, ...)
 // [target] $$.extend([deep], target, obj1, ...)
-	$$.plugin({
+	$$.plugin(true, {
 		extend	: _extend
-	}, true);
+	});
 /**
  * this function will copy all elemetns content into the first element
  * this function is designed to be faster on arrays, normale on objects

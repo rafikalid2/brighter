@@ -1,4 +1,6 @@
 // main assert
-	$$.plugin('assert', _$$Assert);
+	$$.plugin(true, 'assert', {
+		value	: _$$Assert
+	});
 
 	function _$$Assert(expression){}

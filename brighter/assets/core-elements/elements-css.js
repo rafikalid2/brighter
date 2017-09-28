@@ -23,7 +23,7 @@
 		widows						: 1,
 		zIndex						: 1,
 		zoom						: 1
-	},
+	};
 
 
 
@@ -93,7 +93,7 @@
 				for(i=0; i<c; ++i)
 					ele.removeProperty(arguments[i]);
 			});
-		}
+		},
 		/**
 		 * width()
 		 * all.width()
@@ -121,7 +121,7 @@
 		/**
 		 * set/get the style.position
 		 */
-		position	: function(position){ return this.css(position && {position: position} || 'position'); }
+		position	: function(position){ return this.css(position && {position: position} || 'position'); },
 		/**
 		 * get coordination relative to the offset parent or to the document
 		 * offset(true?)
@@ -137,7 +137,7 @@
 					result	= _getElementOffset(ele, isRelativeToDocument);
 			}
 			return result;
-		}
+		},
 		offsetLeft	: function(isRelativeToDocument){ _offsetTopLeft.call(this, 'offsetLeft', isRelativeToDocument); },
 		offsetTop	: function(isRelativeToDocument){ _offsetTopLeft.call(this, 'offsetTop', isRelativeToDocument); },
 
@@ -155,14 +155,12 @@
 		scrollHeight: function(){ return _elementsAttr.call(this, 'scrollHeight'); },
 		scrollWidth	: function(){ return _elementsAttr.call(this, 'scrollWidth'); },
 		/**
+		 * see events.scroll
 		 * scroll(callBack, optionalBollAnimate)			: listener onscroll
 		 * scroll(y, optionalBollAnimate)					: equivalent to scrollTop(y)
 		 * scroll(x, y, optionalBollAnimate)				: scroll to (x, y)
 		 * scroll({top: y, left: x}, optionalBollAnimate)	: scroll to (x, y)
 		 */
-		scroll		: function(arg){
-			// TODO
-		}
 	});
 
 	// offset
