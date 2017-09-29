@@ -56,13 +56,25 @@ $$.plugin({
 			return hasClass;
 		},
 	// toggleClass('cl1', 'cl2', ...)
+	// toggleClass(boolean, 'cl1', 'cl2')	// if boolean == true, add those classes, else remove theme
 		toggleClass		: function(){
-			var i, c	= arguments.length;
+			var i, arg, c = arguments.length;
 			if(c){
-			 	this.eachTag(ele =>{
-			 		for(i=0; i<c; ++i)
-			 			ele.classList.toggle(arguments[i]);
-			 	});
+				// add or remove classes
+				if(typeof arguments[0] == 'boolean'){
+					arg	= Array.prototype.slice.call(arguments, 1);
+					if(arguments[0]) // add classes
+						this.addClass.apply(this, arg);
+					else // remove classes
+						this.removeClass.apply(this, arg);
+				}
+				// toggle classes
+				else{
+				 	this.eachTag(ele =>{
+				 		for(i=0; i<c; ++i)
+				 			ele.classList.toggle(arguments[i]);
+				 	});
+				 }
 			}
 			return this;
 		}
@@ -77,3 +89,4 @@ $$.plugin({
 	 	}
 		return this;
 	}
+// 

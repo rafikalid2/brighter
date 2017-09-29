@@ -1,6 +1,10 @@
 /**
  * all those function will return a new collection
  * all elements other then tag ones will be filtered
+ *
+ * parent()			// get the emediate parent
+ * parent(3)		// get the third parent
+ * parent(selector)	// get the first parent that matches this selector
  */
 (function(){
 	$$.plugin({
