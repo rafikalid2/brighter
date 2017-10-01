@@ -21,7 +21,7 @@ function $$(expression, namespace){
 	// create HTML or SVG element
 		else if(typeof expression == 'string'){
 			if(namespace && (typeof namespace == 'string'))
-				result	= [document.createElementNS(namespace)];
+				result	= [document.createElementNS(_mapNS(namespace))];
 			else
 				result	= [document.createElement(expression)];
 		}

@@ -6,11 +6,11 @@ $$.plugin({
 	 * .next(HTMLElement)				// return this element if is the next element
 	 * .next(ArrayLikeOfHTMLElements)	// return elements that are next
 	 * 
-	 * .not.next(selector)			// inverse the meaning of the selector
+	 * .not.next(selector)			// inverse the meaning of the selector (coded inside the "filter" function)
 	 * .all.next					// get all next elements
 	 * .not.all.next, all.not.next
 	 */
-	next		: function(selector){}, //TODO
+	next		: _sibling('nextSibling'),
 	/**
 	 * get next elements until somme selected one
 	 * nextUntil(selector)
@@ -23,7 +23,7 @@ $$.plugin({
 	 * .not.nextUntil		// get elements others than selected ones (after selected ones)
 	 * .not.all.nextUntil
 	 */
-	nextUntil	: function(selector){}, //TODO
+	nextUntil	: _siblingUntil('nextSibling'), //TODO
 	/**
 	 * immediately prev elements in the DOM
 	 * .prev(filterSelector)
@@ -34,7 +34,7 @@ $$.plugin({
 	 * .all.prev					// get all prev elements
 	 * .not.all.prev, all.not.prev
 	 */
-	prev		: function(selector){}, //TODO
+	prev		: _sibling('previousSibling'), //TODO
 	/**
 	 * get next elements until somme selected one
 	 * prevUntil(selector)
@@ -46,7 +46,7 @@ $$.plugin({
 	 *
 	 * .not.prevUntil		// get elements others than selected ones (before selected ones)
 	 */
-	prevUntil	: function(selector){}, //TODO
+	prevUntil	: _siblingUntil('previousSibling'), //TODO
 	/**
 	 * get siblings elements
 	 * siblings(selector)
@@ -56,7 +56,11 @@ $$.plugin({
 	 *
 	 * .all.siblings		// include current element
 	 */
-	siblings	: function(selector){}, //TODO
+	siblings	: function(selector){
+		return this.tags.$$map(ele => {
+			return ele.parentNode && ele.parentNode.firstChild;
+		}).next(selector);
+	}, //TODO
 	/**
 	 * get siblings elements until somme selected one in each direction
 	 * siblingsUntil(selector)
@@ -68,7 +72,13 @@ $$.plugin({
 	 *
 	 * .not.siblingsUntil		// get elements others than selected ones and the current element
 	 */
-	siblingsUntil	: function(selector){}, //TODO
+	siblingsUntil	: function(selector){
+		return this
+				.prevUntil(selector) // previous elements
+				.push(
+					this.nextUntil(selector) // next elements
+				);
+	}, //TODO
 	/**
 	 * .find(selector)		: select elements that has somme childs
 	 * .find(ArrayLike)		: Array, $$Object, HTMLElements or even jQuery object
@@ -82,3 +92,75 @@ $$.plugin({
 	 */
 	findAll		: function(selector){} //TODO
 });
+
+/**
+ * next	: nextSibling
+ * prev	: previousSibling
+ */
+function _sibling(attr){
+	return function(selector){
+		var result, elements;
+		// get data
+			if(this._all)
+				result	= this.tags.$$map(ele => {
+					elements	= [];
+					while(ele = ele[attr])
+						elements.push(ele);
+					return elements;
+				});
+			else
+				resut	=  this.tags.$$map(ele => {
+					return ele[attr];
+				});
+		// filter
+			if(selector)
+				result	= result.filter(selector);
+		return result;
+	};
+}
+
+/**
+ * sibling until
+ */
+function _siblingUntil(attr){
+	return function(selector){
+		var result,
+			elements,
+			includeTargetElement	= this._all,
+			returnsAfterTarget		= this._not; // return elements after targetElement instead of before it
+		// if no selector, just execute "next"
+			if(!selector)
+				result	= this[attr	=== 'nextSibling' ? 'next' : 'prev']();
+		// else
+			else{
+				result	= this.tags.$$map(
+					returnsAfterTarget ?
+					(ele => {
+						elements	= [];
+						// escape unwanted elements
+							while((ele = ele[attr]) && !_extendedMatches(ele, selector)){}
+						// if include the target element
+							if(includeTargetElement && ele)
+								elements.push(ele);
+						// got other elements
+							if(ele){
+								ele = ele[attr];
+								while(ele = ele[attr])
+									elements.push(ele);
+							}
+						return elements;
+					})
+					:(ele => {
+						elements	= [];
+						while((ele = ele[attr]) && !_extendedMatches(ele, selector))
+							elements.push(ele);
+						// if include target element
+						if(includeTargetElement && ele)
+							elements.push(ele);
+						return elements;
+					})
+				);
+			}
+		return result;
+	}
+}

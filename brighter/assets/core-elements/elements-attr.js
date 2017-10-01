@@ -15,7 +15,7 @@ $$.plugin({
 			if(arguments.length ==1)
 				attr		= arguments[0];
 			else if(arguments.length == 2){
-				namespace	= arguments[0];
+				namespace	= _mapNS(arguments[0]);
 				attr		= arguments[1];
 			}
 		if(attr){

@@ -32,5 +32,20 @@
 	 */
 		var svgNS = "http://www.w3.org/2000/svg";
 
+	/**
+	 * map namespaces
+	 */
+	 	var _MAP_NAMESPACES	= {
+	 		svg		: svgNS
+	 	};
+	 	function _mapNS(namespace){
+	 		if(namespace){
+		 		var ns	= namespace.toLowerCase();
+		 		if(_MAP_NAMESPACES[ns])
+		 			namespace	= _MAP_NAMESPACES[ns];
+	 		}
+	 		return namespace;
+	 	}
+
 
 // <!> do not add any closing parenteses, this is splited in several files

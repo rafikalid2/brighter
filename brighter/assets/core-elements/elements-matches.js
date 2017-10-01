@@ -22,3 +22,27 @@ else
         while (--i >= 0 && matches.item(i) !== ele) {}
         return i > -1;
 	}
+
+
+/**
+ * extended marches
+ * selector	: String
+ * function	: return boolean
+ * HTMLElement
+ * ArrayLike of elements
+ */
+
+function _extendedMatches(ele, selector){
+	var result;
+	if(typeof selector	== 'string')
+		result	= _ElementMatches(ele, selector);
+	else if(typeof selector	== 'function')
+		result	= selector(ele);
+	else if(selector.nodeType)
+		result	= (ele == selector);
+	else if(Array.isArray(selector))
+		result	= (selector.indexOf(ele) != -1);
+	else
+		throw new $$.errors.illegalArgument('unsupported argument: ', selector);
+	return result;
+}

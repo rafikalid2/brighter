@@ -85,7 +85,7 @@ $$.plugin({
  */
 	$$.plugin('tags',{
 		get	: function(){
-			return this.filter(ele => ele.nodeType == 1);
+			return this.filter(ele => ele.nodeType == 1);// here, "not" is checked inside "filter"
 		}
 	});
 /**

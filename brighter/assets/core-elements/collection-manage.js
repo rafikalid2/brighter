@@ -82,8 +82,8 @@ $$.plugin({
 		each		: _collectionManagerEach,
 	// each tag (tag only, exclude attributeNode, commentNode, textNode, ...)
 		eachTag		: function(callBack){
-			var i, c= this.length, ele;
-			for(i=0; i<c; ++i){
+			var ele;
+			for(var i = 0, c = this.length; i < c; ++i){
 				ele	= this[i];
 				if(
 					ele
@@ -111,6 +111,26 @@ $$.plugin({
 	 */
 		mapTags		: function(callBack){
 			return this.map(ele => (ele.nodeType == 1 ? callBack(ele) : undefined))
+		},
+	/**
+	 * $$map is similar to map, the difference is that $$map returns a $$Object ($$Object is a set and contains only HTMLElements)
+	 */
+		$$map		: function(callBack){
+			var lst	= [], r;
+			this.each(ele => {
+				r	= callBack(ele);
+				if(Array.isArray(r)){
+					for(var i=0, c = r.length; i < c; ++i)
+						if(r[i] && r[i].nodeType && lst.indexOf(r[i]) == -1)
+							lst.push(r[i]);
+				}
+				else{
+					if(r && r.nodeType && lst.indexOf(r) == -1)
+						lst.push(r);
+				}
+			});
+			lst.__proto__	= $$prototype;
+			return lst;
 		},
 	/**
 	 * every: check if all tags got the expression true

@@ -86,12 +86,39 @@
 				}
 			return this;
 		},
+		/**
+		 * the difference between style and css, is when returns values, style returns reel value in element style attributes
+		 * and do not use window.computed style, style do not access pseudo elements styles too
+		 * 	.style()				// get element style
+		 * 	.style('styleAttr')	// returns the computed value of the first tag, if "all" is set, return a list of all elements
+		 *  .all.style(...)		// return a list mapping all elements with previous options
+		 * 
+		 * 	.style({key: value})	// set thos attributes to all selected tags
+		 */
+		style	: function(arg){
+			var result;
+			if(!arg || typeof arg == 'string'){
+				if(this._all)
+					result	= this.mapTags(arg ?
+						(ele => { return ele.style[arg]; })
+						:(ele => { return ele.style; })
+					);
+				else{
+					result	= this.getFirstTag();
+					if(result)
+						result	= arg ? result.style[arg] : result.style;
+				}
+			}
+			else
+				result	= this.css(arg); // use css to insert values
+			return result;
+		}
 		// remove css property
-		rmCss	: function(){
+		rmStyle	: function(){
 			var i, c= arguments.length;
 			return this.eachTag(ele => {
 				for(i=0; i<c; ++i)
-					ele.removeProperty(arguments[i]);
+					ele.style.removeProperty(arguments[i]);
 			});
 		},
 		/**
