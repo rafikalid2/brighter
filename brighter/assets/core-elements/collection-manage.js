@@ -12,20 +12,36 @@
 	// Array.prototype.shift
 
 $$.plugin({
-	// add element to collection
+	/**
+	 * add elements to the collection
+	 * push(HTMLElement, ...)
+	 * push(ArrayLike, ...)		// brighterObject, jQueryObject, Array, ...	
+	 * push(this => this.fx(), ...)	// add new elements to the list based on the current one,
+	 * 							example: $$elements.push(ele=> ele.parent(), ele => ele.next('b'))	// add parents and next 'b' to the list
+	 */
 		push	: _collectionManagerPush,
 		add		: _collectionManagerPush,
-	// unshift
+	/**
+	 * unshift(HTMLElemnt, ArrayLike, this => this.fx())
+	 */
 		unshift : function(){
 			// control
-				var list = _argsToBrighterList(arguments);
+				var list = _argsToBrighterList.call(this, arguments);
+			// filter already existing elements
+				list	= list.filter(ele => this.indexOf(ele) == -1);
 			// unshift
-				Array.prototype.unshift.apply(this, list);
+				if(list.length)
+					Array.prototype.unshift.apply(this, list);
 			return this;
 		},
-	// concat
+	/**
+	 * concat(HTMLElemnt, ArrayLike, this => this.fx())
+	 */
 		concat	: function(){
-			var lst	= this.concat(_argsToBrighterList(arguments));
+			var lst	= _argsToBrighterList.call(this, arguments);
+			// filter already existing elements
+				lst	= lst.filter(ele => this.indexOf(ele) == -1);
+			lst		= this.concat(lst);
 			lst.__proto__ = $$prototype;
 			return lst;
 		},
@@ -35,14 +51,19 @@ $$.plugin({
 			lst.__proto__ = $$prototype;
 			return lst;
 		},
-	// splice
+	/**
+	 * splice(index, elementToRemove)
+	 * splice(index, elementToRemove, HTMLElement, ArrayLike, this => this.fx())
+	 */
 		splice	: function(strt, nbrRemove){
 			// elements to be added
 				var tobeAdded	= [];
 				if(arguments.length > 2){
 					tobeAdded = Array.prototype.push.apply(tobeAdded, arguments);
 					tobeAdded.splice(0,2);
-					tobeAdded	= _argsToBrighterList(tobeAdded);
+					tobeAdded	= _argsToBrighterList.call(this,tobeAdded);
+					// filter already existing elements
+						tobeAdded	= tobeAdded.filter(ele => this.indexOf(ele) == -1);
 				}
 			// other args
 				tobeAdded.splice(0, 0, strt, nbrRemove);
@@ -89,22 +110,36 @@ $$.plugin({
 	 * "undefined" for non tag values
 	 */
 		mapTags		: function(callBack){
-			this.map(ele => (ele.nodeType == 1 ? callBack(ele) : undefined))
-		}
+			return this.map(ele => (ele.nodeType == 1 ? callBack(ele) : undefined))
+		},
+	/**
+	 * every: check if all tags got the expression true
+	 */
+		everyTag	: function(checkFx){
+			return this.every(ele => (ele.nodeType == 1 ? checkFx(ele) : true));
+		},
+	/**
+	 * check if at least one tag maches the condition
+	 */
+	 	someTag		: function(checkFx){
+	 		return this.some(ele => (ele.nodeType == 1 ? checkFx(ele): false));
+	 	}
 });
 // add element to collection
 	function _collectionManagerPush(){
 		// control
-			var list = _argsToBrighterList(arguments);
+			var list = _argsToBrighterList.call(this, arguments);
+		// filter already existing elements
+			list	= list.filter(ele => this.indexOf(ele) == -1);
 		// add to list
-			Array.prototype.push.apply(this, list);
+			if(list.length)
+				Array.prototype.push.apply(this, list);
 		return this;
 	}
 
 // forEach
 	function _collectionManagerEach(callBack){
-		var i, c= this.length;
-		for(i=0; i<c ; ++i){
+		for(var i = 0, c = this.length; i < c ; ++i){
 			if(callBack(this[i], i) === false)
 				break;
 		}

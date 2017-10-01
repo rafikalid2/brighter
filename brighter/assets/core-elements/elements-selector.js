@@ -20,16 +20,16 @@
 /*
 > div > div > .element
 
-we correct this by adding ":scop"
+we correct this by adding ":scope"
 
 div:first >hello
 
 
-:button (input button, button, .btn)
-:checkbox
-:file
-:header
-:text
+:button (input button, button, .btn),   => .btn, button, input[type=button]
+:checkbox								=> input[type=checkbox]
+:file									=> input[type=file]
+:header									=> h1, h2, h3, h4, h5, h6
+:text									=> input[type=text], textarea
 
 
 
@@ -39,12 +39,32 @@ div:first >hello
 :odd
 :has(selector)
 :parent
+:offset-parent
 :visible
+
+:first
+:last
 
 :target			// $$('p#:target') whill mach p#foo, $$('#:target') #foo, will replaced with url hastag
 
-
+:animated	// select elements that are in some animation
 
 :slice(i,i2)
 :form-control
+
+:lang(fr)
+
+:prev()
+:prevAll()
+
++ subling
+ */
+
+/**
+ * native supported
+ * 		:lang
+ * 		:checked
+ * 		:visited
+ * 		:last-child
+ * 		:
  */

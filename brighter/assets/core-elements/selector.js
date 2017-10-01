@@ -5,8 +5,8 @@ $$.plugin(true,{
 	// using CSS selector
 	// if multiple arguments are given, use the first matched one
 		query		: function(){
-			var matchedElement, i, ele;
-			for(i =0; i< arguments.length; ++i){
+			var matchedElement, i, c, ele;
+			for(i = 0, c = arguments.length; i < c; ++i){
 				ele	= document.querySelector(selector);
 				if(ele){
 					matchedElement	= ele;
@@ -21,14 +21,13 @@ $$.plugin(true,{
 
 	// multiple elements selector
 		queryAll	: function(){
-			var result	= [], i, ele, c;
-			for(i=0; i<arguments.length; ++i){
+			var result	= [], i, ele, c, j, cc;
+			for(i=0, c = arguments.length; i < c; ++i){
 				ele		= document.querySelectorAll(selector);
 				if(ele && ele.length){
 					// copy node list to array
-					c	= ele.length;
-					for(var i=0; i< c; ++i)
-						result.push(ele[i]);
+					for(var j=0, cc = ele.length; j< cc; ++j)
+						result.push(ele[j]);
 					break;
 				}
 			}

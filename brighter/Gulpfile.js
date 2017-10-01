@@ -9,6 +9,7 @@ var order	= require('gulp-order');
 	var concatOrder	= [
 				'header.js',
 				'plugin.js',
+				'root-attributes.js',
 				'**/*.js',
 				'footer.js'
 			];

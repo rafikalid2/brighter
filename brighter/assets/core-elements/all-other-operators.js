@@ -13,3 +13,17 @@ $$.plugin('all',{
 		return this;
 	}
 });
+
+/**
+ * reverse the meaning of the successive fx
+ */
+$$.plugin('not',{
+	get	: function(){
+		Object.defineProperty(this, '_not',{
+			value	: !this._not,
+			writable: true,
+			enumerable: false
+		});
+		return this;
+	}
+})

@@ -13,7 +13,8 @@ function classExtend(parent, child){
 	if(oldPrototype){
 		_extendObject(child.prototype, oldPrototype);
 	}
+	return child;
 }
 
 // make it usable by others
-	$$.classExtend	= classExtend;
+	$$.obj.extend	= classExtend;

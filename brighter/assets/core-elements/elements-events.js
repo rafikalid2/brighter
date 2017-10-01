@@ -1,5 +1,9 @@
 /**
  * events
+ * .bind(eventName, eventListner)
+ * .unbind()							// unbind all avents
+ * .unbind(eventName)					// unbind all listeners on this event
+ * .unbind(eventName, eventListener)	// unbind this listner on this event
  */
 (function(){
 	// add wrappers
@@ -7,6 +11,8 @@
 		var otherWrappers	= [ 'change', 'error', 'focusin', 'focusout', 'load', 'resize', 'unload'];
 		var keyboardEvents	= ['keydown', 'keypress', 'keyup'];
 		var specialWrappers	= ['blur', 'focus', 'submit'];
+
+
 
 	// add/remove listeners
 		var plugins	= {};

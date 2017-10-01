@@ -11,3 +11,10 @@
  * fill({values}, false)// unspecified values will be cleared
  * fill({values}, {defaultValue: ''})	// unspecified values will be filled with this value
  */
+/**
+ * reset: (default values or brighter default values)
+ * serialize
+ * fill
+ * toObject
+ * toJSON
+ */
