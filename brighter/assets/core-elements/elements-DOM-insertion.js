@@ -71,7 +71,31 @@ $$.plugin({
 	 *
 	 * all.prepend		// clone and insert copie to each element
 	 */
-	prepend		: function(){}, //TODO
+	prepend		: function(){
+		// get elements
+			var list	= _getElementsFrom.apply(this, arguments),
+				i,
+				c		= list.length;
+		// insert theme
+			if(c){
+				// append clones to all tags
+				if(this._all){
+					this.eachTag(ele => {
+						for(i = 0; i < c; ++i)
+							ele.appendChild(_cloneHTMLNode(list[i], true));
+					});
+				}
+				// append to first tag
+				else{
+					ele	= this.getFirstTag();
+					if(ele){
+						for(i = 0; i < c; ++i)
+							ele.appendChild(list[i]);
+					}
+				}
+			}
+		return this;
+	}, //TODO
 	/**
 	 *
 	 * all.prependTo	// prepend clones
