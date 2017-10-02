@@ -2,20 +2,52 @@ $$.plugin({
 	/**
 	 * empty each element
 	 */
-	empty		: function(filter){}, //TODO
+	empty		: function(filter){ this.each(node => {
+		while(node.firstChild)
+			node.removeChild(node.firstChild);
+	})},
 	/**
 	 * remove all elements from the DOM and destroy theme
 	 */
-	remove		: function(filter){}, //TODO
+	remove		: function(filter){ return this.each(node => node.remove()); },
 	/**
 	 * detach all elements from the DOM
 	 */
-	detach		: function(filter){}, //TODO
+	detach		: function(filter){ return this.each(node => node.remove()); },
 	/**
-	 * replace first tag element with given tags
-	 * all.replaceWidth	: replace all elements with clones of given tags
+	 * .replaceWidth(HTMLElement, ...)
+	 * .replaceWidth(ArryLike, ...)
+	 * .replaceWidth(this => this.fx(), ...)	// append elements based on current ones in the collection
+	 * .replaceWidth('div')
+	 * .replaceWidth('div#id...')
+	 *
+	 * .all.replaceWidth		// replace each node with clones
 	 */
-	replaceWith	: function(target){}, //TODO
+	replaceWith	: function(target){
+		var list	= _getElementsFrom.apply(this, arguments);
+		if(list.length){
+			// append to fragment
+				var frag	= document.createDocumentFragment();
+					ele;
+				for(var i = 0, c = list.length; i < c; ++i)
+					frag.appendChild(list[i]);
+			// replace with copies
+				if(this._all){
+					this.each(node => {
+						if(node.parentNode)
+							node.parentNode.replaceChild(_cloneHTMLNode(frag, true), node);
+					});
+				}
+			// replace first tag
+				else{
+					ele	= this[0];
+					if(ele && ele.parentNode)
+						ele.parentNode.replaceChild(frag, ele);
+					// this.firstTag.before(frag).remove();
+				}
+		}
+		return this;
+	}, //TODO
 	/**
 	 * remove parents and append elements to perents of parents
 	 */

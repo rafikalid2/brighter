@@ -172,6 +172,7 @@ function _getElementsFrom(){
 				throw new $$.errors.illegalArgument(ele);
 		}
 	}
+	return result;
 }
 
 
