@@ -75,6 +75,61 @@ $$.plugin({
 	 */
 		has			: function(selector){
 			return this.filter(ele => ele.find(selector).length);
+		},
+	/**
+	 * .first()		: first element
+	 * .first(ele => boolean) returns the first element that matches condition or undifined
+	 * .not.first()	: remove first element
+	 */
+		first		: function(condition){
+			var result;
+			// if function
+				if(typeof condition == 'function'){
+					for(var i = 0, c = this.length; i < c; ++i){
+						if(condition(this[i])){
+							if(this._not){
+								result	= this.slice(0);
+								result.splice(i, 1);
+							}else{
+								result	= this.eq(i);
+							}
+							break;
+						}
+					}
+					// if condition is not meat, first will be undefined
+				}
+			// else
+				else{
+					result	= this._not ? this.slice(1) : this.eq(0);
+				}
+			return result;
+		},
+	/**
+	 * .last()		: last element
+	 * .last(ele => condition) // returns last element matches condition or undefined
+	 * .not.last	: remove the last element
+	 */
+		last		: function(condition){
+			var result;
+			// if function
+				if(typeof condition == 'function'){
+					for(var i = this.length - 1; i >= 0; --i){
+						if(condition(this[i])){
+							if(this._not){
+								result	= this.slice(0);
+								result.splice(i, 1);
+							}else{
+								result	= this.eq(i);
+							}
+							break;
+						}
+					}
+				}
+			// else
+				else{
+					result	= this._not ? this.slice(0, -2) : this.eq(-1);
+				}
+			return result;
 		}
 });
 
@@ -89,74 +144,18 @@ $$.plugin({
 		}
 	});
 /**
- * .first		: first element
- * .not.first	: remove first element
- */
-	$$.plugin('first', {
-		get	: function(){
-			return this._not ? this.slice(1) : this.eq(0);
-		}
-	});
-/**
- * .last		: last element
- * .not.last	: remove the last element
- */
-	$$.plugin('last', {
-		get	: function(){
-			return this._not ? this.slice(0, -1) : this.eq(-1);
-		}
-	});
-/**
  * .fistTag			: first tag
  * .not.firstTag	: remove the first tag
  */
 	$$.plugin('firstTag',{
-		get: function(){
-			var result;
-			// all except first tag
-			if(this._not){
-				result	= this.slice(0);// copie
-				for(var i = 0, c = result.length; i<c; ++i){
-					if(result[i].nodeType == 1){
-						result.splice(i, 1);
-						break;
-					}
-				}
-			}
-			// first tag
-			else{
-				result	= this.getFirstTag();
-				result	= result ? [result] : [];
-			}
-			result.__proto__	= $$prototype;
-			return result;
-		}
+		get: function(){ return this.first(ele => ele.nodeType == 1); }
 	});
 /**
  * .lastTag		: last tag
  * .not.lastTag	: remove the last tag
  */
 	$$.plugin('lastTag',{
-		get: function(){
-			var result;
-			// not last tag
-				if(this._not){
-					result	= this.slice(0);
-					for(var i = result.length - 1; i >= 0; --i){
-						if(result[i].nodeType == 1){
-							result.splice(i, 1);
-							break;
-						}
-					}
-				}
-			// last tag
-				else{
-					result	= this.getLastTag();
-					result	= result ? [result] : [];
-				}
-			result.__proto__	= $$prototype;
-			return result;
-		}
+		get: function(){ return this.last(ele => ele.nodeType == 1); }
 	});
 
 

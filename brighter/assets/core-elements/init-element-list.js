@@ -27,8 +27,8 @@ function _argsToBrighterList(args){
 				continue;
 		}
 		// selector
-		else if(typeof ele == 'selector')
-			ele	= $$.findAll(ele);
+		else if(typeof ele == 'string')
+			ele	= this.findAll(ele);
 		// brighter collection
 		else if(ele instanceof $$){}
 		// array like

@@ -31,7 +31,11 @@ div:first >hello
 :header									=> h1, h2, h3, h4, h5, h6
 :text									=> input[type=text], textarea
 
+:style(border)
+:style(border:red)
 
+:css(border)		// equivalent to style(border)
+:css(border:red)	// use window.computedStyle instead of normale style attribute
 
 :contains(text)
 :eq(index)
@@ -68,3 +72,7 @@ div:first >hello
  * 		:last-child
  * 		:
  */
+
+// function _advancedSelector(rootElement, selector){
+// 	throw new Error('_advancedSelector not implemented')
+// }
