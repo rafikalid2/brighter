@@ -58,21 +58,18 @@ $$.obj.exists	= function(obj, path, childrenAttr){
 }
 
 function _objExists(obj, path, childrenAttr){
-	var exists	= true;
-	for(var i = 0, c = path.length; i < c; ++i){
-		if(obj[path[i]]){
-			obj	= obj[path[i]];
-			if(childrenAttr){
-				obj	= obj[childrenAttr];
-				if(!obj){
-					exists	= false;
-					break;
-				}
-			}
-		}else{
-			exists	= false;
-			break;
-		}
+	var exists	= true,
+		c	= path.length,
+		i;
+	try{
+		if(childrenAttr)
+			for(i = 0; i < c; ++i)
+				obj	= obj[path[i]][childrenAttr];
+		else
+			for(i = 0; i < c; ++i)
+				obj	= obj[path[i]];
+	}catch(e){
+		exists	= false;
 	}
 	return exists;
 }
