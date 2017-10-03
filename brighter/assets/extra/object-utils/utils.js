@@ -10,4 +10,8 @@ $$.obj.isEmpty	= function(obj){
 /**
  * check if an element is a plain object, create with {} or new Object
  */
-$$.obj.isPlain	= function(obj){}; //TODO
+$$.obj.isPlain	= function(obj){
+	return obj
+			&& !Array.isArray(obj)
+			&& obj.__proto__ == Object.prototype;
+};

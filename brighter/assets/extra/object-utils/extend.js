@@ -18,3 +18,10 @@ function classExtend(parent, child){
 
 // make it usable by others
 	$$.obj.extend	= classExtend;
+
+
+/**
+ * clone object
+ */
+
+	function _objExtend(){}

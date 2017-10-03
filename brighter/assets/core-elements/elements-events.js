@@ -12,6 +12,8 @@
  * .unbind(eventName, eventListener)	// unbind this listner on this event
  */
 (function(){
+	// params
+		var LISTNER_ATTR_NAME	= '_eventListeners';
 	// add wrappers
 		var mouseWrappers	= ['click', 'contextmenu', 'dblclick', 'hover', 'mousedown', 'mouseenter', 'mouseleave', 'mousemove', 'mouseout', 'mouseover', 'mouseup'];
 		var otherWrappers	= [ 'change', 'error', 'focusin', 'focusout', 'load', 'resize', 'unload'];
@@ -48,8 +50,33 @@
 
 	// store listener
 		function _addListener(element, eventListPath, listener){
-			ele.addEventListener(eventName, listener, false);
-			_elementPrivateData(ele).listener
+			// add event to element
+				ele.addEventListener(eventListPath[0], listener, false);
+			// get private data store
+				var obj	= _elementPrivateData(ele);
+				if(!obj[LISTNER_ATTR_NAME])
+					obj[LISTNER_ATTR_NAME]	= {};
+				obj	= obj[LISTNER_ATTR_NAME];
+			// add event data
+				if(!obj[eventListPath[0]])
+					obj[eventListPath[0]]	= {
+						listeners	: [],
+						items		: {}
+					};
+				obj	= obj[eventListPath[0]];
+			// add other group
+				for(var i=1, c= eventListPath.length; i < c; ++i){
+					// group
+						if(!obj.items[eventListPath[i]]){
+							obj.items[eventListPath[i]]	= {
+								listeners	: [],
+								items		: {}
+							};
+						}
+					obj = obj[eventListPath[i]]; 
+				}
+			// store the listener
+				obj.listener.push(listener);
 		}
 		if(HTMLElement.prototype.addEventListener){
 			// bind
