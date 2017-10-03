@@ -102,7 +102,7 @@ $$.plugin({
 				else{
 					result	= this._not ? this.slice(1) : this.eq(0);
 				}
-			return result;
+			return result || $$.emptyList;
 		},
 	/**
 	 * .last()		: last element

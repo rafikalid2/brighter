@@ -16,6 +16,13 @@
 
 	// add/remove listeners
 		var plugins	= {};
+		plugins.bind	= plugins.on	=  function(eventName, listener){
+			if(!eventName || !listener)
+				throw $$.errors.missedArgument('eventName and listener');
+			var c	= event
+			var eventName	=
+			return this.eachTag(ele => {ele.addEventListener(eventName, listener, false)});
+		};
 		if(HTMLElement.prototype.addEventListener){
 			// bind
 				plugins.bind	= plugins.on	=  function(eventName, listener){
