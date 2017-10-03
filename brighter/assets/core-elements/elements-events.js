@@ -1,6 +1,12 @@
 /**
  * events
  * .bind(eventName, eventListner)
+ * .bind('click', listener)
+ * .bind('click focus', listener)
+ * .bind('click.grpName focus.groupF1', listener)
+ * .bind('click.grp1.grp2', listener)
+ *
+ * 
  * .unbind()							// unbind all avents
  * .unbind(eventName)					// unbind all listeners on this event
  * .unbind(eventName, eventListener)	// unbind this listner on this event
@@ -17,12 +23,34 @@
 	// add/remove listeners
 		var plugins	= {};
 		plugins.bind	= plugins.on	=  function(eventName, listener){
-			if(!eventName || !listener)
-				throw $$.errors.missedArgument('eventName and listener');
-			var c	= event
-			var eventName	=
-			return this.eachTag(ele => {ele.addEventListener(eventName, listener, false)});
+			// arg validation
+				if(!eventName || !listener)
+					throw new $$.errors.missedArgument('eventName, listener');
+			// eventName validation
+				eventName	= eventName.trim();
+				if(!eventName.match(/^(?:(?:[\w-]+\.)*[\w-]+\s*)+$/))
+					throw new $$.errors.illegalArgument('incorrect eventName: ', eventName);
+			// listener
+				if(typeof listener != 'function')
+					throw new $$.errors.illegalArgument('incorrect listener: ', listener);
+			// groups
+				var events		= eventName.split(/\s+/).map(evnt =>{
+					return evnt.split('.');
+				});
+				var eventsCount	= events.length;
+				var i;
+			// add listner
+				return this.eachTag(ele => {
+					for(i = 0; i < eventsCount; ++i)
+						_addListener(ele, events[i], listener);
+				});
 		};
+
+	// store listener
+		function _addListener(element, eventListPath, listener){
+			ele.addEventListener(eventName, listener, false);
+			_elementPrivateData(ele).listener
+		}
 		if(HTMLElement.prototype.addEventListener){
 			// bind
 				plugins.bind	= plugins.on	=  function(eventName, listener){
