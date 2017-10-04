@@ -5,6 +5,7 @@
  * .bind('click focus', listener)
  * .bind('click.grpName focus.groupF1', listener)
  * .bind('click.grp1.grp2', listener)
+ * .bind('click.grp1 click.grp2')	// multiple groups
  *
  * 
  * .unbind()							// unbind all avents
@@ -48,6 +49,17 @@
 				});
 		};
 
+	/**
+	 * remove listener
+	 * .unbind()					// remove all events listeners
+	 * .unbind('click')				// remove all events on click
+	 * .unbind('click.grp1.grp2')	// remove all events on this group and subgoups
+	 * .unbind('click', listener)	// remove this listener on click and subgroups
+	 * .unbind('click.grp', listener)// remove this listener on click.grp and subgroups
+	 * .unbind('click focus ...')	// we can add multiple events 
+	 * .unbind('click.grp1 click.grp2')// multiple groups too
+	 */
+	 plugins.unbind	= plugins.off	=  function(eventName, listener){};
 	// store listener
 		function _addListener(element, eventListPath, listener){
 			// add event to element
@@ -57,26 +69,9 @@
 				if(!obj[LISTNER_ATTR_NAME])
 					obj[LISTNER_ATTR_NAME]	= {};
 				obj	= obj[LISTNER_ATTR_NAME];
-			// add event data
-				if(!obj[eventListPath[0]])
-					obj[eventListPath[0]]	= {
-						listeners	: [],
-						items		: {}
-					};
-				obj	= obj[eventListPath[0]];
-			// add other group
-				for(var i=1, c= eventListPath.length; i < c; ++i){
-					// group
-						if(!obj.items[eventListPath[i]]){
-							obj.items[eventListPath[i]]	= {
-								listeners	: [],
-								items		: {}
-							};
-						}
-					obj = obj[eventListPath[i]]; 
-				}
-			// store the listener
-				obj.listener.push(listener);
+			// add listener to dest path
+				obj = _objPath(obj, eventListPath, {items: {}, listeners: []}, 'items');
+				obj.listeners.push(listener);
 		}
 		if(HTMLElement.prototype.addEventListener){
 			// bind

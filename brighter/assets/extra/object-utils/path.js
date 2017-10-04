@@ -16,6 +16,14 @@ $$.obj.path	= function(obj, path, template, childrenAttr, putValue){
 		return _objPath(obj, path.split('.'), template, childrenAttr, putValue);
 };
 
+/**
+ * @param  {Object} 		obj
+ * @param  {Array<String>} 	path
+ * @param  {Object or Array, optional} template
+ * @param  {String, optional} 
+ * @param  {any, optional} putValue
+ * @return {object}
+ */
 function _objPath(obj, path, template, childrenAttr, putValue){
 	var i, c = path.length;
 	// if put value
