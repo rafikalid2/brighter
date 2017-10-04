@@ -8,16 +8,27 @@
 */
 
 // aserts
-	$$.assert(expression).is(value);
-	$$.assert(expression).is(true);
-	$$.assert(expression).is(false);
+	$$.assert(expression, errorMessage).is(value);
+	$$.assert(expression).is(true, ErrorMessage);
+	$$.assert(expression).is(false, ErrorMessage);
+	$$.assert(expression).is(null, ErrorMessage);
+
+	$$.assert(obj).isNaN(ErrorMessage);
+		.isUndefined(ErrorMessage)
+		.isDefined(ErrorMessage)
+		.isNull(ErrorMessage)
+
+		.exists(errorMessage)	// if != undefined and != null
+
+	$$.assert(ele).isString(ErrorMessage);
+		.isEmpty(ErrorMessage)		// empty text or array or object
+
+		.not // inverser tout les methode qui viennent apres
 
 
 	$$.assert(obj).instanceof(String);
 
-	$$.assert(obj).isNaN();
 
-	$$.assert(ele).isString();
 
 	$$.assert(fx)
 		.throws(err);
@@ -30,15 +41,6 @@
 		.catch('msg $msg')	 // message to be trown when fails, $msg is the original error message
 		.than(obj => {}) // exec an fx if all previous asserts didn't fail
 
-		.isEmpty()		// empty text or array or object
-		.isNotEmpty()
-
-		.isNull()
-		.isNotNull()
-		.isUndefined()
-		.isDefined()
-
-		.not // inverser tout les methode qui viennent apres
 
 		.has(value) // an array or object or string contains value
 		.has(value1, value2, ,,,)//and

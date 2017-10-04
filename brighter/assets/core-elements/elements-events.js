@@ -1,17 +1,4 @@
-/**
- * events
- * .bind(eventName, eventListner)
- * .bind('click', listener)
- * .bind('click focus', listener)
- * .bind('click.grpName focus.groupF1', listener)
- * .bind('click.grp1.grp2', listener)
- * .bind('click.grp1 click.grp2')	// multiple groups
- *
- * 
- * .unbind()							// unbind all avents
- * .unbind(eventName)					// unbind all listeners on this event
- * .unbind(eventName, eventListener)	// unbind this listner on this event
- */
+
 (function(){
 	// params
 		var LISTNER_ATTR_NAME	= '_eventListeners';
@@ -25,21 +12,28 @@
 
 	// add/remove listeners
 		var plugins	= {};
+	/**
+	 * events
+	 * .bind(eventName, eventListner)
+	 * .bind('click', listener)
+	 * .bind('click focus', listener)
+	 * .bind('click.grpName focus.groupF1', listener)
+	 * .bind('click.grp1.grp2', listener)
+	 * .bind('click.grp1 click.grp2')	// multiple groups
+	 *
+	 * 
+	 * .unbind()							// unbind all avents
+	 * .unbind(eventName)					// unbind all listeners on this event
+	 * .unbind(eventName, eventListener)	// unbind this listner on this event
+	 */
 		plugins.bind	= plugins.on	=  function(eventName, listener){
-			// arg validation
-				if(!eventName || !listener)
-					throw new $$.errors.missedArgument('eventName, listener');
-			// eventName validation
+			if(eventName)
 				eventName	= eventName.trim();
-				if(!eventName.match(/^(?:(?:[\w-]+\.)*[\w-]+\s*)+$/))
-					throw new $$.errors.illegalArgument('incorrect eventName: ', eventName);
-			// listener
-				if(typeof listener != 'function')
-					throw new $$.errors.illegalArgument('incorrect listener: ', listener);
+			// arg validation
+				$$.assert(eventName, 'Error with eventName').match(/^(?:(?:[\w-]+\.)*[\w-]+\s*)+$/);
+				$$.assert(listener, 'Error with listener').isFunction();
 			// groups
-				var events		= eventName.split(/\s+/).map(evnt =>{
-					return evnt.split('.');
-				});
+				var events		= eventName.split(/\s+/).map(evnt =>{ return evnt.split('.'); });
 				var eventsCount	= events.length;
 				var i;
 			// add listner
@@ -48,18 +42,6 @@
 						_addListener(ele, events[i], listener);
 				});
 		};
-
-	/**
-	 * remove listener
-	 * .unbind()					// remove all events listeners
-	 * .unbind('click')				// remove all events on click
-	 * .unbind('click.grp1.grp2')	// remove all events on this group and subgoups
-	 * .unbind('click', listener)	// remove this listener on click and subgroups
-	 * .unbind('click.grp', listener)// remove this listener on click.grp and subgroups
-	 * .unbind('click focus ...')	// we can add multiple events 
-	 * .unbind('click.grp1 click.grp2')// multiple groups too
-	 */
-	 plugins.unbind	= plugins.off	=  function(eventName, listener){};
 	// store listener
 		function _addListener(element, eventListPath, listener){
 			// add event to element
@@ -73,6 +55,65 @@
 				obj = _objPath(obj, eventListPath, {items: {}, listeners: []}, 'items');
 				obj.listeners.push(listener);
 		}
+
+	/**
+	 * remove listener
+	 * .unbind()					// remove all events listeners
+	 * .unbind('click')				// remove all events on click
+	 * .unbind('click.grp1.grp2')	// remove all events on this group and subgoups
+	 * .unbind('click', listener)	// remove this listener on click and subgroups
+	 * .unbind('click.grp', listener)// remove this listener on click.grp and subgroups
+	 * .unbind('click focus ...')	// we can add multiple events 
+	 * .unbind('click.grp1 click.grp2')// multiple groups too
+	 */
+	 plugins.unbind	= plugins.off	=  function(eventName, listener){
+	 	if(eventName)
+			eventName	= eventName.trim();
+		// arg validation
+			$$.assert(eventName, 'Error with eventName').whenExists.match(/^(?:(?:[\w-]+\.)*[\w-]+\s*)+$/);
+			$$.assert(listener, 'Error with listener').whenExists.isFunction();
+	 	// if unbind all
+	 		if(!eventName)
+	 			this.eachTag(ele => _unbindEvent(ele));
+	 	// if unbind specific event
+	 		else{
+	 			eventName		= eventName.split(/\s+/).map(evnt =>{ return evnt.split('.'); });
+	 			var i, c	= eventName.length;
+				this.eachTag(ele =>{
+					// remove event on the object
+						if(eventListener)
+							ele.removeEventListener(eventName, listener, false);
+					// remove event listener in data
+						for(i = 0; i < c; ++i)
+							_unbindEvent(ele, eventName[i], listener);
+				});
+	 		}
+	 };
+
+	 function _unbindEvent(obj, eventPath, listener){
+	 	var dataEvent	= _elementPrivateData(ele);
+	 	var eventName	= eventPath[0];
+	 	// unbind from DOM
+		 	if(listener){
+		 		obj.removeEventListener(eventName, listener, false);
+		 	}
+		 	else // unbind all regestred events
+		 		$$.obj.deep(dataEvent, ele => ele.items, ele => {
+		 			ele.listeners.forEach(lstner => obj.removeEventListener(eventName, lstner, false));
+		 		});
+	 }
+	 function _unbindEventFrom_ (obj, rootObj, listener){
+	 	// remove all ocurrence of this object
+	 		if(eventListener)
+	 			$$Arrays.removeAll.call(rootObj.listeners, listener);
+	 		else
+	 			rootObj.listeners.forEach(lst => obj.removeEventListener())
+	 	// use recursive fx
+	 		for(var i in rootObj.items)
+	 			_unbindEventFrom_(obj, rootObj.items[i], listener);
+	 	//TODO change recursive function
+	 }
+
 		if(HTMLElement.prototype.addEventListener){
 			// bind
 				plugins.bind	= plugins.on	=  function(eventName, listener){
