@@ -66,29 +66,26 @@
 	 * .unbind('click focus ...')	// we can add multiple events 
 	 * .unbind('click.grp1 click.grp2')// multiple groups too
 	 */
-	 plugins.unbind	= plugins.off	=  function(eventName, listener){
-	 	if(eventName)
+		plugins.unbind	= plugins.off	=  function(eventName, listener){
+			if(eventName)
 			eventName	= eventName.trim();
-		// arg validation
-			$$.assert(eventName, 'Error with eventName').whenExists.match(/^(?:(?:[\w-]+\.)*[\w-]+\s*)+$/);
-			$$.assert(listener, 'Error with listener').whenExists.isFunction();
-	 	// if unbind all
-	 		if(!eventName)
-	 			this.eachTag(ele => _unbindEvent(ele));
-	 	// if unbind specific event
-	 		else{
-	 			eventName		= eventName.split(/\s+/).map(evnt =>{ return evnt.split('.'); });
-	 			var i, c	= eventName.length;
-				this.eachTag(ele =>{
-					// remove event on the object
-						if(eventListener)
-							ele.removeEventListener(eventName, listener, false);
-					// remove event listener in data
-						for(i = 0; i < c; ++i)
-							_unbindEvent(ele, eventName[i], listener);
-				});
-	 		}
-	 };
+			// arg validation
+				$$.assert(eventName, 'Error with eventName').whenExists.match(/^(?:(?:[\w-]+\.)*[\w-]+\s*)+$/);
+				$$.assert(listener, 'Error with listener').whenExists.isFunction();
+			// if unbind all
+				if(!eventName)
+					this.eachTag(ele => _unbindEvent(ele));
+			// if unbind specific event
+				else{
+					eventName	= eventName.split(/\s+/).map(evnt =>{ return evnt.split('.'); });
+					var i, c	= eventName.length;
+					this.eachTag(ele =>{
+						// remove event listener in data
+							for(i = 0; i < c; ++i)
+								_unbindEvent(ele, eventName[i], listener);
+					});
+				}
+		};
 
 	 function _unbindEvent(obj, eventPath, listener){
 	 	var dataEvent	= _elementPrivateData(ele);
@@ -96,6 +93,10 @@
 	 	// unbind from DOM
 		 	if(listener){
 		 		obj.removeEventListener(eventName, listener, false);
+		 		// remove this listener on data
+		 			_ObjDeepOperation(dataEvent, eventPath, 'items' , ele => {
+		 				ele.listeners && $$Arrays.removeAll.call(ele.listeners, listener);
+		 			})
 		 	}
 		 	else // unbind all regestred events
 		 		$$.obj.deep(dataEvent, ele => ele.items, ele => {

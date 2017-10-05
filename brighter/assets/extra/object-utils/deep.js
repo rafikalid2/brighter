@@ -2,16 +2,24 @@
  * do deep operations on object
  */
 
-$$.obj.deep
+$$.obj.deep	= function(obj, path, fxWathToDo, childAttr){
+	// control
+		$$.assert(obj).typeof('plainObject', 'array');
+};
+
+function _ObjDeepOperation(obj, pathArray, fxWathToDo, childAttr);
 
 /*
-$$.obj.deep(fx)		// do this fx on each attribute
+$$.obj.deep(obj, path, fxWathToDo)		// do this fx on each attribute
+$$.obj.deep(obj, path, fxWathToDo, childAttr)		// do this fx, next is in "childAttr"
+$$.obj.deep(obj, path, fxWathToDo, [childAttr, ..])		// do this fx on each attribute
+$$.obj.deep(obj, path, fxWathToDo, fx)		// do this fx: get child attr
 
-$$.obj.deep(pathFx, fx)	// pathFx: fx that return obj to iterat with, default is the current obj, fx is the operation
-	example:
-		$$.obj.deep((ele, next) => {for(var i in ele.items) next(ele.items[i]}, ele => {
- 			....
- 		});
+
+
+
+// in code:
+
 
 
  */

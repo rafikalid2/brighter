@@ -1,4 +1,19 @@
-
+/**
+ * Go through object
+ * $$.obj.path(
+ * 		obj, 	// base object: Plain object or array
+ * 		path,	// string or list<String>
+ * 		{		// optional
+ * 			template	: object or array to use to create attribute if not exists, default to {}
+ * 			childNode	: String, list<String>
+ * 			putValue	: value to put in the last attribute in the path
+ * 			upsert		: create path if not exists, implicite true if "template" is set
+ * 		}
+ * 	)
+ *
+ * $$.obj.path(obj, path) // returns the value inside this path or undefined if the path do not exists
+ * $$.obj.path(obj, path, {template:{...}}) // get path, create it using this template if not exists
+ */
 /**
  * create Object path
  * $$.obj.path(obj, 'g1.g2.g3', template, clue)
@@ -6,12 +21,12 @@
  * $$.obj.path(obj, 'g1.g2.g3', {items:{}, att:value, ...})
  * $$.obj.path(obj, 'g1.g2.g3', {items:{}, att:value, ...}, 'items')
  */
-$$.obj.path	= function(obj, path, template, childrenAttr, putValue){
+$$.obj.path	= function(obj, path, options){
 	// control
+	// plain object or array
 		if(!obj)
 			throw new $$.errors.missedArgument('first argument');
-		if(!path || !path.match(/^(?:\w+\.)+\w+$/))
-			throw new $$.errors.illegalArgument('incorrect path: ', path);
+		$$.assert(path, 'incorrect path').match(/^(?:\w+\.)+\w+$/);
 	// operations
 		return _objPath(obj, path.split('.'), template, childrenAttr, putValue);
 };
@@ -24,8 +39,15 @@ $$.obj.path	= function(obj, path, template, childrenAttr, putValue){
  * @param  {any, optional} putValue
  * @return {object}
  */
-function _objPath(obj, path, template, childrenAttr, putValue){
-	var i, c = path.length;
+const _objPathEmptyOptions	= {};// we just need this to avoid to create new object each time we do not have options, this will remaine empty
+function _objPath(obj, path, options){
+	// set path as Array
+		if(typeof path == 'string')
+			path	= path.split('.');
+		if(!options)
+			options	= _objPathEmptyOptions;
+	// vars
+		var i, c = path.length;
 	// if put value
 		var lastKey;
 		if(putValue){
