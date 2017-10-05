@@ -27,8 +27,10 @@ $$.obj.path	= function(obj, path, options){
 		if(!obj)
 			throw new $$.errors.missedArgument('first argument');
 		$$.assert(path, 'incorrect path').match(/^(?:\w+\.)+\w+$/);
+
+		//TODO verifier les options
 	// operations
-		return _objPath(obj, path.split('.'), template, childrenAttr, putValue);
+		return _objPath(obj, path, options);
 };
 
 /**
@@ -48,16 +50,25 @@ function _objPath(obj, path, options){
 			options	= _objPathEmptyOptions;
 	// vars
 		var i, c = path.length;
+	// reglage
+		var childrenAttr	= options.childNode; // pour le moment on support juste d'avoir un string //TODO
+		var upsert	= options.upsert || !!options.template;
 	// if put value
 		var lastKey;
-		if(putValue){
+		if(options.putValue){
 			--c;
 			lastKey	= path[c];
 		}
 	// create path
 		for(i = 0; i < c; i++){
-			if(!obj[path[i]])
-				obj[path[i]]	= template && _objClone(template, true) || {};
+			if(!obj[path[i]]){
+				// if create element
+					if(upsert)
+						obj[path[i]]	= options.template && _objClone(options.template, true) || {};
+				// else, returns undefined
+					else
+						return undefined;
+			}
 			obj	= obj[path[i]];
 			if(childrenAttr){
 				if(!obj[childrenAttr])
@@ -66,8 +77,8 @@ function _objPath(obj, path, options){
 			}
 		}
 	// if put value
-		if(putValue){
-			obj[lastKey]	= putValue;
+		if(options.putValue){
+			obj[lastKey]	= options.putValue;
 			obj	= obj[lastKey];
 		}
 	return obj;

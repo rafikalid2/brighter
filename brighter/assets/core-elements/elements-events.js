@@ -52,7 +52,10 @@
 					obj[LISTNER_ATTR_NAME]	= {};
 				obj	= obj[LISTNER_ATTR_NAME];
 			// add listener to dest path
-				obj = _objPath(obj, eventListPath, {items: {}, listeners: []}, 'items');
+				obj = _objPath(obj, eventListPath, {
+					template	: {items: {}, listeners: []},
+					childNode	: 'items'
+				});
 				obj.listeners.push(listener);
 		}
 
@@ -87,33 +90,75 @@
 				}
 		};
 
-	 function _unbindEvent(obj, eventPath, listener){
-	 	var dataEvent	= _elementPrivateData(ele);
-	 	var eventName	= eventPath[0];
-	 	// unbind from DOM
-		 	if(listener){
-		 		obj.removeEventListener(eventName, listener, false);
-		 		// remove this listener on data
-		 			_ObjDeepOperation(dataEvent, eventPath, 'items' , ele => {
-		 				ele.listeners && $$Arrays.removeAll.call(ele.listeners, listener);
-		 			})
+	function _unbindEvent(obj, eventPath, listener){
+	 	var dataEvent	= _elementPrivateData(ele),
+	 		eventName,
+	 		i, c,
+	 		prnt;
+	 	// no events
+	 		if(!dataEvent){}
+	 	// unbind all events
+		 	if(!eventPath){
+		 		for(i in dataEvent){
+			 		_ObjDeepOperation(
+			 			dataEvent[i],
+			 			ele => {
+			 				ele.listeners.forEach(lstner => obj.removeEventListener(eventName, lstner, false));
+				 		},{
+				 			childNode	: 'items'
+						}
+					);
+					delete dataEvent[i];
+			 	}
 		 	}
-		 	else // unbind all regestred events
-		 		$$.obj.deep(dataEvent, ele => ele.items, ele => {
-		 			ele.listeners.forEach(lstner => obj.removeEventListener(eventName, lstner, false));
-		 		});
-	 }
-	 function _unbindEventFrom_ (obj, rootObj, listener){
-	 	// remove all ocurrence of this object
-	 		if(eventListener)
-	 			$$Arrays.removeAll.call(rootObj.listeners, listener);
-	 		else
-	 			rootObj.listeners.forEach(lst => obj.removeEventListener())
-	 	// use recursive fx
-	 		for(var i in rootObj.items)
-	 			_unbindEventFrom_(obj, rootObj.items[i], listener);
-	 	//TODO change recursive function
-	 }
+		 	else{
+			 	// eventPath to Array
+			 		if(typeof eventPath == 'string')
+			 			eventPath	= eventPath.split('.');
+			 	eventName	= eventPath[0];
+			 	// unbind from DOM
+				 	if(listener){
+				 		obj.removeEventListener(eventName, listener, false);
+				 		// remove this listener on data
+				 			_ObjDeepOperation(
+				 				_ObjDeepOperation(dataEvent, eventPath),
+				 				ele => {
+				 					ele.listeners && $$Arrays.removeAll.call(ele.listeners, listener);
+				 				},{
+				 					childNode	: 'items'
+				 				}
+				 			);
+				 	}
+				// unbind all regestred event listeners
+				 	else{
+				 		_ObjDeepOperation(
+			 				_ObjDeepOperation(dataEvent, eventPath),
+			 				ele => {
+			 					if(ele.listener)
+			 						for(i=0, c= ele.listeners.length)
+			 							obj.removeEventListener(eventName, ele.listeners[i], false);
+			 				},{
+			 					childNode	: 'items'
+			 				}
+			 			);
+			 			if(eventPath.length == 1)
+			 				delete dataEvent[eventName];
+			 			else
+			 				delete _ObjDeepOperation(dataEvent, eventPath.slice(0,-2))[eventPath[eventPath.length - 1]];
+				 	}
+		 	}
+	}
+	// function _unbindEventFrom_ (obj, rootObj, listener){
+	//  	// remove all ocurrence of this object
+	//  		if(eventListener)
+	//  			$$Arrays.removeAll.call(rootObj.listeners, listener);
+	//  		else
+	//  			rootObj.listeners.forEach(lst => obj.removeEventListener())
+	//  	// use recursive fx
+	//  		for(var i in rootObj.items)
+	//  			_unbindEventFrom_(obj, rootObj.items[i], listener);
+	//  	//TODO change recursive function
+	// }
 
 		if(HTMLElement.prototype.addEventListener){
 			// bind
