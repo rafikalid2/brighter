@@ -66,7 +66,7 @@ $$.plugin({
 			}
 		}
 		return this;
-	}, //TODO
+	},
 	/**
 	 *
 	 * all.prepend		// clone and insert copie to each element
@@ -74,6 +74,7 @@ $$.plugin({
 	prepend		: function(){
 		// get elements
 			var list	= _getElementsFrom.apply(this, arguments),
+				ele,
 				i,
 				c		= list.length;
 		// insert theme
@@ -82,7 +83,7 @@ $$.plugin({
 				if(this._all){
 					this.eachTag(ele => {
 						for(i = 0; i < c; ++i)
-							ele.appendChild(_cloneHTMLNode(list[i], true));
+							_prepend(ele, _cloneHTMLNode(list[i], true));
 					});
 				}
 				// append to first tag
@@ -90,17 +91,35 @@ $$.plugin({
 					ele	= this.getFirstTag();
 					if(ele){
 						for(i = 0; i < c; ++i)
-							ele.appendChild(list[i]);
+							_prepend(ele, list[i]);
 					}
 				}
 			}
 		return this;
-	}, //TODO
+	},
 	/**
 	 *
 	 * all.prependTo	// prepend clones
 	 */
-	prependTo	: function(){}, //TODO
+	prependTo	: function(){
+		var list	= _argsToBrighterList.call(this, arguments);
+		var parent;
+		if(list.length){
+			// make copies and add to each parent
+			if(this._all){
+				$$prototype.eachTag.call(list, parent => {
+					this.each(ele => _prepend(parent, _cloneHTMLNode(ele, true)));
+				});
+			}
+			// add to first parent
+			else{
+				parent = $$prototype.getFirstTag.call(list);
+				if(parent)
+					this.each(ele => _prepend(parent, ele));
+			}
+		}
+		return this;
+	},
 	/**
 	 * .before(elementToInsert)
 	 * .all.before		// insert clone before each element in the collection
@@ -177,5 +196,11 @@ function _getElementsFrom(){
 
 
 /**
- * append, prepend
+ * prepend
  */
+ 	function _prepend(parent, child){
+		if(parent.firstChild)
+			parent.insertBefore(child, parent.firstChild);
+		else
+			parent.appendChild(child);
+ 	}
