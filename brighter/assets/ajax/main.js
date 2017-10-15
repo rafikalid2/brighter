@@ -2,6 +2,17 @@
  * pourvoir grouper les appel ajax
  * se rappler de tous les appel ajax, voir par groupe
  *
+ *
+ 
+ *
+ * $$.get(url)
+ * $$.post(url)
+ * $$.head(url)
+ * $$.delete(url)
+ * 		.param('name', value)	// add URL param
+ * 		.param({name:value})
+ *
+ * 
  * $$.get(baseUrl, GetData)
  * $$.post(baseURL, GetData, PostData)
  *

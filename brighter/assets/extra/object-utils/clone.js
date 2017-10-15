@@ -1,7 +1,10 @@
 /**
- * clone an object
+ * clone an object (will have the same prototype)
+ * clone(obj)			// clone object or array
+ * clone(true, obj)		// clone deeeply the object
  */
-$$.obj.clone	= function(obj, deep){};
+
+$$.plugin(true, 'clone', function(obj, deep){});
 
 function _objClone(obj, deep){
 	
