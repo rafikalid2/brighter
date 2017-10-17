@@ -6,23 +6,30 @@
 **/
 // GET
 	$$.get(url)
+	$$.post(url)
+	$$.head(url)
+	$$.delete(url)
 		.cache(false) //force de navigator to reload the data from this url, // set or get
 
-//POST
-	$$.post(url)
+		.param('name')			// get param value
+		.param('name', value)	// add URL param
+		.param({name:value})
+
 		.data(obj || formData || HTMLForm || text) // set or get the data
 
-		.dataConverter(data=>{})// optional, fx that will convert data to text, // set or get
+		
 
-		.uploadProgress((percent, totalBytes, uploadedBytes){})// set or get
-		// .dataType('type')//optional, data type header, [json, form] will be converted to mime-type equivalent
-		.contentType('type')// optional, the content type, it will be guessed from data if not present, // set or get
+		.request
+			.converter(data=>{})// optional, fx that will convert data to text, // set or get
+			.uploadProgress((percent, totalBytes, uploadedBytes){})// set or get, valable aussi on top object
+			.contentType('type')// optional, the content type, it will be guessed from data if not present, // set or get
+			.accepts('', '', ,,,)	// accepted server responses, valable aussi on top object
+		.response
+			.downloadProgress((percent, totalBytes, downloadedBytes)=>{})// set or get, valbale aussi on top object
+			.converter(data=>{})// optional, fx that will convert data to text, // set or get
+		
 
 // commons
-		.query(queryParams) // params to be encoded in URL// set or get
-		.downloadProgress((percent, totalBytes, downloadedBytes)=>{})// set or get
-
-		.accepts('', '', ,,,)	// accepted server responses
 
 
 		.converter(fx)
