@@ -11,6 +11,8 @@
  * $$.delete(url)
  * 		.param('name', value)	// add URL param
  * 		.param({name:value})
+ * 		.cache(false|true)		// force to ignore navigator cache
+ * 		
  *
  * 
  * $$.get(baseUrl, GetData)
