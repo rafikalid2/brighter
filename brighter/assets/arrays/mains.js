@@ -91,3 +91,10 @@
 /*
 removeAll(obj)	: remove all ocurrences of "ob" in the array
  */
+
+// events
+	/*
+	push/add	(item, index)
+	remove		(item, index)
+	clear		(removedItems)
+	 */
