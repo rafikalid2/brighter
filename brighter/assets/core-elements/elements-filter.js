@@ -24,7 +24,7 @@ $$.plugin({
 					if(filterArg.length)
 						filterFx	= (ele => filterArg.indexOf(ele) > -1);
 					else
-						throw new $$.errors.illegalArgument('insupported arguments: ', arguments);
+						throw new $$.err.illegalArgument('insupported arguments: ', arguments);
 				}
 			// apply filter fx
 				if(filterFx)

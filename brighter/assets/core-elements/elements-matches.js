@@ -43,6 +43,6 @@ function _extendedMatches(ele, selector){
 	else if(Array.isArray(selector))
 		result	= (selector.indexOf(ele) != -1);
 	else
-		throw new $$.errors.illegalArgument('unsupported argument: ', selector);
+		throw new $$.err.illegalArgument('unsupported argument: ', selector);
 	return result;
 }

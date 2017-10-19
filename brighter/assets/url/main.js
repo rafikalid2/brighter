@@ -54,7 +54,7 @@
 		function pathVars(path, params){
 			url.replace(/{[^}]+}/g, function(p){
 				if(params[p] === undefined)
-					throw new $$.errors.missedArgument('could not found the argument "' + p + '"" inside the given list');
+					throw new $$.err.missedArgument('could not found the argument "' + p + '"" inside the given list');
 				return params[p];
 			});
 		}

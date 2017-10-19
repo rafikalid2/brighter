@@ -27,6 +27,8 @@
 		.bind()
 		.unbind()
 
+		.urlDecoder(url => url) // optional, decoder to decode URL
+
 		.url(patern, pattern2, ...)	// apply those functions on each URL that matches those patterns
 			.status({})
 			.catch()
@@ -53,8 +55,11 @@
 	$$.post(url)
 	$$.head(url)
 	$$.delete(url)
-		.url() // get URL
-		.url(url) // override url if not yeat sent
+		.url // get URL
+		.originalURL	// getter, the original URL before redirects
+
+		.urlDecoder(url => url) // optional, decoder to decode URL
+		.goToURL(url)	// make redirect to this URL
 
 		/**
 		 * @param {regex} urlPattern match an url already in progress or in the queu, default to undefined (no waiting, exec request immediately)
@@ -62,7 +67,7 @@
 		 * @param {int} queuTimeout max time to wait in the queu, default to 0 (wait intil the previous connection ends)
 		 * @param {boolean} abortWhenQueuTimeout abort the connection if timeout in queu, default to true
 		 */
-		.urlQeu(urlPattern, timeout, QueuTimeout, abortWhenQueuTimeout)	// if a request is already in progress, wait this timeout, do not use parallel requests
+		.lazyRequest(urlPattern, timeout, QueuTimeout, abortWhenQueuTimeout)	// if a request is already in progress, wait this timeout, do not use parallel requests
 
 		.cache(false) 				//force de navigator to reload the data from this url, // set or get
 		.timeout(int) 				// timeout, get timeout if the arg is undefined
@@ -70,6 +75,7 @@
 
 		.followMetaRedirects(true|false)	// if follow meta and script redirections
 		.followMetaRedirects((url, xhr) => {})	// on before following metaredirect, if return is false, == do not follow
+
 
 		.xhr						// the native XHR
 
@@ -97,7 +103,6 @@
 
 		.readyState()			// get ready state [0, 1, 2, 3, 4]
 		.readyState(fx)			// add this fx as callBack when the state change
-		.readyStateChange(fx)	// alias to readyState
 
 
 		.bind('eventName', fx)		// eventName in ['readyState', 'readyStateChange', ]
@@ -140,6 +145,8 @@
 
 			.header()		// get all headers
 			.header('name')	// get a header
+
+			.header(xhr=>{})// call when headers received (state = 2s)
 
 			.contentType()// get content type	
 

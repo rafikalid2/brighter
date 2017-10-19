@@ -25,7 +25,7 @@ $$.obj.path	= function(obj, path, options){
 	// control
 	// plain object or array
 		if(!obj)
-			throw new $$.errors.missedArgument('first argument');
+			throw new $$.err.missedArgument('first argument');
 		$$.assert(path, 'incorrect path').match(/^(?:\w+\.)+\w+$/);
 
 		//TODO verifier les options
@@ -91,9 +91,9 @@ function _objPath(obj, path, options){
 $$.obj.exists	= function(obj, path, childrenAttr){
 	// control
 		if(!obj)
-			throw new $$.errors.missedArgument('first argument');
+			throw new $$.err.missedArgument('first argument');
 		if(!path || !path.match(/^(?:\w+\.)+\w+$/))
-			throw new $$.errors.illegalArgument('incorrect path: ', path);
+			throw new $$.err.illegalArgument('incorrect path: ', path);
 	// operations
 		return _objExists(obj, path.split('.'), childrenAttr);
 }

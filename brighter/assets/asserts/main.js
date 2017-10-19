@@ -1,3 +1,9 @@
+/**
+ * all sub function has this signature
+ * 		.fx(value)
+ * 		.fx(value, errMessage)
+ * 		.fx(value, errType, errMessage) @param {String} errType
+ */
 // main assert
 	$$.plugin(true, 'assert', {
 		value	: _$$Assert
@@ -8,6 +14,9 @@
 //
 // $$.assert(obj).not.null();
 // $$.assert(path).match(/^(?:\w+\.)+\w+$/);
+// 
+// $$.assert(obj).fx(value, errMessage)
+// $$.assert(obj).fx(value, errType, errMessage)
 // 
 // $$.assert(obj).exists(errMsg)
 //

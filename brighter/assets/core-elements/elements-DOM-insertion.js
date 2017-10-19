@@ -188,7 +188,7 @@ function _getElementsFrom(){
 					Array.prototype.push.apply(result, rs);
 			}
 			else
-				throw new $$.errors.illegalArgument(ele);
+				throw new $$.err.illegalArgument(ele);
 		}
 	}
 	return result;

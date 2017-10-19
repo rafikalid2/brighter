@@ -28,7 +28,7 @@ function $$(arg){
 		else{
 			result	= _argsToBrighterList(arg);
 			if(!result.length)
-				throw new $$.errors.illegalArgument(arg);
+				throw new $$.err.illegalArgument(arg);
 		}
 	// make list as brighter object
 		result.__proto__	= $$prototype;

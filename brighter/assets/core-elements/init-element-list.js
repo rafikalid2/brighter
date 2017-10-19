@@ -35,7 +35,7 @@ function _argsToBrighterList(args){
 		else if(ele.length)
 			ele	= ele.filter(ele => ele && ele.nodeType > 0);
 		else
-			throw new $$.errors.illegalArgument('Argument ' + i + ' is not supported: ', ele);
+			throw new $$.err.illegalArgument('Argument ' + i + ' is not supported: ', ele);
 
 		if(ele.length)
 			Array.prototype.push.apply(list, ele);
