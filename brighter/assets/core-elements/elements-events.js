@@ -30,8 +30,8 @@
 			if(eventName)
 				eventName	= eventName.trim();
 			// arg validation
-				$$.assert(eventName, 'Error with eventName').match(/^(?:(?:[\w-]+\.)*[\w-]+\s*)+$/);
-				$$.assert(listener, 'Error with listener').isFunction();
+				$$.assert((typeof eventName == 'string') && /^(?:(?:[\w-]+\.)*[\w-]+\s*)+$/.test(eventName), 'illegalArgument', 'Incorrect event name');
+				$$.assert(typeof listener == 'function', 'illegalArgument', 'Incorrect listener');
 			// groups
 				var events		= eventName.split(/\s+/).map(evnt =>{ return evnt.split('.'); });
 				var eventsCount	= events.length;
@@ -73,8 +73,8 @@
 			if(eventName)
 			eventName	= eventName.trim();
 			// arg validation
-				$$.assert(eventName, 'Error with eventName').whenExists.match(/^(?:(?:[\w-]+\.)*[\w-]+\s*)+$/);
-				$$.assert(listener, 'Error with listener').whenExists.isFunction();
+				$$.assert((typeof eventName == 'string') && /^(?:(?:[\w-]+\.)*[\w-]+\s*)+$/.test(eventName), 'illegalArgument', 'Incorrect event name');
+				$$.assert(typeof listener == 'function', 'illegalArgument', 'Incorrect listener');
 			// if unbind all
 				if(!eventName)
 					this.eachTag(ele => _unbindEvent(ele));

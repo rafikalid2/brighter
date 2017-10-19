@@ -8,25 +8,25 @@
 */
 
 // aserts
-	$$.assert(expression, errorMessage).is(value);
-	$$.assert(expression).is(true, ErrorMessage);
-	$$.assert(expression).is(false, ErrorMessage);
-	$$.assert(expression).is(null, ErrorMessage);
+	// $$.assert(expression, errorMessage).is(value);
+	// $$.assert(expression).is(true, ErrorMessage);
+	// $$.assert(expression).is(false, ErrorMessage);
+	// $$.assert(expression).is(null, ErrorMessage);
 
-	$$.assert(obj).isNaN(ErrorMessage);
-		.isUndefined(ErrorMessage)
-		.isDefined(ErrorMessage)
-		.isNull(ErrorMessage)
+	// $$.assert(obj).isNaN(ErrorMessage);
+	// 	.isUndefined(ErrorMessage)
+	// 	.isDefined(ErrorMessage)
+	// 	.isNull(ErrorMessage)
 
-		.exists(errorMessage)	// if != undefined and != null
+	// 	.exists(errorMessage)	// if != undefined and != null
 
-	$$.assert(ele).isString(ErrorMessage);
-		.isEmpty(ErrorMessage)		// empty text or array or object
+	// $$.assert(ele).isString(ErrorMessage);
+	// 	.isEmpty(ErrorMessage)		// empty text or array or object
 
-		.not // inverser tout les methode qui viennent apres
+	// 	.not // inverser tout les methode qui viennent apres
 
 
-	$$.assert(obj).instanceof(String);
+	// $$.assert(obj).instanceof(String);
 
 
 
@@ -43,7 +43,7 @@
 
 
 		.has(value) // an array or object or string contains value
-		.has(value1, value2, ,,,)//and
+		.has([value1], errMsg)//and
 		// cas ou on veut juste qu'une veleur soit presente (ou), ou exlusif
 		.contains(value) // alias: has
 		.deepHas(value)// value is contained deeply inside the object
@@ -143,3 +143,142 @@
 		fx(callBack);//
 	})
 		.than((err, timeout) =>{})
+
+//--------------------------------------------------------------------------------
+/**
+ * all sub function has this signature
+ * 		.fx(value)
+ * 		.fx(value, errMessage)
+ * 		.fx(value, errType, errMessage) @param {String} errType
+ * 		.fx(value, new Error('message'))
+ */
+// main assert
+(function(){
+	$$.plugin(true, 'assert', {
+		value	: _$$Assert
+	});
+
+	function _$$Assert(obj, a, b){
+		return new _$$AssertFacto(obj, a, b);
+	}
+
+	function _$$AssertFacto(obj){
+		this._obj			= obj;
+		this._defaultMsg	= b || a;
+		this._defaultType	= !b && a;
+	}
+
+	
+	//make those vars all of type $$.assert
+		var $$assertProto = _$$Assert.prototype	= _$$AssertFacto.prototype;
+
+
+	_extendNative($$assertProto, {
+		is			: _conditionWithArg((obj, arg) => obj == arg, 'Equals'),
+		isNumber	: _condition(obj => !isNaN(obj), 'Number'),
+		isNaN		: _condition(obj => isNaN(obj), 'not Number'),
+		isString	: _condition(obj => typeof obj == 'string', 'String'),
+
+		isUndefined	: _condition(obj => obj === undefined, 'Undefined'),
+		isDefined	: _condition(obj => obj !== undefined, 'Undefined'),
+		isNull		: _condition(obj => obj === null, 'Null'),
+		exists		: _condition(obj => obj !== null && obj !== undefined, 'Exists'),
+		isEmpty		: _condition(obj => !obj || $$.isEmpty(obj), 'Empty'), // empty array or empty string or empty object, null or undefined or 0
+
+		// (array).has(value)
+		// (string).has(substr)
+		// (object).has(value)
+		has			: _conditionWithArg((obj, arg) => {
+			(cnd => {
+				Array.isArray(arg)? arg.every() : obj instanceof arg
+			})(ele => {
+
+			});
+		}, 'Has'),
+
+		instanceof	: _conditionWithArg((obj, arg) => obj instanceof arg, 'Instanceof'),// .instanceOf(String)
+	});
+
+	/**
+	 * exec condition
+	 * privates:
+	 * 		 ._not	: inverses condition
+	 */
+		function _conditionWithArg(cndFx, msgPrefix){
+			return function(arg, a, b){
+				var cnd	= cndFx.call(this, this._obj, arg);
+				if(this._not ? cnd : !cnd)
+					_throwError.call(this, msgPrefix, a, b);
+				return this;
+			};
+		}
+		function _condition(cndFx, msgPrefix){
+			return function(a, b){
+				var cnd	= cndFx.call(this, this._obj);
+				if(this._not ? cnd : !cnd)
+					_throwError.call(this, msgPrefix, a, b);
+				return this;
+			};
+		}
+		function _throwError(msgPrefix, a, b){
+			var msg, type;
+			if(a && (typeof a != 'string')){
+				throw a;
+			}else{
+				msg 	= b || a || this._defaultMsg;
+				type	= !b && a || this._defaultType;
+				msg		= (this._not ? msgPrefix : 'Not ' + msgPrefix) + (msg ? ': ' + msg : '');
+				throw type && $$.err[type] && (new $$.err[type](msg)) || new Error(msg);
+			}
+		}
+
+	Object.defineProperty($$assertProto, 'not', {
+		get	: function(){
+			this._not	= true;
+			return this;
+		}
+	})
+
+//
+// $$.assert(obj).not.null();
+// $$.assert(path).match(/^(?:\w+\.)+\w+$/);
+// 
+// $$.assert(obj).fx(value, errMessage)
+// $$.assert(obj).fx(value, errType, errMessage)
+// 
+// $$.assert(obj).exists(errMsg)
+//
+// $$.assert(eventName, 'Error with eventName').isString().match(/^(?:(?:[\w-]+\.)*[\w-]+\s*)+$/);
+// $$.assert(listener, 'Error with listener').isFunction();
+// 
+// 
+// conditions
+// .whenExists. 	// when the variable !=undefined and !=null, do what is next, example: $$.assert(eventName, 'Error with eventName').whenExists.match(/^(?:(?:[\w-]+\.)*[\w-]+\s*)+$/);
+// 
+// 		.typeof(...)	// accepted types
+
+
+
+/*
+assert(arg1)
+		.exists('define: need the seconde argument')
+		.when
+			.not.isPlainObject()
+		.then
+			.isString()
+			.and(arg2)
+			.isPlainObject();
+
+
+assert(arg1)
+		.exists('define: need the seconde argument')
+		.or(
+			a => a.isPlainObject(),
+			a => a.isString()
+				.and(arg2)
+				.isPlainObject()
+		);
+			
+ */
+
+})();

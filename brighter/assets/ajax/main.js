@@ -107,11 +107,14 @@
 			},
 		// followMetaRedirects
 			followMetaRedirects	: function(arg){
-				if(typeof arg == 'boolean')
+				if(!arg)
+					return this._options.followMetaRedirects;
+				else if(typeof arg == 'boolean')
 					this._options.followMetaRedirects	= arg;
-				else{
+				else if(typeof arg == 'function'){
 					//TODO add event
 				}
+				else throw new $$.err.illegalArgument('Needs boolean or function')
 				return this;
 			},
 		/**
@@ -253,9 +256,7 @@
 						result	= headers[a];
 				// set headers
 					else{
-						//$$.assert(this.xhr.readyState).is(0, $$.err.illegalState('Could not add a header when the request is in progress or done.'))
-						if(this.xhr.readyState)
-							throw new $$.err.illegalState('Could not add a header when the request is in progress or done.');
+						$$.assert(this.xhr.readyState == 0, 'illegalState', 'Could not add a header when the request is in progress or done.');
 						if(typeof a == 'string')
 							headers[a]	= b;
 						else{
@@ -269,10 +270,9 @@
 			 * .removeHeader('header name', 'header2', '...')// remove header
 			 */
 			removeHeader	: function(){
-				//$$.assert(this.xhr.readyState).is(0, $$.err.illegalState('Could not add a header when the request is in progress or done.'))
-				if(this.xhr.readyState)
-					throw new $$.err.illegalState('Could not add a header when the request is in progress or done.');
-				
+				$$.assert(this.xhr.readyState == 0, 'illegalState', 'Could not add a header when the request is in progress or done.');
+				for(var i=0, c = arguments.length; i < c; ++i)
+					delete this.headers[arguments[i]];
 			}
 	});
 

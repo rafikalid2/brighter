@@ -1,54 +1,23 @@
 /**
- * all sub function has this signature
- * 		.fx(value)
- * 		.fx(value, errMessage)
- * 		.fx(value, errType, errMessage) @param {String} errType
+ * $$.assert(condition : boolean)
+ * $$.assert(condition : boolean, errorMessage : string)
+ * $$.assert(condition : boolean, errorMessage : Error)
+ * $$.assert(condition : boolean, errorMessageType : string, errorMessage : string)
  */
-// main assert
-	$$.plugin(true, 'assert', {
-		value	: _$$Assert
-	});
 
-	function _$$Assert(expression){}
-
-//
-// $$.assert(obj).not.null();
-// $$.assert(path).match(/^(?:\w+\.)+\w+$/);
-// 
-// $$.assert(obj).fx(value, errMessage)
-// $$.assert(obj).fx(value, errType, errMessage)
-// 
-// $$.assert(obj).exists(errMsg)
-//
-// $$.assert(eventName, 'Error with eventName').isString().match(/^(?:(?:[\w-]+\.)*[\w-]+\s*)+$/);
-// $$.assert(listener, 'Error with listener').isFunction();
-// 
-// 
-// conditions
-// .whenExists. 	// when the variable !=undefined and !=null, do what is next, example: $$.assert(eventName, 'Error with eventName').whenExists.match(/^(?:(?:[\w-]+\.)*[\w-]+\s*)+$/);
-// 
-// 		.typeof(...)	// accepted types
-
-
-
-/*
-assert(arg1)
-		.exists('define: need the seconde argument')
-		.when
-			.not.isPlainObject()
-		.then
-			.isString()
-			.and(arg2)
-			.isPlainObject();
-
-
-assert(arg1)
-		.exists('define: need the seconde argument')
-		.or(
-			a => a.isPlainObject(),
-			a => a.isString()
-				.and(arg2)
-				.isPlainObject()
-		);
-			
- */
+$$.plugin(true, 'assert', {
+	value	: function(condition, a, b){
+		var type;
+		if(!condition){
+			if(a && (typeof a != 'string'))
+				throw a;
+			else{
+				if(b === undefined){
+					type	= a; // type
+					a		= b; // message
+				}
+				throw type && $$.err[type] ? new $$.err[type](a) : new Error(a);
+			}
+		}
+	}
+});
