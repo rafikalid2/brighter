@@ -24,8 +24,8 @@
 $$.obj.path	= function(obj, path, options){
 	// control
 	// plain object or array
-		$$.assert(obj, 'missedArgument', 'Needs the object');
-		$$.assert((typeof path == 'string') && /^(?:\w+\.)+\w+$/.test(path), 'illegalArgument', 'Inccorect path');
+		$$.assert(obj, $$.err.missedArgument, 'Needs the object');
+		$$.assert((typeof path == 'string') && /^(?:\w+\.)+\w+$/.test(path), $$.err.illegalArgument, 'Inccorect path');
 
 		//TODO verifier les options
 	// operations

@@ -9,15 +9,10 @@ $$.plugin(true, 'assert', {
 	value	: function(condition, a, b){
 		var type;
 		if(!condition){
-			if(a && (typeof a != 'string'))
-				throw a;
-			else{
-				if(b === undefined){
-					type	= a; // type
-					a		= b; // message
-				}
-				throw type && $$.err[type] ? new $$.err[type](a) : new Error(a);
-			}
+			if(typeof a == 'function')
+				throw new a(b);
+			else
+				throw new Error(a || 'Assertion Fails');
 		}
 	}
 });

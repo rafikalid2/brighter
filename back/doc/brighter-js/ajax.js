@@ -56,7 +56,7 @@
 	$$.head(url)
 	$$.delete(url)
 		.url // get URL
-		.originalURL	// getter, the original URL before redirects
+		.originalURL	// getter, the ori ginal URL before redirects
 
 		.urlDecoder(url => url) // optional, decoder to decode URL
 		.goToURL(url)	// make redirect to this URL

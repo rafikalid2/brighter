@@ -5,17 +5,28 @@
 
 (function(){
 	// pricipal calls
-		$$.get		= _makeAjax('GET');
-		$$.post		= _makeAjax('POST');
-		$$.delete	= _makeAjax('DELETE');
-		$$.head		= _makeAjax('HEAD');
+		$$.get			= _makeAjax('GET');
+		$$.post			= _makeAjax('POST');
+		$$.delete		= _makeAjax('DELETE');
+		$$.head			= _makeAjax('HEAD');
+	// specified calls
+		$$.getJSON		= _makeAjax('GET', options => {options.contentType = 'json'});
+		$$.getXML		= _makeAjax('GET', options => {options.contentType = 'xml'});
+	// GET once
+	// get url only once, and store parsed response in the cache
+		$$.getOnce		= _makeAjax('GET', options => {options.once = true});
+		$$.getJSONOnce	= _makeAjax('GET', options => {options.once = true; options.contentType = 'json'});
+		$$.getXMLOnce	= _makeAjax('GET', options => {options.once = true; options.contentType = 'xml'});
 	// ajax wrapper
-		function _makeAjax(type){
+		function _makeAjax(type, otherOp){
 			return (options => {
 				// prepare options
 					options	= _prepareOptions(options);
 				// type
 					options.type	= type;
+				// other operations
+					if(otherOp)
+						otherOp(options);
 				return new _XHR(options);
 			})
 		}
@@ -52,21 +63,36 @@
 		function _XHR(options){
 			// save options
 				this._options	= options;
+			// prepare XHR
+				_prepareXHR.call(this);
+		};
+	// prepare xhr
+		function _prepareXHR(){
+			var options	= this._options;
 			// make XHR
 				var xhr		= new XMLHttpRequest();
 				this._xhr	= xhr;
-			// 
 			// on ready state change
 				xhr.onreadystatechange = (event => {
 					this._readyState	= event.readySate;
 					//TODO trigger onreadyStateChange
+					//Done
 				});
 			// make call
-				setTimeout(()=>{
-					xhr.open(options.type, options.url.href, true);
-					xhr.send(options.data);
-				}, 0);
-		};
+				setTimeout(_xhrSend.bind(this), 0);
+		}
+	// finalize request preparation end send
+		function _xhrSend(){
+			var xhr	= this._xhr;
+			// timeout
+				if(options.timeout)
+					xhr.timeout	= options.timeout;
+			// data
+				var data	= options.data;
+
+			xhr.open(options.type, options.url.href, true);
+			xhr.send(data);
+		}
 	/////
 	// ADD METHODS
 	/////
@@ -96,8 +122,10 @@
 						//TODO add event
 					}
 				// timeout
-					else if(typeof tmeout == 'number')
+					else if(typeof tmeout == 'number'){
 						this._options.timeout	= tmeout;
+						this.xhr.timeout		= tmeout;
+					}
 					else if(!tmeout)
 						result	= this._options.timeout;
 				// else
@@ -114,7 +142,7 @@
 				else if(typeof arg == 'function'){
 					//TODO add event
 				}
-				else throw new $$.err.illegalArgument('Needs boolean or function')
+				else throw new $$.err.illegalArgument('Needs boolean or function');
 				return this;
 			},
 		/**
@@ -129,6 +157,7 @@
 				}
 			},
 		/**
+		 * 
 		 * retry()				// retry connection
 		 * retry(xhr => {})		// add retry event listener
 		 */
@@ -189,18 +218,23 @@
 					}
 			},
 		/**
-		 * .data(obj || formData || HTMLForm || text)
+		 * .data(obj || formData || HTMLForm || text || form-selector)
 		 */
 			data		: function(arg){
 				//TODO add assets
 				var result	= this;
-				if(arg) this._options.data	= arg;
+				if(arg){
+					// assert accepted data (serializable data), depends on used serialization
+					// $$.assert($$.isPlainObj(arg) || $$.isForm(arg), $$.err.illegalArgument,'Incorrect data')
+					this._options.data	= arg;
+				}
 				else result	= this._options.data;
 				return result;
 			},
 		/**
 		 * then
 		 */
+			// then()
 		 	then		: function(callBack){
 		 		//TODO asset callBack is function
 		 		if(callBack)
@@ -246,33 +280,79 @@
 		 * .header('key', 'value')	// set request some header
 		 * .header({key:value}) 	// override all headers
 		 */
-			header	: function(a, b){
-				var result	= this;
-				var headers	= this._options.headers;
-				// get headers
-					if(!a)
-						result	= headers;
-					else if(typeof a == 'string' && !b)
-						result	= headers[a];
-				// set headers
-					else{
-						$$.assert(this.xhr.readyState == 0, 'illegalState', 'Could not add a header when the request is in progress or done.');
-						if(typeof a == 'string')
-							headers[a]	= b;
+				header	: function(a, b){
+					var result	= this;
+					var headers	= this._options.headers;
+					// get headers
+						if(!a)
+							result	= headers;
+						else if(typeof a == 'string' && !b)
+							result	= headers[a];
+					// set headers
 						else{
-							for(var i in a)
-								headers[i]	= a[i];
+							this.assertNew(); // assert request not yeat in progress
+							if(typeof a == 'string')
+								headers[a]	= b;
+							else{
+								for(var i in a)
+									headers[i]	= a[i];
+							}
 						}
-					}
-				return result;
-			},
+					return result;
+				},
 			/**
 			 * .removeHeader('header name', 'header2', '...')// remove header
 			 */
-			removeHeader	: function(){
-				$$.assert(this.xhr.readyState == 0, 'illegalState', 'Could not add a header when the request is in progress or done.');
-				for(var i=0, c = arguments.length; i < c; ++i)
-					delete this.headers[arguments[i]];
+				removeHeader	: function(){
+					this.assertNew(); // assert request not yeat in progress
+					for(var i=0, c = arguments.length; i < c; ++i)
+						delete this.headers[arguments[i]];
+				},
+			// get/set request contentType
+				dataType		: function(){},
+			// get/set response contentType
+				contentType		: function(){},
+			// get/set request charset
+				charset			: function(){},
+			// get/set response charset
+				responseCharset	: function(){},
+			// get/set Accepted 
+			// accepts()	// get accepted mimetypes
+			// accepts('json', ...)	// set accepted mimetypes
+				accepts			: function(){}
+
+		// progress
+			//.progress() // progress 0 to 1
+			//.progress((percent, totalBytes, downloadedBytes)=>{})// set or get, valbale aussi on top object
+			//.progress($$progressBar)// adjust progressbar auto
+			uploadProgress	: function(){},
+			downloadProgress: function(){},
+
+		// serializers
+			//serialize request data
+			//serializer()			// get serializer
+			//serializer(data=>{})	// set serializer
+			serializer		: function(converter){
+				this.assertNew();
+				//TODO
+				return this;
+			},
+			// deserialize response data
+			// deserialize((xhr, data) => data)
+			// deserialize({
+			// 		mimeType	: (data => data)
+			// })
+			deserializer	: function(converter){
+				//TODO
+				return this;
+			},
+		// operations
+			//beforeSend() get
+			//beforeSend(xhr =>{})
+				beforeSend	: function(){}
+		// assert new Request (readystate == XMLHttpRequest.UNSENT)
+			assertNew	: function(){
+				$$.assert(this.xhr.readyState == 0, $$.err.illegalState, 'Request is in progress');
 			}
 	});
 
