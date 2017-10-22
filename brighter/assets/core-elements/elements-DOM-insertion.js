@@ -152,11 +152,6 @@ $$.plugin({
 	 * down element in the parent children list
 	 */
 	down		: function(n){}, //TODO
-	/**
-	 * detach the elements from the DOM
-	 */
-	detach		: function(n){}, //TODO
-	
 });
 
 

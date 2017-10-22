@@ -112,7 +112,7 @@
 			else
 				result	= this.css(arg); // use css to insert values
 			return result;
-		}
+		},
 		// remove css property
 		rmStyle	: function(){
 			var i, c= arguments.length;

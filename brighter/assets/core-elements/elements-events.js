@@ -30,8 +30,8 @@
 			if(eventName)
 				eventName	= eventName.trim();
 			// arg validation
-				$$.assert((typeof eventName == 'string') && /^(?:(?:[\w-]+\.)*[\w-]+\s*)+$/.test(eventName), $$.err.illegalArgument, 'Incorrect event name');
-				$$.assert(typeof listener == 'function', $$.err.illegalArgument, 'Incorrect listener');
+				$$.assertArg((typeof eventName == 'string') && /^(?:(?:[\w-]+\.)*[\w-]+\s*)+$/.test(eventName), 'Incorrect event name');
+				$$.assertFunction(listener, 'Incorrect listener');
 			// groups
 				var events		= eventName.split(/\s+/).map(evnt =>{ return evnt.split('.'); });
 				var eventsCount	= events.length;
@@ -73,8 +73,8 @@
 			if(eventName)
 			eventName	= eventName.trim();
 			// arg validation
-				$$.assert((typeof eventName == 'string') && /^(?:(?:[\w-]+\.)*[\w-]+\s*)+$/.test(eventName), $$.err.illegalArgument, 'Incorrect event name');
-				$$.assert(typeof listener == 'function', $$.err.illegalArgument, 'Incorrect listener');
+				$$.assertArg((typeof eventName == 'string') && /^(?:(?:[\w-]+\.)*[\w-]+\s*)+$/.test(eventName), 'Incorrect event name');
+				$$.assertFunction(listener, 'Incorrect listener');
 			// if unbind all
 				if(!eventName)
 					this.eachTag(ele => _unbindEvent(ele));
@@ -135,7 +135,7 @@
 			 				_ObjDeepOperation(dataEvent, eventPath),
 			 				ele => {
 			 					if(ele.listener)
-			 						for(i=0, c= ele.listeners.length)
+			 						for(i = 0, c = ele.listeners.length; i < c; ++i)
 			 							obj.removeEventListener(eventName, ele.listeners[i], false);
 			 				},{
 			 					childNode	: 'items'

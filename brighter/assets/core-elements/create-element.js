@@ -68,4 +68,3 @@ function _createElement(strExpression, namespace){
 		}
 	return result;
 }
-}

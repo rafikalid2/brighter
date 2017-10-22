@@ -4,8 +4,8 @@
  * clone(true, obj)		// clone deeeply the object
  */
 
-$$.plugin(true, 'clone', function(obj, deep){});
+// $$.plugin(true, 'clone', function(obj, deep){});
 
-function _objClone(obj, deep){
+// function _objClone(obj, deep){
 	
-}
+// }

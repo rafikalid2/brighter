@@ -55,8 +55,8 @@
 
 // wrappers
 	['push', 'unshift', 'reverse', 'sort']
-		.each(function(ele){
-			Object.defineProperty($$Arrays[ele], ele, {
+		.forEach(function(ele){
+			Object.defineProperty($$Arrays, ele, {
 				value	: function(){
 					Array.prototype[ele].apply(this, arguments);
 					return this;
@@ -65,8 +65,8 @@
 		});
 // wrappers 2
 	['concat', 'slice', 'splice', 'filter', 'map']
-		.each(function(ele){
-			Object.defineProperty($$Arrays[ele], ele, {
+		.forEach(function(ele){
+			Object.defineProperty($$Arrays, ele, {
 				value	: function(){
 					var lst			= Array.prototype[ele].apply(this, arguments);
 					lst.__proto__	= $$Arrays;

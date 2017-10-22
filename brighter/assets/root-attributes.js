@@ -11,5 +11,5 @@ $$.plugin(true,{
 
 	 * Errors
 	 */
-	errors	: {}
+	err	: {}
 });

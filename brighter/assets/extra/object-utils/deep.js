@@ -8,7 +8,7 @@
 
 $$.obj.deep	= function(obj, operation, options){
 	// control
-		$$.assert(Array.isArray(obj) || $$.isPlainObj(obj), $$.err.illegalArgument, 'Needs plain object or array');
+		$$.assertArg(Array.isArray(obj) || $$.isPlainObj(obj), 'Needs plain object or array');
 
 };
 

@@ -43,13 +43,13 @@ _extendObject(_animationFx.prototype, {
 	/**
 	 * stop all animations
 	 */
-	stop		: function(){}; //TODO
+	stop		: function(){}, //TODO
 	/**
 	 * reset animations
 	 */
-	reset		: function(){}; //TODO
+	reset		: function(){}, //TODO
 	/**
 	 * skip all animations
 	 */
-	skip		: function(){}; //TODO
+	skip		: function(){} //TODO
 });
