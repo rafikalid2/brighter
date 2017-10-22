@@ -4,22 +4,39 @@
  */
 
 (function(){
-	// pricipal calls
-		$$.get			= _makeAjax('GET');
-		$$.post			= _makeAjax('POST');
-		$$.delete		= _makeAjax('DELETE');
-		$$.head			= _makeAjax('HEAD');
-	// specified calls
-		$$.getJSON		= _makeAjax('GET', options => {options.contentType = 'json'});
-		$$.getXML		= _makeAjax('GET', options => {options.contentType = 'xml'});
-	// GET once
-	// get url only once, and store parsed response in the cache
-		$$.getOnce		= _makeAjax('GET', options => {options.once = true});
-		$$.getJSONOnce	= _makeAjax('GET', options => {options.once = true; options.contentType = 'json'});
-		$$.getXMLOnce	= _makeAjax('GET', options => {options.once = true; options.contentType = 'xml'});
+	// Consts
+		const MIMETYPE_MAP = {
+			json		: 'application/json',
+			xml			: 'application/xml',
+			urlEncoded	: 'application/x-www-form-urlencoded',
+			text		: 'text/plain',
+			multipart	: ''
+		};
+	// interface
+		$$.plugin(true,{
+			// pricipal calls
+				get			: _makeAjax('GET'),
+				post		: _makeAjax('POST'),
+				delete		: _makeAjax('DELETE'),
+				head		: _makeAjax('HEAD'),
+			// specified calls
+				getJSON		: _makeAjax('GET', options => {options.contentType = 'json'}),
+				getXML		: _makeAjax('GET', options => {options.contentType = 'xml'}),
+			// GET once
+			// get url only once, and store parsed response in the cache
+				getOnce		: _makeAjax('GET', options => {options.once = true}),
+				getJSONOnce	: _makeAjax('GET', options => {options.once = true; options.contentType = 'json'}),
+				getXMLOnce	: _makeAjax('GET', options => {options.once = true; options.contentType = 'xml'})
+		});
 	// ajax wrapper
 		function _makeAjax(type, otherOp){
 			return (options => {
+				return new _XHR(type, options, otherOp);
+			});
+		}
+	// xhr Object
+		function _XHR(type, options, otherOp){
+			try{
 				// prepare options
 					options	= _prepareOptions(options);
 				// type
@@ -27,71 +44,166 @@
 				// other operations
 					if(otherOp)
 						otherOp(options);
-				return new _XHR(options);
-			})
-		}
+				// save options
+					this._options	= options;
+				// start XHR
+					this._startTimeout	= setTimeout(() => {
+						this._startTimeout	= null;
+						try{
+							_xhrSend.call(this, resolve.bind(this), reject.bind(this));
+						}catch(e){
+							reject.call(this);
+						}
+					}, 0);
+					_prepareXHR.call(this);
+			}catch(e){
+				reject.call(this, e);
+			}
+		};
 	// prepare options
 		function _prepareOptions(options){
-			var url;
-			// if URL
+			$$.assert(options != undefined, $$.err.missedArgument, 'need arguments');
+
+			var tmpVar, i;
+			// URL
 				if(typeof options == 'string'){
-					url		= options;
+					tmpVar	= options;
 					options	= {};
+				} else if(options instanceof URL || options instanceof HTMLAnchorElement){
+					tmpVar	= args.href;
+					options	= {};
+				} else if($$.isPlainObj(options)){
+					tmpVar	= options.url;
+					if(typeof tmpVar != 'string') // URL or HTMLAnchorElement
+						tmpVar	= tmpVar.href;
+				} else {
+					throw new $$.illegalArgument('incorrect argument: ', options);
 				}
-			// else if is URL or HTMLAnchorElement
-				else if(options.href){
-					url		= options.href;
-					options	= {}
-				}
-			// ajax custom options
-				else if(options.url){
-					url		= options.url;
-				}
-			// invalid options
-				else
-					throw $$.err.illegalArgument('invalid URL');
-			// convert URL to absolute URL
-				url = $$.toAbsURL(url);
-				options.url	= new URL(url);
+				// finalise url
+					tmpVar 		= $$.toAbsURL(tmpVar);
+					options.url	= new URL(tmpVar);
 			// request headers
-				if(!options.headers)
+			// capitalize all header kies
+				if(options.headers){
+					tmpVar	= options.headers;
 					options.headers	= {};
+					for(i in tmpVar)
+						options.headers[$$.capitalize(i)]	= tmpVar[i];
+					// charset
+						if(options.headers['Content-Type'])
+							_optionsSplitConentTypeAndCharset(options, options.headers['Content-Type']);
+				}
+				else
+					options.headers	= {};
+			// dataType
+				if(options.dataType)
+					_optionsSplitConentTypeAndCharset(options, options.dataType);
 			// end
 				return options;
 		}
-	// xhr Object
-		function _XHR(options){
-			// save options
-				this._options	= options;
-			// prepare XHR
-				_prepareXHR.call(this);
-		};
-	// prepare xhr
-		function _prepareXHR(){
+	// split content type and charset
+		_optionsSplitConentTypeAndCharset(options, contentType){
+			contentType			= contentType.match(/^([^;]+)(?:;\s*charset\s*=(.*)$)?/i);
+			options.dataType	= contentType[1].trim();
+			options.dataCharset	= contentType[2].trim();
+		}
+	// reject & resolve
+		function resolve(){}
+		function reject(){}
+	// finalize request preparation end send
+		function _xhrSend(resolve, reject){
 			var options	= this._options;
+			var i, tmpVar;
+			// prepare options
+
 			// make XHR
 				var xhr		= new XMLHttpRequest();
 				this._xhr	= xhr;
+			// timeout
+				if(options.timeout){
+					$$.assert(isFinite(options.timeout) && options.timeout >= 0, $$.err.illegalArgument, 'incorrect timeout');
+					xhr.timeout	= options.timeout;
+				}
+			// data
+				// var data	= options.data;
+				// if(data instanceof HTMLFormElement)
+				// 	data	= new formData(data);
+			// headers
+				
+				// content type
+					
+				// prepare post
+				
+			// init data
+				tmpVar	= 
 			// on ready state change
 				xhr.onreadystatechange = (event => {
 					this._readyState	= event.readySate;
 					//TODO trigger onreadyStateChange
 					//Done
 				});
-			// make call
-				setTimeout(_xhrSend.bind(this), 0);
-		}
-	// finalize request preparation end send
-		function _xhrSend(){
-			var xhr	= this._xhr;
-			// timeout
-				if(options.timeout)
-					xhr.timeout	= options.timeout;
-			// data
-				var data	= options.data;
 
 			xhr.open(options.type, options.url.href, true);
-			xhr.send(data);
+			xhr.send(options.data || null);
+		}
+	// convert data to mimetype
+		function _toMimeType(value){
+			return MIMETYPE_MAP[value.toLowerCase()] || value;
+		}
+	// prepare post request
+		function _preparePost(options){
+			var options	= this;_options,
+				dataType= options.dataType,
+				data	= options.data,
+				tmpVar;
+			// find form if the given data is a selector
+				if(typeof data == 'string'){
+					try{
+						data	= $$.find(data);
+					}catch(e){} // not a selector
+				}
+			// if data is a Brighter object, give the native form
+				if(data instanceof $$){
+					data	= data.firstTag(ele => ele instanceof HTMLFormElement);
+					if(!data)
+						throw $$.err.illegalArgument('selected element is not a form');
+				}
+			// content type
+				tmpVar	= options.headers;
+				// Guess the data type
+					if(!dataType){
+						if(typeof data == 'string'){
+							// url encoded
+								if(/^[^&]+=[^&]*(?:&[^&]+=[^&]*)*$/.test(data))
+									dataType = 'urlEncoded';
+							//JSON
+								else if(
+									( () => { try{ JSON.parse(data); return true; }catch(e){ return false } })()
+								)
+									dataType = 'json';
+							// text
+								else
+									datatype = 'text';
+						}
+						else if(data instanceof FormData)
+							dataType = ''; // will be 
+						else if(data instanceof HTMLFormElement)
+						else if($$.isPlainObj(options.data)) // JSON
+							dataType = 'json';
+						else if(typeof data	= )
+					}
+				// convert datatype to mimetype
+					datatype	= _toMimeType(dataType);
+				// gess datatype
+					else{
+						
+					}
+				  ?  : () ? 'application/json' : 'application/x-www-form-urlencoded');
+				// charset
+					options.headers['Content-Type']	= dataType + '; charset=' + (options.dataCharset || 'UTF-8');
+			// data
+				tmpVar	= options.data;
+				if(typeof )
 		}
 	/////
 	// ADD METHODS
@@ -122,15 +234,13 @@
 						//TODO add event
 					}
 				// timeout
-					else if(typeof tmeout == 'number'){
+					else if(typeof tmeout == 'number')
 						this._options.timeout	= tmeout;
-						this.xhr.timeout		= tmeout;
-					}
 					else if(!tmeout)
 						result	= this._options.timeout;
 				// else
 					else
-						throw new $$.err.illegalArgument('timeout: need function or number');
+						throw new $$.err.illegalArgument('incorrect timeout');
 				return result;
 			},
 		// followMetaRedirects
@@ -150,11 +260,24 @@
 		 * abort(xhr => {})		// add an onAbort event listener
 		 */
 			abort		: function(arg){
-				if(!arg)
-					this.xhr.abort();
-				else{
-					//TODO add event
-				}
+				// abort process
+					if(!arg){
+						// not starting yeat
+							if(this._startTimeout){
+								clearTimeout(this._startTimeout);
+								this._startTimeout	= null;
+								//TODO trigger abort event
+							}
+						// XHR en cours
+							if(this.xhr){
+								this.xhr.abort();
+							}
+						//TODO remvoe from global ajax
+					}
+				// add abort event
+					else{
+						//TODO add event
+					}
 			},
 		/**
 		 * 
@@ -221,28 +344,12 @@
 		 * .data(obj || formData || HTMLForm || text || form-selector)
 		 */
 			data		: function(arg){
-				//TODO add assets
 				var result	= this;
-				if(arg){
-					// assert accepted data (serializable data), depends on used serialization
-					// $$.assert($$.isPlainObj(arg) || $$.isForm(arg), $$.err.illegalArgument,'Incorrect data')
+				if(arg)
 					this._options.data	= arg;
-				}
 				else result	= this._options.data;
 				return result;
 			},
-		/**
-		 * then
-		 */
-			// then()
-		 	then		: function(callBack){
-		 		//TODO asset callBack is function
-		 		if(callBack)
-		 			this._options.then	= callBack;
-		 		else
-		 			return this._options.then;
-		 		return this;
-		 	},
 		/**
 		 * .readyState()			// get ready state [0, 1, 2, 3, 4]
 		 * .readyState(fx)			// add this fx as callBack when the state change
@@ -280,24 +387,34 @@
 		 * .header('key', 'value')	// set request some header
 		 * .header({key:value}) 	// override all headers
 		 */
-				header	: function(a, b){
+				requestHeader	: function(a, b){
 					var result	= this;
 					var headers	= this._options.headers;
 					// get headers
 						if(!a)
 							result	= headers;
 						else if(typeof a == 'string' && !b)
-							result	= headers[a];
+							result	= headers[$$.capitalize(a)];
 					// set headers
 						else{
-							this.assertNew(); // assert request not yeat in progress
-							if(typeof a == 'string')
-								headers[a]	= b;
-							else{
-								for(var i in a)
-									headers[i]	= a[i];
-							}
+							((addHeader) => {
+								if(typeof a == 'string')
+									addHeader(a, b);
+								else{
+									for(var i in a)
+										addHeader(i, a[i]);
+								}
+							})
+							// fx to add each header
+							((key, value) => {
+								key	= $$.capitalize(key);
+								if(key	== 'Content-Type')
+									_optionsSplitConentTypeAndCharset(this._options, value);
+								else
+									headers[key]	= value;
+							});
 						}
+
 					return result;
 				},
 			/**
@@ -309,11 +426,17 @@
 						delete this.headers[arguments[i]];
 				},
 			// get/set request contentType
-				dataType		: function(){},
+				dataType		: function(type){
+					if(type){ _optionsSplitConentTypeAndCharset(this._options, type); return this; }
+					else{ return this.options.dataType; }
+				},
+			// get/set request charset
+				dataCharset			: function(charset){
+					if(charset){ this.dataCharset	= charset; return this; }
+					else return this.dataCharset;
+				},
 			// get/set response contentType
 				contentType		: function(){},
-			// get/set request charset
-				charset			: function(){},
 			// get/set response charset
 				responseCharset	: function(){},
 			// get/set Accepted 
@@ -353,7 +476,20 @@
 		// assert new Request (readystate == XMLHttpRequest.UNSENT)
 			assertNew	: function(){
 				$$.assert(this.xhr.readyState == 0, $$.err.illegalState, 'Request is in progress');
-			}
+			},
+
+		/**
+		 * then
+		 */
+			// then()
+		 	then		: function(callBack){
+		 		//TODO asset callBack is function
+		 		if(callBack)
+		 			this._options.then	= callBack;
+		 		else
+		 			return this._options.then;
+		 		return this;
+		 	}
 	});
 
 	// URL
@@ -388,6 +524,9 @@
 
 		followMetaRedirects : true|false, // default to true
 		data		: '',
+		dataType	: '',
+		dataCharset	: '',
+
 		then		: fx, // when finish
 		status : {},
 

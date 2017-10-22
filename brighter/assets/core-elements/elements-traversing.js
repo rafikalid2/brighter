@@ -84,13 +84,17 @@ $$.plugin({
 	 * .find(ArrayLike)		: Array, $$Object, HTMLElements or even jQuery object
 	 * .all.find			: equivalent to findAll
 	 */
-	find		: function(selector){}, //TODO
+	find		: function(selector){
+		//TODO validate the selector
+	}, //TODO
 	/**
 	 * findAll
 	 * .findAll(selector)		: select elements that has somme childs
 	 * .findAll(ArrayLike)		: Array, $$Object, HTMLElements or even jQuery object
 	 */
-	findAll		: function(selector){} //TODO
+	findAll		: function(selector){
+		//TODO validate the selector
+	} //TODO
 });
 
 /**
