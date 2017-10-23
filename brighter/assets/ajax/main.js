@@ -19,6 +19,20 @@
 			'application/x-www-form-urlencoded'	: $$.toURLEncoded,
 			'multipart/form-data'				: $$.toFormData
 		};
+
+		// default redirect rules
+		const META_REDIRECT_RULES	= [
+			{
+				pattern	: /\/html$/i,
+				rule	: function(response){
+					if(typeof response == 'string'){
+						var url	= response.match(/<meta\s+http-equiv\s*=\s*["']refresh["']\s+content\s*=\s*["']0\s*;\s*URL\s*=\s*["']?(https?:\/\/[^"'>]*)["']/i);
+						if(url)
+							return url[1];
+					}
+				}
+			}
+		];
 	// interface
 		$$.plugin(true,{
 			// pricipal calls
@@ -38,7 +52,6 @@
 	// ajax wrapper
 		function _makeAjax(type, otherOp){
 			return (options => {
-				console.log('----new ss')
 				return new _XHR(type, options, otherOp);
 			});
 		}
@@ -47,28 +60,32 @@
 			try{
 				// prepare options
 					options	= _prepareOptions(options);
-					console.log('---ff', options)
 				// type
 					options.type	= type;
 				// other operations
 					if(otherOp)
 						otherOp(options);
 				// save options
-					console.log('---- options', options)
 					this._options	= options;
+				// redirects trace
+					this._redirectTrace	= [options.url.href]; // store redirect URLs to avoid cyclic calls
 				// start XHR
-					this._startTimeout	= setTimeout(() => {
-						this._startTimeout	= null;
-						try{
-							_xhrSend.call(this, resolve.bind(this), reject.bind(this));
-						}catch(e){
-							reject.call(this);
-						}
-					}, 0);
+					_startXHR.call(this);
 			}catch(e){console.log('----------', e)
 				reject.call(this, e);
 			}
 		};
+	// start loading
+		function _startXHR(){
+			this._startTimeout	= setTimeout(() => {
+				this._startTimeout	= null;
+				try{
+					_xhrSend.call(this, resolve.bind(this), reject.bind(this));
+				}catch(e){
+					reject.call(this, e);
+				}
+			}, 0);
+		}
 	// prepare options
 		function _prepareOptions(options){
 			$$.assert(options != undefined, $$.err.missedArgument, 'need arguments');
@@ -117,12 +134,17 @@
 			options.dataCharset	= contentType[2].trim();
 		}
 	// reject & resolve
-		function resolve(){
+		function resolve(data, err){
 			if(this._options.then){
-				this._options.then.call(this, this, '');
+				this._options.then.call(this, data || this._response, err, this);
 			}
+			// end
+			if(this._endFx)
+				this._endFx.call(this, this); //TODO change this to envent
 		}
-		function reject(){}
+		function reject(err){
+			resolve(null, err);
+		}
 	// finalize request preparation end send
 		function _xhrSend(resolve, reject){
 			var options	= this._options;
@@ -139,7 +161,7 @@
 
 			// make XHR
 				var xhr		= new XMLHttpRequest();
-				this._xhr	= xhr;
+				this.xhr	= xhr;
 			// timeout
 				if(options.timeout){
 					$$.assertArg(isFinite(options.timeout) && options.timeout >= 0, 'incorrect timeout');
@@ -151,13 +173,34 @@
 			
 			// on ready state change
 				xhr.onreadystatechange = (event => {
-					console.log('--->>> ', event.readystate);
-					this._readyState	= event.readySate;
+					this._readyState	= xhr.readyState;
 					//TODO trigger onreadyStateChange
+					//headers received or redirect
+						if(xhr.readyState == 2){
+							if(this._responseHeaderFx) //TODO change this to be event trigger
+								this._responseHeaderFx.call(this, this);
+						}
 					//Done
-						if(event.readystate == 4){
-							resolve();
-							console.log('---- resolve: ', event);
+						else if(xhr.readyState == 4){
+							// parse result
+								_deserialize.call(this);
+
+							// if follow metaredirects
+								if(this.followMetaRedirects()){
+									tmpVar	= _getMetaRedirectURL.call(this); // url to follow
+									if(tmpVar){
+										// avoid cyclic calls
+											if(this._redirectTrace.indexOf(tmpVar) != -1)
+												throw new $$.err.illegalState('Cyclic redirects.');
+										// go to next url
+											this.gotoURL(tmpVar);
+									}else{
+										resolve();
+									}
+								}
+								else{
+									resolve();
+								}
 						}
 				});
 
@@ -253,15 +296,44 @@
 	 * deserialize data
 	 */
 	 function _deserialize(){
-
+	 	this._response	= this.xhr.responseText;
 	 }
+	 /**
+	  * follow meta redirect
+	  */
+	function _getMetaRedirectURL(){
+		var response	= this._response;
+		var contentType	= this.contentType;
+		var i, c, url;
+		if(response){
+			for(i = 0, c = META_REDIRECT_RULES.length; i < c; ++i){
+				if(META_REDIRECT_RULES[i].pattern.test(contentType)){
+					url	= META_REDIRECT_RULES[i].rule(response);
+					if(url)
+						break;
+				}
+			}
+		}
+		return url;
+	}
 	/////
 	// ADD METHODS
 	/////
 	_extendNative(_XHR.prototype, {
+		/**
+		 * give an id or group to this request, so we could manage it with $$.ajax.find('') function
+		 */
+			id		: function(identifier){
+				//TODO
+			},
 		// URL redirect
 			gotoURL		: function(url){
-				//TODO
+
+				this._redirectTrace.push(url);
+				this._options.url	= new URL($$.toAbsURL(url));
+
+				_startXHR.call(this); // call this URL
+
 				return this;
 			},
 		// URL decoder
@@ -309,7 +381,7 @@
 		// followMetaRedirects
 			followMetaRedirects	: function(arg){
 				if(!arg)
-					return this._options.followMetaRedirects;
+					return this._options.followMetaRedirects || false;
 				else if(typeof arg == 'boolean')
 					this._options.followMetaRedirects	= arg;
 				else if(typeof arg == 'function'){
@@ -433,42 +505,12 @@
 					//TODO
 				},
 		/**
-		 * .readyState()			// get ready state [0, 1, 2, 3, 4]
-		 * .readyState(fx)			// add this fx as callBack when the state change
-		 */
-			readyState	: function(callBack){
-				var result	= this;
-				if(!callBack)
-					result	= this._readyState;
-				else{
-					$$.assertFunction(callBack);// assert that this is a function
-					//TODO add event
-				}
-				return result;
-			},
-		/**
-		 * .bind('eventName', fx)		// eventName in ['readyState', 'readyStateChange', ]
-		 */
-			bind	: function(){
-				//TODO
-				return this;
-			},
-		/**
-		 * .unbind()				// unbind all event listeners
-		 * .unbind('eventName')		// unbind all event listeners of type eventName
-		 * .unbind('eventName', fx)	// unbind the listener
-		 */
-			unbind	: function(){
-				//TODO
-				return this;
-			},
-		/**
 		 * .header() 				// get all request header
 		 * .header('name')			// get a request header
 		 * .header('key', 'value')	// set request some header
 		 * .header({key:value}) 	// override all headers
 		 */
-				requestHeader	: function(a, b){
+				header	: function(a, b){
 					var result	= this;
 					var headers	= this._options.headers;
 					// get headers
@@ -509,6 +551,36 @@
 				},
 			// get/set Accepted 
 			// accepts()	// get accepted mimetypes
+		/**
+		 * .readyState()			// get ready state [0, 1, 2, 3, 4]
+		 * .readyState(fx)			// add this fx as callBack when the state change
+		 */
+			readyState	: function(callBack){
+				var result	= this;
+				if(!callBack)
+					result	= this._readyState;
+				else{
+					$$.assertFunction(callBack);// assert that this is a function
+					//TODO add event
+				}
+				return result;
+			},
+		/**
+		 * .bind('eventName', fx)		// eventName in ['readyState', 'readyStateChange', ]
+		 */
+			bind	: function(){
+				//TODO
+				return this;
+			},
+		/**
+		 * .unbind()				// unbind all event listeners
+		 * .unbind('eventName')		// unbind all event listeners of type eventName
+		 * .unbind('eventName', fx)	// unbind the listener
+		 */
+			unbind	: function(){
+				//TODO
+				return this;
+			},
 
 		// progress
 			//.progress() // progress 0 to 1
@@ -555,49 +627,90 @@
 				$$.assert(this.xhr.readyState == 0, $$.err.illegalState, 'Request is in progress');
 			},
 
+		// get response
+			/**
+			 * responseHeader()				// get all response headers
+			 * responseHeader('headerName')	// get this response header
+			 * responseHeader(xhr => {})	// add this callBack when status is 3 (headers received)
+			 */
+			responseHeader	: function(a){
+				var result	= this;
+				var reg;
+				var i;
+				if(!a){
+					result	= this.xhr && this.xhr.getAllResponseHeaders();
+					//parse headers
+					if(typeof result == 'string'){
+						reg	= result;
+						result	= {};
+						reg.split(/[\r\n]+/).forEach( e => {
+							if(e){
+								i	= e.indexOf(':');
+								result[e.substr(0, i)]	= e.substr(i + 1).trim();
+							}
+						});
+					}
+				}
+				else if(typeof a == 'string')
+					result	= this.xhr && this.xhr.getResponseHeader($$.capitalize(a));
+				else if(typeof a == 'function')
+					this._responseHeaderFx	= a; //TODO change this to be an event listener
+				else throw new $$.err.illegalArgument('argument must be string or function');
+				return result;
+			},
 		/**
 		 * then
+		 * @returns {Promise} like "then" of promises
 		 */
-			// then()
+			// then(response => {})
+			// then((response, error, xhr) => {})
 		 	then		: function(callBack){
-		 		//TODO asset callBack is function
-		 		if(callBack){
-		 			$$.assertFunction(callBack);// assert that this is a function
-		 			console.log('---- this: ', this);
-		 			this._options.then	= callBack;
-		 		}
-		 		else
-		 			return this._options.then;
-		 		return this;
-		 	}
+	 			$$.assertFunction(callBack);// assert that this is a function
+	 			this._options.then	= callBack;
+		 		//TODO add it as event
+		 	},
+		 /**
+		  * life cycle
+		  * end() // true or false, if the process is finished
+		  * end(xhr => {})	// callBack when the process is finished
+		  */
+			end			: function(callBack){
+				//TODO change this
+					if(callBack)
+						this._endFx	= callBack;
+				return this;
+			}
 	});
 
-	// URL
-		Object.defineProperty(_XHR.prototype, 'url', {
-			get	: function(){ return this._xhr.responseURL || this._options.url.href; }
-		});
-	// original URL
-		Object.defineProperty(_XHR.prototype, 'originalURL', {
-			get	: function(){ return this._options.url.href; }
-		});
-	// original data (before parsing)
-		Object.defineProperty(_XHR.prototype, 'originalData', {
-			get	: function(){ return this.xhr.responseText; }
-		});
-	// response
-		// get/set response contentType
-		Object.defineProperty(_XHR.prototype, 'contentType', {
-			get	: function(){
+	/////
+	// define Getters
+	/////
+		(function(obj){
+			for(var i in obj){
+				Object.defineProperty(_XHR.prototype, i, {
+					get	: obj[i]
+				});
+			}
+		})
+		({
+			url			: function(){ return this.xhr && this.xhr.responseURL || this._options.url.href; },
+			originalURL	: function(){ return this._options.url.href; },
+			originalData: function(){ return this.xhr && this.xhr.responseText; },
+
+			// redirects
+				redirectTrace	: function(){ return this._redirectTrace; },
+
+			// response
+			originalResponse	: function(){ return this.xhr && this.xhr.responseText; },
+			response			: function(){ return this._reponse; },
+			contentType			: function(){
 				$$.assert(this.readyState() >= 2 , 'Headers not yeat received');
 				var result	= this.xhr.getResponseHeader('Content-Type');
 				if(result)
 					result	= result.split(';')[0].trim();
 				return result;
-			}
-		});
-		// get/set response charset
-		Object.defineProperty(_XHR.prototype, 'responseCharset', {
-			get	: function(){
+			},
+			responseCharset		: function(){
 				$$.assert(this.readyState() >= 2 , 'Headers not yeat received');
 				var result	= this.xhr.getResponseHeader('Content-Type');
 				if(result){
@@ -606,8 +719,10 @@
 						result	= result[1].trim();
 				}
 				return result;
-			}
+			},
+
 		});
+
 
 
 	

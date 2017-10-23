@@ -7,7 +7,7 @@
 
 
 
-$$.obj.define	= function(obj, arg1, arg2){
+$$.obj.define	= function(obj, arg1, arg2){ //TODO rename it
 	assert(obj).exists('define: need the first argument');
 	assert(arg1, 'Error with 2 argument')
 		.exists()
