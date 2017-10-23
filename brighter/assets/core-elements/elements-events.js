@@ -52,7 +52,7 @@
 					obj[LISTNER_ATTR_NAME]	= {};
 				obj	= obj[LISTNER_ATTR_NAME];
 			// add listener to dest path
-				obj = _objPath(obj, eventListPath, {
+				obj = $$.path(obj, eventListPath, {
 					template	: {items: {}, listeners: []},
 					childNode	: 'items'
 				});

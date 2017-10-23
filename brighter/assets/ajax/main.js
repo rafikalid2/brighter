@@ -319,7 +319,12 @@
 	/////
 	// ADD METHODS
 	/////
-	_extendNative(_XHR.prototype, {
+	(function(src){
+		for(var i in src)
+			Object.defineProperty(_XHR.prototype, i, {
+				value	: src[i]
+			});
+	})({
 		/**
 		 * give an id or group to this request, so we could manage it with $$.ajax.find('') function
 		 */
@@ -719,8 +724,7 @@
 						result	= result[1].trim();
 				}
 				return result;
-			},
-
+			}
 		});
 
 

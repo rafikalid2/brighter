@@ -10,6 +10,7 @@ var order	= require('gulp-order');
 				'header.js',
 				'plugin.js',
 				'root-attributes.js',
+				'lib/**/*.js',
 				'**/*.js',
 				'footer.js'
 			];

@@ -1,6 +1,6 @@
 /**
  * Go through object
- * $$.obj.path(
+ * $$.path(
  * 		obj, 	// base object: Plain object or array
  * 		path,	// string or list<String>
  * 		{		// optional
@@ -11,25 +11,34 @@
  * 		}
  * 	)
  *
- * $$.obj.path(obj, path) // returns the value inside this path or undefined if the path do not exists
- * $$.obj.path(obj, path, {template:{...}}) // get path, create it using this template if not exists
+ * $$.path(obj, path) // returns the value inside this path or undefined if the path do not exists
+ * $$.path(obj, path, {template:{...}}) // get path, create it using this template if not exists
  */
 /**
  * create Object path
- * $$.obj.path(obj, 'g1.g2.g3', template, clue)
- * $$.obj.path(obj, 'g1.g2.g3')
- * $$.obj.path(obj, 'g1.g2.g3', {items:{}, att:value, ...})
- * $$.obj.path(obj, 'g1.g2.g3', {items:{}, att:value, ...}, 'items')
+ * $$.path(obj, 'g1.g2.g3', template, clue)
+ * $$.path(obj, 'g1.g2.g3')
+ * $$.path(obj, 'g1.g2.g3', {items:{}, att:value, ...})
+ * $$.path(obj, 'g1.g2.g3', {items:{}, att:value, ...}, 'items')
  */
-$$.obj.path	= function(obj, path, options){
-	// control
-	// plain object or array
-		$$.assert(obj, $$.err.missedArgument, 'Needs the object');
-		$$.assertArg((typeof path == 'string') && /^(?:\w+\.)+\w+$/.test(path), 'Inccorect path');
-		//TODO verifier les options
-	// operations
-		return _objPath(obj, path, options);
-};
+$$.plugin(true, {
+	path	: function(obj, path, options){
+		// plain object or array
+			$$.assert(obj, $$.err.missedArgument, 'Needs the object');
+			$$.assertArg((typeof path == 'string') && /^(?:\w+\.)+\w+$/.test(path), 'Inccorect path');
+			//TODO verifier les options
+		// operations
+			return _objPath(obj, path, options);
+	},
+
+	hasPath	: function(obj, path, childrenAttr){
+		// control
+			$$.assert(obj, $$.err.missedArgument, 'Needs the object');
+			$$.assertArg((typeof path == 'string') && /^(?:\w+\.)+\w+$/.test(path), 'Inccorect path');
+		// operations
+			return _objExists(obj, path.split('.'), childrenAttr);
+	}
+});
 
 /**
  * @param  {Object} 		obj
@@ -80,20 +89,6 @@ function _objPath(obj, path, options){
 			obj	= obj[lastKey];
 		}
 	return obj;
-}
-
-/**
- * if a path exists
- * $$.obj.exists(obj, path)
- */
-$$.obj.exists	= function(obj, path, childrenAttr){
-	// control
-		if(!obj)
-			throw new $$.err.missedArgument('first argument');
-		if(!path || !path.match(/^(?:\w+\.)+\w+$/))
-			throw new $$.err.illegalArgument('incorrect path: ', path);
-	// operations
-		return _objExists(obj, path.split('.'), childrenAttr);
 }
 
 function _objExists(obj, path, childrenAttr){
