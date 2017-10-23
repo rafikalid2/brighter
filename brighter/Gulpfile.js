@@ -25,11 +25,12 @@ var order	= require('gulp-order');
 	gulp.task('js-prod', ()=>{
 		gulp.src('assets/**/*.js')
 			.pipe(order(concatOrder))
+			.pipe(concat('brighter.js', {newLine: ";\n"}))
 			.pipe(minify({
 		        ext:{
 		            src:'-debug.js',
 		            min:'.min.js'
-		        },
+		        }
 		        // exclude: ['tasks'],
 		        // ignoreFiles: ['.combo.js', '-min.js']
 		    }))
