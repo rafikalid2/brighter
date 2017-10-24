@@ -11,7 +11,7 @@ var order	= require('gulp-order');
 				'plugin.js',
 				'root-attributes.js',
 				'lib/**/*.js',
-				'**/*.js',
+				'core/**/*.js',
 				'footer.js'
 			];
 // javascript
