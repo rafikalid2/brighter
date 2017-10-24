@@ -20,6 +20,11 @@
  * $$.path(obj, 'g1.g2.g3')
  * $$.path(obj, 'g1.g2.g3', {items:{}, att:value, ...})
  * $$.path(obj, 'g1.g2.g3', {items:{}, att:value, ...}, 'items')
+ *
+ *
+ * $$.path(obj, 'path', 'childAttr')
+ * 
+ * $$.pathFound(obj, 'path', ...) // check if the path exists
  */
 //TODO add support to wildcard, it means any key, add support de [a,b], it means a or b
 //TODO if it is an array, add support to, arr.attr means a.att of any a from arr
