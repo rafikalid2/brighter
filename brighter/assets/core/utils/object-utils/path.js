@@ -21,6 +21,8 @@
  * $$.path(obj, 'g1.g2.g3', {items:{}, att:value, ...})
  * $$.path(obj, 'g1.g2.g3', {items:{}, att:value, ...}, 'items')
  */
+//TODO add support to wildcard, it means any key, add support de [a,b], it means a or b
+//TODO if it is an array, add support to, arr.attr means a.att of any a from arr
 $$.plugin(true, {
 	path	: function(obj, path, options){
 		// plain object or array

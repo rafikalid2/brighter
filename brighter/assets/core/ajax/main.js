@@ -10,6 +10,7 @@
 			xml			: 'application/xml',
 			urlEncoded	: 'application/x-www-form-urlencoded',
 			text		: 'text/plain',
+			string		: 'text/plain',
 			multipart	: ''
 		};
 		// convert data
@@ -77,6 +78,9 @@
 		};
 	// start loading
 		function _startXHR(){
+			// flags
+				this._flags		= {};
+
 			this._startTimeout	= setTimeout(() => {
 				this._startTimeout	= null;
 				try{
@@ -143,7 +147,7 @@
 				this._endFx.call(this, this); //TODO change this to envent
 		}
 		function reject(err){
-			resolve(null, err);
+			resolve.call(this, null, err);
 		}
 	// finalize request preparation end send
 		function _xhrSend(resolve, reject){
@@ -182,25 +186,22 @@
 						}
 					//Done
 						else if(xhr.readyState == 4){
-							// parse result
-								_deserialize.call(this);
+							// if abort, do not anyting
+							if(this._flags.abort){}
+							else{
+								// parse result
+									_deserialize.call(this);
 
-							// if follow metaredirects
-								if(this.followMetaRedirects()){
-									tmpVar	= _getMetaRedirectURL.call(this); // url to follow
-									if(tmpVar){
-										// avoid cyclic calls
-											if(this._redirectTrace.indexOf(tmpVar) != -1)
-												throw new $$.err.illegalState('Cyclic redirects.');
-										// go to next url
-											this.gotoURL(tmpVar);
-									}else{
+								// if follow metaredirects
+									if(this.followMetaRedirects() && _followMetaRedirectURL.call(this)){}
+									else if(xhr.status >= 200 && xhr.status <=299){
 										resolve();
 									}
-								}
-								else{
-									resolve();
-								}
+									else{ // error
+										if(status)
+										reject();
+									}
+							}
 						}
 				});
 
@@ -296,25 +297,39 @@
 	 * deserialize data
 	 */
 	 function _deserialize(){
+	 	// verifier que deserialisable
 	 	this._response	= this.xhr.responseText;
 	 }
 	 /**
 	  * follow meta redirect
+	  * @return {boolean} true if there is a URL to follow
 	  */
-	function _getMetaRedirectURL(){
-		var response	= this._response;
-		var contentType	= this.contentType;
-		var i, c, url;
-		if(response){
-			for(i = 0, c = META_REDIRECT_RULES.length; i < c; ++i){
-				if(META_REDIRECT_RULES[i].pattern.test(contentType)){
-					url	= META_REDIRECT_RULES[i].rule(response);
-					if(url)
-						break;
+	function _followMetaRedirectURL(){
+		// get URL
+			var response	= this._response;
+			var contentType	= this.contentType;
+			var i, c, url;
+			if(response){
+				for(i = 0, c = META_REDIRECT_RULES.length; i < c; ++i){
+					if(META_REDIRECT_RULES[i].pattern.test(contentType)){
+						url	= META_REDIRECT_RULES[i].rule(response);
+						if(url)
+							break;
+					}
 				}
 			}
-		}
-		return url;
+		// follow URL
+			if(url){
+				// avoid cyclic calls
+					if(this._redirectTrace.indexOf(url) != -1)
+						throw new $$.err.illegalState('Cyclic redirects.');
+				// go to next url
+					this.gotoURL(url);
+				return true;
+			}
+			else{
+				return false;
+			}
 	}
 	/////
 	// ADD METHODS
@@ -402,6 +417,7 @@
 			abort		: function(arg){
 				// abort process
 					if(!arg){
+							this._flags.abort	= true;
 						// not starting yeat
 							if(this._startTimeout){
 								clearTimeout(this._startTimeout);
@@ -412,7 +428,8 @@
 							if(this.xhr){
 								this.xhr.abort();
 							}
-						//TODO remvoe from global ajax
+						//send abort event
+							reject.call(this, 'abort');
 					}
 				// add abort event
 					else{
@@ -663,6 +680,15 @@
 				else throw new $$.err.illegalArgument('argument must be string or function');
 				return result;
 			},
+			/**
+			 * force response content-type to this value
+			 */
+			responseType	: function(type){
+				$$.assertArg(typeof type == 'string', 'Arg must be string');
+
+				this._options.responseType	= type; //TODO
+				return this;
+			},
 		/**
 		 * then
 		 * @returns {Promise} like "then" of promises
@@ -713,7 +739,7 @@
 				var result	= this.xhr.getResponseHeader('Content-Type');
 				if(result)
 					result	= result.split(';')[0].trim();
-				return result;
+				return result || '';
 			},
 			responseCharset		: function(){
 				$$.assert(this.readyState() >= 2 , 'Headers not yeat received');
