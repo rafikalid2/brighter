@@ -24,7 +24,7 @@ function _animationFx($$currentCollection){
 	this._$$	= $$currentCollection;
 };
 
-_extendObject(_animationFx.prototype, {
+_objExtend(_animationFx.prototype, {
 	/**
 	 * fade()		: fade toggle
 	 * fade(1)		: fadeIn
