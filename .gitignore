@@ -1,12 +1,8 @@
 core/node_modules/**
-core/dest/brighter.css
-core/dest/brighter.css
-core/dest/brighter.css
-core/dest/brighter.js
-core/dest/brighter.js
+core/dest/**
 
 chart/node_modules/**
 chart/dest/**
-brighter/dest/brighter.js
-brighter/dest/brighter-debug.js
-brighter/dest/brighter.min.js
+
+brighter/dest/**
+brighter/node_modules/**
