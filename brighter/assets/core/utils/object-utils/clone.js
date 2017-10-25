@@ -13,16 +13,14 @@
 $$.plugin(true, {
 	clone	: function(obj){
 		var deep;
-		var args	= arguments;
 		// is deep
 			if(typeof obj == 'boolean'){
 				deep	= obj;
 				obj	= arguments[1];
-				args	= Array.prototype.slice.call(arguments, 1);
 			}else{
 				deep	= false;
 			}
 		// clone
-			cloner[deep ? 'deep' : 'shallow'].copy(object);
+			return cloner[deep ? 'deep' : 'shallow'].copy(obj);
 	}
 });

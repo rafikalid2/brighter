@@ -42,6 +42,7 @@ function classExtend(parent, child){
 function _objExtend(target){
 	var deep;
 	var args	= arguments;
+	var initClonner;
 	// is deep
 		if(typeof target == 'boolean'){
 			deep	= target;
@@ -51,7 +52,9 @@ function _objExtend(target){
 			deep	= false;
 		}
 	// 
-		target	= cloner[deep ? 'deep' : 'shallow'].merge.apply(cloner.shallow, args);
+	// 
+		initClonner	= cloner[deep ? 'deep' : 'shallow'];
+		target	= initClonner.merge.apply(initClonner, args);
 	
 	// array
 		// if(Array.isArray(target)){
