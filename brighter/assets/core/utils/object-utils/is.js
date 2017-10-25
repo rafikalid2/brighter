@@ -12,7 +12,7 @@ $$.plugin(true, {
 	 * is empty
 	 */
 	isEmpty		: function(obj){
-		if(Array.isArray(obj))
+		if(typeof obj == 'string' || Array.isArray(obj))
 			return obj.length == 0;
 		else{
 			for(var i in obj)

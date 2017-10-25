@@ -8,9 +8,9 @@ var order	= require('gulp-order');
 // order
 	var concatOrder	= [
 				'header.js',
+				'plugin.js',
 				'lib/**/*.js',
 				'root-operations.js',
-				'plugin.js',
 				'root-attributes.js',
 				'core/**/*.js',
 				'footer.js'

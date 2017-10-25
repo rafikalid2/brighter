@@ -139,15 +139,44 @@
 		}
 	// reject & resolve
 		function resolve(data, err){
+			// TEHN
 			if(this._options.then){
-				this._options.then.call(this, data || this._response, err, this);
+				try{
+					this._options.then.call(this, data || this._response, err, this);
+				}catch(e){
+					_catch.call(this, 'Uncaught Error inside THEN callBack', e);
+				}
+			}
+			// catch
+			if(err && this._options.catch){
+				try{
+					this._options.catch.call(this, err, this);
+				}catch(e){
+					_catch.call(this, 'Uncaught Error inside CATCH callBack', e);
+				}
 			}
 			// end
-			if(this._endFx)
-				this._endFx.call(this, this); //TODO change this to envent
+			if(this._options.end){
+				try{
+					this._options.end.call(this, this); //TODO change this to envent
+				}catch(e){
+					_catch.call(this, 'Uncaught Error inside END callBack', e);
+				}
+			}
 		}
 		function reject(err){
-			resolve.call(this, null, err);
+			resolve.call(this, null, err || new Error('Rejected'));
+		}
+		function _catch(desc, err){
+			if(this._options.catch){
+				try{
+					this._options.catch.call(this, err, this);
+				}catch(e){
+					$$.fatalError('AJAX', 'Uncaught Error inside CATCH callBack', e);
+				}
+			}else{
+				$$.fatalError('AJAX', desc || 'Uncaught Error', err);
+			}
 		}
 	// finalize request preparation end send
 		function _xhrSend(resolve, reject){
@@ -198,7 +227,6 @@
 										resolve();
 									}
 									else{ // error
-										if(status)
 										reject();
 									}
 							}
@@ -646,7 +674,7 @@
 				beforeSend	: function(){},
 		// assert new Request (readystate == XMLHttpRequest.UNSENT)
 			assertNew	: function(){
-				$$.assert(this.xhr.readyState == 0, $$.err.illegalState, 'Request is in progress');
+				$$.assert(!this.xhr || this.xhr.readyState == 0, $$.err.illegalState, 'Request is in progress');
 			},
 
 		// get response
@@ -698,7 +726,15 @@
 		 	then		: function(callBack){
 	 			$$.assertFunction(callBack);// assert that this is a function
 	 			this._options.then	= callBack;
-		 		//TODO add it as event
+	 			return this;
+		 	},
+		 /**
+		  * catch any kind of error, even inside then callBack
+		  */
+		 	catch		: function(callBack){
+		 		$$.assertFunction(callBack);// assert that this is a function
+		 		this._options.catch	= callBack;
+	 			return this;
 		 	},
 		 /**
 		  * life cycle
@@ -708,7 +744,7 @@
 			end			: function(callBack){
 				//TODO change this
 					if(callBack)
-						this._endFx	= callBack;
+						this._options.end	= callBack;
 				return this;
 			}
 	});
