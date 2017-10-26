@@ -24,7 +24,7 @@ $$.plugin({
 	 *  all.text('text')		: set the text of all elements
 	 */
 	text		: function(text){
-		return _elementsAttr.call(this, 'text', html);
+		return _elementsAttr.call(this, 'text', text);
 	},
 });
 

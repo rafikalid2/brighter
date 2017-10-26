@@ -6,7 +6,7 @@ $$.plugin({
 		return _elementsAttr.call(this, attrName, attrValue);
 	},
 	// get or set attributes
-	// attr('attrName')		// get attrubute value
+	// attr('attrName')		// get attribute value
 	// attr({key: value})	// set attributes
 	// attr(namespace, {key: value})	// set attributes with namespace
 	attr			: function(){
@@ -82,7 +82,25 @@ $$.plugin({
 	},
 	// remove attributes
 	removeAttr		: _elementattrRemoveAttr,
-	rmAttr			: _elementattrRemoveAttr
+	rmAttr			: _elementattrRemoveAttr,
+
+	// property, some differences with attr: example: in anchros: href as attribute has the origine URL (at most relative URL), href as property has the absolute URL
+	// property('propertyName')
+	// @return property computed value
+	property		: function(propertyName){
+		$$.assert(arguments.length == 1 && typeof propertyName == 'string', 'this method is used to retrieve property computed value only, use "attr" to get or set relative value');
+		var result;
+		if(this.length){
+			if(this._all){
+				result	= this.mapTags(ele => ele[propertyName]);
+			} else {
+				result	= this.getFirstTag();
+				if(result)
+					result	= result[propertyName];
+			}
+		}
+		return result;
+	}
 });
 
 
