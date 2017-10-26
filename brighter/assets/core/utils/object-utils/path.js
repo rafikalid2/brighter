@@ -24,15 +24,19 @@
  *
  * $$.path(obj, 'path', 'childAttr')
  * 
- * $$.pathFound(obj, 'path', ...) // check if the path exists
  */
 //TODO add support to wildcard, it means any key, add support de [a,b], it means a or b
 //TODO if it is an array, add support to, arr.attr means a.att of any a from arr
 $$.plugin(true, {
+	// check if a path is valid
+	isPath	: function(path){
+		return (typeof path == 'string') && /^(?:\w+\.)+\w+$/.test(path);
+	},
+	// exec path
 	path	: function(obj, path, options){
 		// plain object or array
 			$$.assert(obj, $$.err.missedArgument, 'Needs the object');
-			$$.assertArg((typeof path == 'string') && /^(?:\w+\.)+\w+$/.test(path), 'Inccorect path');
+			$$.assertArg($$.isPath(path), 'Inccorect path');
 			//TODO verifier les options
 		// operations
 			return _objPath(obj, path, options);
@@ -41,7 +45,7 @@ $$.plugin(true, {
 	hasPath	: function(obj, path, childrenAttr){
 		// control
 			$$.assert(obj, $$.err.missedArgument, 'Needs the object');
-			$$.assertArg((typeof path == 'string') && /^(?:\w+\.)+\w+$/.test(path), 'Inccorect path');
+			$$.assertArg($$.isPath(path), 'Inccorect path');
 		// operations
 			return _objExists(obj, path.split('.'), childrenAttr);
 	}

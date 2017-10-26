@@ -1,16 +1,16 @@
 /**
  * this brighter library add 3 utils functions to an element
  * * *
-	 * .bind('eventName', eventListner)
-	 * .bind('event1 event2', eventListner)
-	 * .bind('eventName.groupe', eventListner)
-	 * .bind('eventName.group.subGroup', eventListner)
+	 * .on('eventName', eventListner)
+	 * .on('event1 event2', eventListner)
+	 * .on('eventName.groupe', eventListner)
+	 * .on('eventName.group.subGroup', eventListner)
 	 * 
-	 * .unbind()							// unbind all avents
-	 * .unbind(eventName)					// unbind all listeners on this event
-	 * .unbind(eventName.grp.subGrp)		// unbind all events of this group
-	 * .unbind(eventName, eventListener)	// unbind this listner on this event
-	 * .unbind(eventName.grp, eventListener)// unbind this listner on this event from this group and its subgroups
+	 * .off()							// unbind all avents
+	 * .off(eventName)					// unbind all listeners on this event
+	 * .off(eventName.grp.subGrp)		// unbind all events of this group
+	 * .off(eventName, eventListener)	// unbind this listner on this event
+	 * .off(eventName.grp, eventListener)// unbind this listner on this event from this group and its subgroups
 	 *
 	 * .trigger('eventName', extraParams)
 	 * .trigger(eventName)
@@ -25,8 +25,8 @@
  * we could add underlayer functions
  * * *
   	 * $$.addEventManager(clzz.prototype, {
-  	 * 		bind	: (eventName, eventListener) 		=> {this.addEventListener(eventName, eventListener, false)},
-  	 * 		unbind	: (eventName, eventListener) 		=> {this.removeEventListener(eventName, eventListener, false)},
+  	 * 		on	: (eventName, eventListener) 		=> {this.addEventListener(eventName, eventListener, false)},
+  	 * 		off	: (eventName, eventListener) 		=> {this.removeEventListener(eventName, eventListener, false)},
   	 * 		trigger	: (eventNameOrEvent, extratParams)	=> {this.removeEventListener(eventName, eventListener, false)},
   	 * 		// optional methods
   	 * 			items	: function(){} // when this is a helper too, and not the distination object, example; liste of object, must return a list
@@ -37,11 +37,11 @@
  * we could costurmise functions too
  * * * 
   	 * $$.addEventManager(clzz.prototype, {
-  	 * 		bind	: {
+  	 * 		on	: {
   	 * 			name	: 'on',
   	 * 			wrapper	: (element, eventName, eventListener) 		=> {this.addEventListener(eventName, eventListener, false)},
   	 * 		},
-  	 * 		unbind	: {
+  	 * 		off	: {
   	 * 			name	: 'off',
   	 * 			wrapper	: (element, eventName, eventListener) 		=> {this.removeEventListener(eventName, eventListener, false)},
   	 * 		},
@@ -59,10 +59,10 @@
 		var LISTNER_ATTR_NAME	= '_eventListeners';
 	// when there is no underlayer event manager
 		const OWN_EVENTS	= {
-			bind	: {
+			on	: {
 				wrapper	: function(element, eventName, eventListener){}
 			},
-			unbind	: {
+			off	: {
 				wrapper	: function(element, eventName, eventListener){}
 			},
 			trigger	: {
@@ -75,18 +75,18 @@
 			$$.assert(obj, 'the first arg must be defined');
 			// events with inderlayer functions (HTMLElement, Ajax, ...)
 				if(params)
-					$$.assert(params.bind && params.unbind && params.trigger, 'Needs bind, unbind and trigger methods, please see the documentation.');
+					$$.assert(params.on && params.off && params.trigger, 'Needs bind, unbind and trigger methods, please see the documentation.');
 			// if manage events on it's own
 				else
 					params	= OWN_EVENTS;
 			// add event methods
 				// bind
-					Object.defineProperty(obj, params.bind.name || 'bind', {value : function(eventName, listener){
+					Object.defineProperty(obj, params.on.name || 'on', {value : function(eventName, listener){
 						// assertions
 							$$.assertArg((typeof eventName == 'string') && /^\s*(?:(?:[\w-]+\.)*[\w-]+\s*)+$/.test(eventName), 'Incorrect event name');
 							$$.assertFunction(listener, 'Incorrect listener');
 						// groups
-							var events		= eventName.split(/\s+/).map(evnt =>{ return evnt.split('.'); }),
+							var events		= eventName.trim().split(/\s+/).map(evnt =>{ return evnt.split('.'); }),
 								eventsCount	= events.length,
 								i;
 						// add listner
@@ -95,11 +95,11 @@
 								else fx(obj);
 							})(ele => {
 								for(i = 0; i < eventsCount; ++i)
-									_addListener(ele, events[i], listener, params.bind.wrapper || OWN_EVENTS.bind.wrapper);
+									_addListener(ele, events[i], listener, params.on.wrapper || OWN_EVENTS.on.wrapper);
 							});
 					} });
 				// unbind
-					Object.defineProperty(obj, params.unbind.name || 'unbind', {value : function(eventName, listener){
+					Object.defineProperty(obj, params.off.name || 'off', {value : function(eventName, listener){
 						var i, eventCount;
 						// arg validation
 							$$.assertArg(!eventName || (typeof eventName == 'string') && /^\s*(?:(?:[\w-]+\.)*[\w-]+\s*)+$/.test(eventName), 'Incorrect event name');
@@ -112,13 +112,13 @@
 
 							// remove all events or a listener from all events
 								if(!eventName)
-									applyOnElements(ele => { _unbindEvent(ele, null, listener, params.unbind.wrapper || OWN_EVENTS.unbind.wrapper) });
+									applyOnElements(ele => { _unbindEvent(ele, null, listener, params.off.wrapper || OWN_EVENTS.off.wrapper) });
 								else{
 									eventName	= eventName.split(/\s+/).map(evnt =>{ return evnt.split('.'); });
 									eventCount	= eventName.length;
 									applyOnElements(ele => {
 										for(i = 0; i < eventCount; ++i)
-											_unbindEvent(ele, eventName[i], listener, params.unbind.wrapper || OWN_EVENTS.unbind.wrapper);
+											_unbindEvent(ele, eventName[i], listener, params.off.wrapper || OWN_EVENTS.off.wrapper);
 									});
 								}
 					} });
@@ -158,7 +158,7 @@
 		 	// unbind all events
 			 	if(!eventPath){
 			 		for(i in dataEvent){
-				 		_ObjDeepOperation(
+				 		$$.deepOperation(
 				 			dataEvent[i],
 				 			ele => {
 				 				ele.listeners.forEach(lstner => obj.removeEventListener(eventName, lstner, false));
@@ -178,8 +178,8 @@
 					 	if(listener){
 					 		obj.removeEventListener(eventName, listener, false);
 					 		// remove this listener on data
-					 			_ObjDeepOperation(
-					 				_ObjDeepOperation(dataEvent, eventPath),
+					 			$$.deepOperation(
+					 				$$.deepOperation(dataEvent, eventPath),
 					 				ele => {
 					 					ele.listeners && $$Arrays.removeAll.call(ele.listeners, listener);
 					 				},{
@@ -189,8 +189,8 @@
 					 	}
 					// unbind all regestred event listeners
 					 	else{
-					 		_ObjDeepOperation(
-				 				_ObjDeepOperation(dataEvent, eventPath),
+					 		$$.deepOperation(
+				 				$$.deepOperation(dataEvent, eventPath),
 				 				ele => {
 				 					if(ele.listener)
 				 						for(i = 0, c = ele.listeners.length; i < c; ++i)
@@ -202,7 +202,7 @@
 				 			if(eventPath.length == 1)
 				 				delete dataEvent[eventName];
 				 			else
-				 				delete _ObjDeepOperation(dataEvent, eventPath.slice(0,-2))[eventPath[eventPath.length - 1]];
+				 				delete $$.deepOperation(dataEvent, eventPath.slice(0,-2))[eventPath[eventPath.length - 1]];
 					 	}
 			 	}
 		}
