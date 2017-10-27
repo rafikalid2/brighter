@@ -1,5 +1,6 @@
 /**
  * Arrays utils
+ * add: pull(obj, ...)
  */
 	var $$Arrays = ArrayUtils.prototype;
 	/**
