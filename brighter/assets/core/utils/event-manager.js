@@ -148,7 +148,7 @@
 		}
 
 	// unbind event
-		function _unbindEvent(obj, eventPath, listener){
+		function _unbindEvent(obj, eventPath, listener, removeEventListenerWrapper){
 		 	var dataEvent	= _elementPrivateData(ele),
 		 		eventName,
 		 		i, c,
@@ -161,7 +161,7 @@
 				 		$$.deepOperation(
 				 			dataEvent[i],
 				 			ele => {
-				 				ele.listeners.forEach(lstner => obj.removeEventListener(eventName, lstner, false));
+				 				ele.listeners.forEach(lstner => removeEventListenerWrapper(obj, eventName, lstner));
 					 		},{
 					 			childNode	: 'items'
 							}
@@ -176,10 +176,10 @@
 				 	eventName	= eventPath[0];
 				 	// unbind from DOM
 					 	if(listener){
-					 		obj.removeEventListener(eventName, listener, false);
+					 		removeEventListenerWrapper(obj, eventName, listener);
 					 		// remove this listener on data
 					 			$$.deepOperation(
-					 				$$.deepOperation(dataEvent, eventPath),
+					 				$$.path(dataEvent, eventPath, {childNode : 'items'}),
 					 				ele => {
 					 					ele.listeners && $$Arrays.removeAll.call(ele.listeners, listener);
 					 				},{
@@ -190,11 +190,11 @@
 					// unbind all regestred event listeners
 					 	else{
 					 		$$.deepOperation(
-				 				$$.deepOperation(dataEvent, eventPath),
+				 				$$.path(dataEvent, eventPath, {childNode : 'items'}),
 				 				ele => {
 				 					if(ele.listener)
 				 						for(i = 0, c = ele.listeners.length; i < c; ++i)
-				 							obj.removeEventListener(eventName, ele.listeners[i], false);
+				 							removeEventListenerWrapper(obj, eventName, ele.listeners[i]);
 				 				},{
 				 					childNode	: 'items'
 				 				}
