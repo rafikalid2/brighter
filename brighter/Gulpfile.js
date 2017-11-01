@@ -6,27 +6,72 @@ var concat 	= require('gulp-concat');
 var order	= require('gulp-order');
 
 // order
-	var concatOrder	= [
-				'header.js',
-				'plugin.js',
-				'lib/**/*.js',
-				'root-operations.js',
-				'root-attributes.js',
-				'core/**/*.js',
-				'footer.js'
-			];
-// javascript
-	gulp.task('js', ()=>{
-		gulp.src('assets/**/*.js')
+	// web
+		var concatOrder	= [
+			'header.js',
+			'plugin.js',
+			'lib/**/*.js',
+			'web-root-operations.js',
+			'root-attributes.js',
+			'core/**/*.js',
+			'web/**/*.js',
+			'footer.js'
+		];
+	// extension
+		var extConcatOrder	= [
+			'header.js',
+			'plugin.js',
+			'lib/**/*.js',
+			'web-root-operations.js',
+			'root-attributes.js',
+			'core/**/*.js',
+			'web/**/*.js',
+			'extension/**/*.js',
+			'footer.js'
+		];
+	// nodejs
+		//TODO
+// web tasks
+	gulp.task('web', ()=>{
+		// compile
+			gulp.src(['assets/**/*.js', '!assets/extension/**/*', '!assets/nodejs/**/*'])
+				.pipe(order(concatOrder))
+				// .on('error',gutil.log)
+				.pipe(concat('brighter.js', {newLine: ";\n"}))
+				// .on('error',gutil.log)
+				.pipe(gulp.dest('./dest/'));
+		// watch
+			gulp.watch('assets/**/*.js', ['web']);
+	});
+	gulp.task('web-prod', ()=>{
+		gulp.src('assets/**/*.js', '!assets/extension/**/*', '!assets/nodejs/**/*')
 			.pipe(order(concatOrder))
-			// .on('error',gutil.log)
 			.pipe(concat('brighter.js', {newLine: ";\n"}))
-			// .on('error',gutil.log)
+			.pipe(minify({
+		        ext:{
+		            src:'-debug.js',
+		            min:'.min.js'
+		        }
+		        // exclude: ['tasks'],
+		        // ignoreFiles: ['.combo.js', '-min.js']
+		    }))
 			.pipe(gulp.dest('./dest/'));
 	});
-	gulp.task('js-prod', ()=>{
-		gulp.src('assets/**/*.js')
-			.pipe(order(concatOrder))
+// extension tasks
+	gulp.task('extension', ()=>{
+		// compile
+			gulp.src('assets/**/*.js', '!assets/nodejs/**/*')
+				.pipe(order(extConcatOrder))
+				// .on('error',gutil.log)
+				.pipe(concat('brighter.js', {newLine: ";\n"}))
+				// .on('error',gutil.log)
+				.pipe(gulp.dest('./dest/'));
+		// watch
+			gulp.watch('assets/**/*.js', ['extension']);
+	});
+	gulp.task('extension-prod', ()=>{
+		gulp.src('assets/**/*.js', '!assets/nodejs/**/*')
+			.pipe(order(extConcatOrder))
 			.pipe(concat('brighter.js', {newLine: ";\n"}))
 			.pipe(minify({
 		        ext:{
@@ -40,6 +85,6 @@ var order	= require('gulp-order');
 	});
 
 //Watch task
-gulp.task('default',['js'], function() {
-    gulp.watch('assets/**/*.js', ['js']);
+gulp.task('default', function() {
+    console.log('please choose: web, extension or nodejs; add "-prod" to minify code');
 });

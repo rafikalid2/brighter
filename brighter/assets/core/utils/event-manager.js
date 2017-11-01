@@ -5,12 +5,14 @@
 	 * .on('event1 event2', eventListner)
 	 * .on('eventName.groupe', eventListner)
 	 * .on('eventName.group.subGroup', eventListner)
+	 * .on('eventName.grp', {options}, eventListner)
 	 * 
 	 * .off()							// unbind all avents
 	 * .off(eventName)					// unbind all listeners on this event
 	 * .off(eventName.grp.subGrp)		// unbind all events of this group
 	 * .off(eventName, eventListener)	// unbind this listner on this event
 	 * .off(eventName.grp, eventListener)// unbind this listner on this event from this group and its subgroups
+	 * .off(eventNae*le, {options}, listener)
 	 *
 	 * .trigger('eventName', extraParams)
 	 * .trigger(eventName)
@@ -81,7 +83,8 @@
 					params	= OWN_EVENTS;
 			// add event methods
 				// bind
-					Object.defineProperty(obj, params.on.name || 'on', {value : function(eventName, listener){
+					Object.defineProperty(obj, params.on.name || 'on', {value : function(eventName, options, listener){
+						if(!listener){ listener	= options; options = null; }
 						// assertions
 							$$.assertArg((typeof eventName == 'string') && /^\s*(?:(?:[\w-]+\.)*[\w-]+\s*)+$/.test(eventName), 'Incorrect event name');
 							$$.assertFunction(listener, 'Incorrect listener');
@@ -95,11 +98,12 @@
 								else fx(obj);
 							})(ele => {
 								for(i = 0; i < eventsCount; ++i)
-									_addListener(ele, events[i], listener, params.on.wrapper || OWN_EVENTS.on.wrapper);
+									_addListener(ele, events[i], options, listener, params.on.wrapper || OWN_EVENTS.on.wrapper);
 							});
 					} });
 				// unbind
-					Object.defineProperty(obj, params.off.name || 'off', {value : function(eventName, listener){
+					Object.defineProperty(obj, params.off.name || 'off', {value : function(eventName, options, listener){
+						if(!listener){ listener	= options; options = null; }
 						var i, eventCount;
 						// arg validation
 							$$.assertArg(!eventName || (typeof eventName == 'string') && /^\s*(?:(?:[\w-]+\.)*[\w-]+\s*)+$/.test(eventName), 'Incorrect event name');
@@ -112,13 +116,13 @@
 
 							// remove all events or a listener from all events
 								if(!eventName)
-									applyOnElements(ele => { _unbindEvent(ele, null, listener, params.off.wrapper || OWN_EVENTS.off.wrapper) });
+									applyOnElements(ele => { _unbindEvent(ele, null, options, listener, params.off.wrapper || OWN_EVENTS.off.wrapper) });
 								else{
 									eventName	= eventName.split(/\s+/).map(evnt =>{ return evnt.split('.'); });
 									eventCount	= eventName.length;
 									applyOnElements(ele => {
 										for(i = 0; i < eventCount; ++i)
-											_unbindEvent(ele, eventName[i], listener, params.off.wrapper || OWN_EVENTS.off.wrapper);
+											_unbindEvent(ele, eventName[i], options, listener, params.off.wrapper || OWN_EVENTS.off.wrapper);
 									});
 								}
 					} });
@@ -130,10 +134,10 @@
 	});
 
 	// add listener
-		function _addListener(element, eventListPath, listener, wrapper){
+		function _addListener(element, eventListPath, options, listener, wrapper){
 			// add event to element
 				// wrapper.addEventListener(eventListPath[0], listener, false);
-				wrapper(element, eventListPath[0], listener);
+				wrapper(element, eventListPath[0], listener, options);
 			// get private data store
 				var privateData	= _elementPrivateData(element);
 				if(!privateData[LISTNER_ATTR_NAME])
@@ -148,7 +152,7 @@
 		}
 
 	// unbind event
-		function _unbindEvent(obj, eventPath, listener, removeEventListenerWrapper){
+		function _unbindEvent(obj, eventPath, options, listener, removeEventListenerWrapper){
 		 	var dataEvent	= _elementPrivateData(ele),
 		 		eventName,
 		 		i, c,
@@ -161,7 +165,7 @@
 				 		$$.deepOperation(
 				 			dataEvent[i],
 				 			ele => {
-				 				ele.listeners.forEach(lstner => removeEventListenerWrapper(obj, eventName, lstner));
+				 				ele.listeners.forEach(lstner => removeEventListenerWrapper(obj, eventName, lstner, options));
 					 		},{
 					 			childNode	: 'items'
 							}
@@ -176,7 +180,7 @@
 				 	eventName	= eventPath[0];
 				 	// unbind from DOM
 					 	if(listener){
-					 		removeEventListenerWrapper(obj, eventName, listener);
+					 		removeEventListenerWrapper(obj, eventName, listener, options);
 					 		// remove this listener on data
 					 			$$.deepOperation(
 					 				$$.path(dataEvent, eventPath, {childNode : 'items'}),
@@ -194,7 +198,7 @@
 				 				ele => {
 				 					if(ele.listener)
 				 						for(i = 0, c = ele.listeners.length; i < c; ++i)
-				 							removeEventListenerWrapper(obj, eventName, ele.listeners[i]);
+				 							removeEventListenerWrapper(obj, eventName, ele.listeners[i], options);
 				 				},{
 				 					childNode	: 'items'
 				 				}

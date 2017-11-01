@@ -34,6 +34,8 @@
 			.catch()
 			.abort()
 
+		.plugin('fx', value);// add a plugin to ajax
+
 
 		/**
 		 * @param {regex} urlPattern match an url already in progress or in the queu, default to undefined (no waiting, exec request immediately)
