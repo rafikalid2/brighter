@@ -8,10 +8,45 @@
 		var keyboardEvents	= ['keydown', 'keypress', 'keyup'];
 		var specialWrappers	= ['blur', 'focus', 'submit'];
 
+	// add event manager
+		$$.addEventManager($$prototype, {
+			// indicate that events are on inner objects and not on this
+			items	: function(ele){ return ele.children()},
+			//wrappers
+			on	: {
+				wrapper	: function(element, eventName, eventListener, options){
+					element.addEventListener(eventName, eventListener, false);
+				}
+			},
+			off	: {
+				wrapper	: function(element, eventName, eventListener, options){
+					element.removeEventListener(eventName, eventListener, false);
+				}
+			},
+			trigger	: {
+				wrapper	: function(element, eventNameOrEvent, extratParams){
+					if(typeof eventNameOrEvent == 'string'){
+						if(mouseWrappers.indexOf(eventNameOrEvent) != -1)
+							_triggerMouseEvent(element, eventNameOrEvent, extratParams);
+						else if(otherWrappers.indexOf(eventNameOrEvent) != -1)
+							_triggerEvent(element, eventNameOrEvent, extratParams);
+						else if(keyboardEvents.indexOf(eventNameOrEvent) != -1)
+							_triggerKeyboardEvent(element, eventNameOrEvent, extratParams);
+						else if(specialWrappers.indexOf(eventNameOrEvent) != -1)
+							_triggerSpecialEvent(element, eventNameOrEvent);
+						else // custom event
+							_triggerCustomEvent(element, eventNameOrEvent, extratParams);
+					}
+				}
+			}
+		});
 
+	// alias
+		$$.plugin({
+			bind	: $$prototype.on,
+			unbind	: $$prototype.off
+		});
 
-	// add/remove listeners
-		var plugins	= {};
 	/**
 	 * events
 	 * .bind(eventName, eventListner)
@@ -26,38 +61,6 @@
 	 * .unbind(eventName)					// unbind all listeners on this event
 	 * .unbind(eventName, eventListener)	// unbind this listner on this event
 	 */
-		plugins.bind	= plugins.on	=  function(eventName, listener){
-			if(eventName)
-				eventName	= eventName.trim();
-			// arg validation
-				$$.assertArg((typeof eventName == 'string') && /^(?:(?:[\w-]+\.)*[\w-]+\s*)+$/.test(eventName), 'Incorrect event name');
-				$$.assertFunction(listener, 'Incorrect listener');
-			// groups
-				var events		= eventName.split(/\s+/).map(evnt =>{ return evnt.split('.'); });
-				var eventsCount	= events.length;
-				var i;
-			// add listner
-				return this.eachTag(ele => {
-					for(i = 0; i < eventsCount; ++i)
-						_addListener(ele, events[i], listener);
-				});
-		};
-	// store listener
-		function _addListener(element, eventListPath, listener){
-			// add event to element
-				ele.addEventListener(eventListPath[0], listener, false);
-			// get private data store
-				var obj	= _elementPrivateData(ele);
-				if(!obj[LISTNER_ATTR_NAME])
-					obj[LISTNER_ATTR_NAME]	= {};
-				obj	= obj[LISTNER_ATTR_NAME];
-			// add listener to dest path
-				obj = $$.path(obj, eventListPath, {
-					template	: {items: {}, listeners: []},
-					childNode	: 'items'
-				});
-				obj.listeners.push(listener);
-		}
 
 	/**
 	 * remove listener
@@ -69,85 +72,6 @@
 	 * .unbind('click focus ...')	// we can add multiple events 
 	 * .unbind('click.grp1 click.grp2')// multiple groups too
 	 */
-		plugins.unbind	= plugins.off	=  function(eventName, listener){
-			if(eventName)
-			eventName	= eventName.trim();
-			// arg validation
-				$$.assertArg((typeof eventName == 'string') && /^(?:(?:[\w-]+\.)*[\w-]+\s*)+$/.test(eventName), 'Incorrect event name');
-				$$.assertFunction(listener, 'Incorrect listener');
-			// if unbind all
-				if(!eventName)
-					this.eachTag(ele => _unbindEvent(ele));
-			// if unbind specific event
-				else{
-					eventName	= eventName.split(/\s+/).map(evnt =>{ return evnt.split('.'); });
-					var i, c	= eventName.length;
-					this.eachTag(ele =>{
-						// remove event listener in data
-							for(i = 0; i < c; ++i)
-								_unbindEvent(ele, eventName[i], listener);
-					});
-				}
-		};
-
-	function _unbindEvent(obj, eventPath, listener){
-	 	var dataEvent	= _elementPrivateData(ele),
-	 		eventName,
-	 		i, c,
-	 		prnt;
-	 	// no events
-	 		if(!dataEvent){}
-	 	// unbind all events
-		 	if(!eventPath){
-		 		for(i in dataEvent){
-			 		_ObjDeepOperation(
-			 			dataEvent[i],
-			 			ele => {
-			 				ele.listeners.forEach(lstner => obj.removeEventListener(eventName, lstner, false));
-				 		},{
-				 			childNode	: 'items'
-						}
-					);
-					delete dataEvent[i];
-			 	}
-		 	}
-		 	else{
-			 	// eventPath to Array
-			 		if(typeof eventPath == 'string')
-			 			eventPath	= eventPath.split('.');
-			 	eventName	= eventPath[0];
-			 	// unbind from DOM
-				 	if(listener){
-				 		obj.removeEventListener(eventName, listener, false);
-				 		// remove this listener on data
-				 			_ObjDeepOperation(
-				 				_ObjDeepOperation(dataEvent, eventPath),
-				 				ele => {
-				 					ele.listeners && $$Arrays.removeAll.call(ele.listeners, listener);
-				 				},{
-				 					childNode	: 'items'
-				 				}
-				 			);
-				 	}
-				// unbind all regestred event listeners
-				 	else{
-				 		_ObjDeepOperation(
-			 				_ObjDeepOperation(dataEvent, eventPath),
-			 				ele => {
-			 					if(ele.listener)
-			 						for(i = 0, c = ele.listeners.length; i < c; ++i)
-			 							obj.removeEventListener(eventName, ele.listeners[i], false);
-			 				},{
-			 					childNode	: 'items'
-			 				}
-			 			);
-			 			if(eventPath.length == 1)
-			 				delete dataEvent[eventName];
-			 			else
-			 				delete _ObjDeepOperation(dataEvent, eventPath.slice(0,-2))[eventPath[eventPath.length - 1]];
-				 	}
-		 	}
-	}
 	// function _unbindEventFrom_ (obj, rootObj, listener){
 	//  	// remove all ocurrence of this object
 	//  		if(eventListener)
@@ -160,42 +84,7 @@
 	//  	//TODO change recursive function
 	// }
 
-		if(HTMLElement.prototype.addEventListener){
-			// bind
-				plugins.bind	= plugins.on	=  function(eventName, listener){
-					return this.eachTag(ele => {ele.addEventListener(eventName, listener, false)});
-				};
-			// unbind
-				plugins.unbind	= plugins.off	=  function(eventName, listener){
-					return this.eachTag(ele => {ele.removeEventListener(eventName, listener, false)});
-				};
-		}else{
-			// bind
-				plugins.bind	= plugins.on	=  function(eventName, listener){
-					return this.eachTag(ele => {ele.attachEvent(eventName, listener)});
-				};
-			// unbind
-				plugins.bind	= plugins.off	=  function(eventName, listener){
-					return this.eachTag(ele => {ele.detachEvent(eventName, listener)});
-				};
-		}
-
-	// trigger event
-		plugins.trigger	= function(eventName, options){
-			if(mouseWrappers.indexOf(eventName) != -1)
-				_triggerMouseEvent.call(this, eventName, options);
-			else if(otherWrappers.indexOf(eventName) != -1)
-				_triggerEvent.call(this, eventName, options);
-			else if(keyboardEvents.indexOf(eventName) != -1)
-				_triggerKeyboardEvent.call(this, eventName, options);
-			else if(specialWrappers.indexOf(eventName) != -1)
-				_triggerSpecialEvent.call(this, eventName);
-			else // custom event
-				_triggerCustomEvent.call(this, eventName, options);
-		};
 	
-	// add to brighter
-		$$.plugin(plugins);
 	/**
 	 * apply mouse events
 	 * examples:
@@ -204,18 +93,6 @@
 	 * 			$$(...).click(callBack)		// set callBack as event listener
 	 */
 	// 
-		mouseWrappers.forEach(function(eventName){
-			$$.plugin(eventName, {
-				value	: function(arg){
-					// add new listener
-						if(arg && (typeof arg == 'function'))
-							this.on(eventName, arg);
-					// trigger event
-						else
-							_triggerMouseEvent.call(this, eventName, arg);
-				}
-			});
-		});
 	/**
 	 * apply keybord events
 	 * examples:
@@ -225,51 +102,33 @@
 	 * 			$$(...).keydown('a', {options});		// trigger like char 'a' is pressed
 	 * 			$$(...).keydown(callBack)	// add this callBack as a listener
 	 */
-		keyboardEvents.forEach(function(eventName){
-			$$.plugin(eventName, {
-				value	: function(arg, arg2){
-					// add new listener
-						if(arg && (typeof arg == 'function'))
-							this.on(eventName, arg);
-					// trigger event
-						else
-							_triggerKeyboardEvent.call(this, eventName, arg, arg2);
-				}
-			});
-		});
+
 	/**
 	 * special wrappers
 	 * examples
 	 * 		$$(...).focus()	// focus the first tag on the list
 	 * 		$$(...).focus(callBack)// set callBack as a listener
 	 */
-	 	specialWrappers.forEach(function(eventName){
-	 		$$.plugin(eventName, {
-				value	: function(arg){
-					// add new listener
-						if(arg && (typeof arg == 'function'))
-							this.on(eventName, arg);
-					// trigger event
-						else
-							_triggerSpecialEvent.call(this, eventName);
-				}
-			});
-	 	});
+
 	 /**
 	  * other events
 	  */
-		otherWrappers.forEach(function(eventName){
-			$$.plugin(eventName, {
-				value	: function(arg){
-					// add new listener
-						if(arg && (typeof arg == 'function'))
-							this.on(eventName, arg);
-					// trigger event
-						else
-							_triggerEvent.call(this, eventName, arg);
-				}
+		[mouseWrappers, keyboardEvents, specialWrappers, otherWrappers]
+			.forEach(arr => {
+				arr.forEach(function(eventName){
+					$$.plugin(eventName, {
+						value	: function(arg){
+							// add new listener
+								if(arg && (typeof arg == 'function'))
+									this.on(eventName, arg);
+							// trigger event
+								else
+									this.trigger(eventName, arg);
+						}
+					});
+				});
 			});
-		});
+
 	/**
 	 * very special event: scroll
 	 * 		$(...).scroll(callBack, options)						: listener onscroll
@@ -300,7 +159,7 @@
 		});
 
 	// mouse events
-		function _triggerMouseEvent(eventName, otherOptions){
+		function _triggerMouseEvent(element, eventName, otherOptions){
 			var event;
 			try{
 				var event = new MouseEvent(eventName, _extend({ view: window, cancelable: true, bubbles: true }, otherOptions));
@@ -308,9 +167,7 @@
 				event = document.createEvent('MouseEvents');
 				event.initMouseEvent(eventName, true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
 			}
-			this.eachTag(element => {
-				element.dispatchEvent(event);
-			});
+			element.dispatchEvent(event);
 		}
 	// keybord event
 		function _triggerKeyboardEvent(eventName, arg2, arg3){
@@ -337,13 +194,12 @@
 			});
 		}
 	// special event
-		function _triggerSpecialEvent(eventName){
-			var ele	= this.getFirstTag();
+		function _triggerSpecialEvent(ele, eventName){
 			if(ele && ele[eventName])
 				ele[eventName]();
 		}
 	// other events
-		function _triggerEvent(eventName, options){
+		function _triggerEvent(element, eventName, options){
 			var event;
 			try{
 				event	= new Event(eventName, { view: window, cancelable: true, bubbles: true});
@@ -351,12 +207,10 @@
 				event = document.createEvent('Event');
 				event.initEvent(eventName, true, true);
 			}
-			this.eachTag(element => {
-				element.dispatchEvent(event);
-			});
+			element.dispatchEvent(event);
 		}
 	// custom events
-		function _triggerCustomEvent(eventName, options){
+		function _triggerCustomEvent(element, eventName, options){
 			var event;
 			try{
 				event	= new CustomEvent(eventName, { view: window, cancelable: true, bubbles: true});
@@ -364,8 +218,6 @@
 				event = document.createEvent('Event');
 				event.initEvent(eventName, true, true);
 			}
-			this.eachTag(element => {
-				element.dispatchEvent(event);
-			});
+			element.dispatchEvent(event);
 		}
 })();
