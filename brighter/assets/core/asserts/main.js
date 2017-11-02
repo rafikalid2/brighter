@@ -11,7 +11,7 @@ $$.plugin(true, {
 			var type;
 			if(!condition){
 				if(typeof a == 'function')
-					throw new a(Array.prototype.slice.call(arguments, 2));
+					a();
 				else
 					throw new Error(a || 'Assertion Fails');
 			}
