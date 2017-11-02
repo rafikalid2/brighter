@@ -37,7 +37,7 @@
 
 								child 		= {
 									next	: null,
-									node	: childNode;
+									node	: childNode
 								};
 								//place new item at the tail of the list
 								last.next	= child;

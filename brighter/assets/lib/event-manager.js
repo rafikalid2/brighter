@@ -62,10 +62,10 @@
 	// when there is no underlayer event manager
 		const OWN_EVENTS	= {
 			on	: {
-				wrapper	: function(element, eventName, eventListener){}
+				wrapper	: function(element, eventName, eventListener, options){}
 			},
 			off	: {
-				wrapper	: function(element, eventName, eventListener){}
+				wrapper	: function(element, eventName, eventListener, options){}
 			},
 			trigger	: {
 				wrapper	: function(element, eventNameOrEvent, extratParams){}
