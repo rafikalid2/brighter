@@ -12,15 +12,9 @@
 
 $$.plugin(true, {
 	clone	: function(obj){
-		var deep;
-		// is deep
-			if(typeof obj == 'boolean'){
-				deep	= obj;
-				obj	= arguments[1];
-			}else{
-				deep	= false;
-			}
-		// clone
-			return cloner[deep ? 'deep' : 'shallow'].copy(obj);
+		return cloner.shallow.copy(obj);
+	},
+	deepClone: function(obj){
+		return cloner.deep.copy(obj);
 	}
 });

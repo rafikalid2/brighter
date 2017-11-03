@@ -30,12 +30,12 @@
 $$.plugin(true, {
 	// check if a path is valid
 	isPath	: function(path){
-		return (typeof path == 'string') && /^(?:\w+\.)+\w+$/.test(path);
+		return (typeof path == 'string') && /^(?:\w+\.)+\w+$/.test(path) || Array.isArray(path);
 	},
 	// exec path
 	path	: function(obj, path, options){
 		// plain object or array
-			$$.assert(obj, $$.err.missedArgument, 'Needs the object');
+			$$.assert(obj, () => new $$.err.missedArgument('Needs the object'));
 			$$.assertArg($$.isPath(path), 'Inccorect path');
 			//TODO verifier les options
 		// operations
@@ -44,7 +44,7 @@ $$.plugin(true, {
 
 	hasPath	: function(obj, path, childrenAttr){
 		// control
-			$$.assert(obj, $$.err.missedArgument, 'Needs the object');
+			$$.assert(obj, () => new $$.err.missedArgument('Needs the object') );
 			$$.assertArg($$.isPath(path), 'Inccorect path');
 		// operations
 			return _objExists(obj, path.split('.'), childrenAttr);
@@ -79,20 +79,25 @@ function _objPath(obj, path, options){
 		}
 	// create path
 		for(i = 0; i < c; i++){
-			if(!obj[path[i]]){
-				// if create element
-					if(upsert)
-						obj[path[i]]	= options.template && _objClone(options.template, true) || {};
-				// else, returns undefined
-					else
-						return undefined;
-			}
+			// go throw child node
+				if(childrenAttr){
+					if(!(childrenAttr in obj)){
+						if(upsert)
+							obj[childrenAttr] = {};
+						else return undefined;
+					}
+					obj	= obj[childrenAttr];
+				}
+			// add nodes
+				if(!( path[i] in obj)){
+					// if create element
+						if(upsert)
+							obj[path[i]]	= options.template && $$.deepClone(options.template) || {};
+					// else, returns undefined
+						else
+							return undefined;
+				}
 			obj	= obj[path[i]];
-			if(childrenAttr){
-				if(!obj[childrenAttr])
-					obj[childrenAttr] = {};
-				obj	= obj[childrenAttr];
-			}
 		}
 	// if put value
 		if(options.putValue){

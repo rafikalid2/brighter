@@ -11,7 +11,7 @@ $$.plugin(true, {
 			var type;
 			if(!condition){
 				if(typeof a == 'function')
-					a();
+					throw a();
 				else
 					throw new Error(a || 'Assertion Fails');
 			}

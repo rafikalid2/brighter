@@ -6,11 +6,10 @@ $$.plugin(true, {
 	// convert to absolute URL
 		toAbsURL	: function(url){
 			$$.assertArg(typeof url == 'string', 'need string as argument');
-
 			try{
 				url	= url.trim();
-				if(!/^(?:[\w-]+:\/\/|data:)/.test(url))
-					url = $$.baseURL + url;
+				if(!/^(?:[\w-]+:\/\/|data:)/i.test(url))
+					url = (url.startsWith('/') ? document.location.origin :  $$.baseURL) + url;
 			}catch(e){
 				throw new $$.err.illegalArgument('incorrect URL: ' + url, e.message);
 			}
@@ -26,7 +25,7 @@ $$.plugin(true, {
  */
 $$.plugin(true, 'baseURL', {
 	get	: function(){
-		var url	= $$.find('base').attr('href') || document.location.href;
+		var url	= $$.find('base').property('href') || document.location.href;
 		var reg;
 		if(url){
 			if(!/^[\w-]+:\/\//.test(url)){
@@ -34,10 +33,14 @@ $$.plugin(true, 'baseURL', {
 				url	= 'http://' + url;
 			}
 			reg	= url.match(/^([\w-]+:\/\/\/?[^\/]+(?:\/.*\/)?)[^\/]*/);
-			if(reg)	url	= reg[1];
-			else	$$.error('BASE-URL', 'Could not get base url from: ' + url);
+			if(reg){
+				url	= reg[1];
+				if(!url.endsWith('/'))
+					url += '/';
+			}
+			else	$$.fatalError('BASE-URL', 'Could not get base url from: ' + url);
 		}else{
-			$$.error('BASE-URL', 'Could not be found.');
+			$$.fatalError('BASE-URL', 'Could not be found.');
 		}
 		return url;
 	}

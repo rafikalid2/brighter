@@ -30,17 +30,16 @@
   * store BRIGHTER private data
   */
  	function _elementPrivateData(obj){
- 		return _elementDataGet(BRIGHTER_DATA_KEY, obj);
+ 		return _elementDataGet(obj, BRIGHTER_DATA_KEY);
  	}
 
 /**
  * get the data from an object
  */
 function _elementDataGet(obj, key){
-	var dataObj	= obj[key];
-	if(!dataObj)
+	if(!obj[key])
 		Object.defineProperty(obj, key, {
 			value	: {}
 		});
-	return dataObj;
+	return obj[key];
 }

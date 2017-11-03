@@ -70,6 +70,11 @@
 					this._options	= options;
 				// redirects trace
 					this._redirectTrace	= [options.url.href]; // store redirect URLs to avoid cyclic calls
+				// progress data
+					this._uploaded	= 0;
+					this._upTotal	= 0;
+					this._loaded	= 0;
+					this._total		= 0;
 				// start XHR
 					_startXHR.call(this);
 			}catch(e){console.log('----------', e)
@@ -92,7 +97,7 @@
 		}
 	// prepare options
 		function _prepareOptions(options){
-			$$.assert(options != undefined, $$.err.missedArgument, 'need arguments');
+			$$.assert(options != undefined, () => new $$.err.missedArgument('need arguments'));
 
 			var tmpVar, i;
 			// URL
@@ -138,45 +143,26 @@
 			options.dataCharset	= contentType[2].trim();
 		}
 	// reject & resolve
-		function resolve(data, err){
+		function resolve(err, data){
 			// TEHN
 			if(this._options.then){
 				try{
-					this._options.then.call(this, data || this._response, err, this);
+					this._options.then.call(this, err, data || this._response, this);
 				}catch(e){
-					_catch.call(this, 'Uncaught Error inside THEN callBack', e);
+					$$.fatalError('AJAX', 'Uncaught Error inside THEN callBack', e);
 				}
 			}
 			// catch
-			if(err && this._options.catch){
-				try{
-					this._options.catch.call(this, err, this);
-				}catch(e){
-					_catch.call(this, 'Uncaught Error inside CATCH callBack', e);
-				}
-			}
+				if(err)
+					this.trigger('error', {error : err});
+			// load
+				else if(data)
+					this.trigger('load', {data: data});
 			// end
-			if(this._options.end){
-				try{
-					this._options.end.call(this, this); //TODO change this to envent
-				}catch(e){
-					_catch.call(this, 'Uncaught Error inside END callBack', e);
-				}
-			}
+				this.trigger('end');
 		}
 		function reject(err){
-			resolve.call(this, null, err || new Error('Rejected'));
-		}
-		function _catch(desc, err){
-			if(this._options.catch){
-				try{
-					this._options.catch.call(this, err, this);
-				}catch(e){
-					$$.fatalError('AJAX', 'Uncaught Error inside CATCH callBack', e);
-				}
-			}else{
-				$$.fatalError('AJAX', desc || 'Uncaught Error', err);
-			}
+			resolve.call(this, err || new Error('Rejected'));
 		}
 	// finalize request preparation end send
 		function _xhrSend(resolve, reject){
@@ -195,6 +181,8 @@
 			// make XHR
 				var xhr		= new XMLHttpRequest();
 				this.xhr	= xhr;
+			// add Event listeners
+				_addXhrEventListeners.call(this);
 			// timeout
 				if(options.timeout){
 					$$.assertArg(isFinite(options.timeout) && options.timeout >= 0, 'incorrect timeout');
@@ -282,6 +270,24 @@
 				}
 				options.data	= data;
 		}
+	// add event listeners
+		const xhrEvents	= ['progress'];
+		function _addXhrEventListeners(){
+			var xhr	= this.xhr;
+			var ev;
+			// download progress
+				xhr.addEventListener('progress', event => {
+					this._loaded	= event.loaded;
+					this._total		= event.total;
+					this.trigger(event);
+				}, false );
+			// upload progress
+				xhr.addEventListener('upload-progress', event => {
+					this._uploaded	= event.loaded;
+					this._upTotal	= event.total;
+					this.trigger('upload-progress', event);
+				}, false );
+		}
 	/**
 	 * Guess the data type to use as request data content-type
 	 * @return {string} content-type
@@ -359,9 +365,15 @@
 				return false;
 			}
 	}
-	/////
-	// ADD METHODS
-	/////
+
+	////////////////
+	// add events //
+	////////////////
+	$$.addEventManager(_XHR.prototype);
+
+	/////////////////
+	// ADD METHODS //
+	/////////////////
 	(function(src){
 		for(var i in src)
 			Object.defineProperty(_XHR.prototype, i, {
@@ -457,11 +469,12 @@
 								this.xhr.abort();
 							}
 						//send abort event
-							reject.call(this, 'abort');
+							this.trigger('abort');
+							reject.call(this, 'abort');//
 					}
 				// add abort event
 					else{
-						//TODO add event
+						this.on('abort', arg);
 					}
 			},
 		/**
@@ -615,29 +628,23 @@
 				}
 				return result;
 			},
-		/**
-		 * .bind('eventName', fx)		// eventName in ['readyState', 'readyStateChange', ]
-		 */
-			bind	: function(){
-				//TODO
-				return this;
-			},
-		/**
-		 * .unbind()				// unbind all event listeners
-		 * .unbind('eventName')		// unbind all event listeners of type eventName
-		 * .unbind('eventName', fx)	// unbind the listener
-		 */
-			unbind	: function(){
-				//TODO
-				return this;
-			},
 
 		// progress
 			//.progress() // progress 0 to 1
 			//.progress((percent, totalBytes, downloadedBytes)=>{})// set or get, valbale aussi on top object
 			//.progress($$progressBar)// adjust progressbar auto
-			uploadProgress	: function(){},
-			downloadProgress: function(){},
+			uploadProgress	: function(listener){
+				if(listener)
+					this.on('upload-progress', listener);
+				else
+					return this._upTotal && !isNaN(this._uploaded) &&  (this._uploaded / this._total);
+			},
+			downloadProgress: function(){
+				if(listener)
+					this.on('progress', listener);
+				else
+					return this._total && !isNaN(this._loaded) && (this._loaded / this.total);
+			},
 
 		// serializers
 			//serialize request data
@@ -674,7 +681,7 @@
 				beforeSend	: function(){},
 		// assert new Request (readystate == XMLHttpRequest.UNSENT)
 			assertNew	: function(){
-				$$.assert(!this.xhr || this.xhr.readyState == 0, $$.err.illegalState, 'Request is in progress');
+				$$.assert(!this.xhr || this.xhr.readyState == 0, () => new $$.err.illegalState('Request is in progress'));
 			},
 
 		// get response
@@ -732,8 +739,7 @@
 		  * catch any kind of error, even inside then callBack
 		  */
 		 	catch		: function(callBack){
-		 		$$.assertFunction(callBack);// assert that this is a function
-		 		this._options.catch	= callBack;
+		 		this.on('error', callBack);
 	 			return this;
 		 	},
 		 /**
@@ -742,9 +748,10 @@
 		  * end(xhr => {})	// callBack when the process is finished
 		  */
 			end			: function(callBack){
-				//TODO change this
-					if(callBack)
-						this._options.end	= callBack;
+				if(callBack){
+					$$.assertFunction(callBack);
+					this.bind('end', callBack);
+				}
 				return this;
 			}
 	});

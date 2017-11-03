@@ -16,6 +16,12 @@ $$.plugin(true, {
 		else
 			result	= _objExtend.apply(this, arguments);
 		return result;
+	},
+	marge		: function(){
+		return cloner.shallow.merge.apply(cloner.shallow, arguments);
+	},
+	deepMerge	: function(){
+		return cloner.deep.merge.apply(cloner.deep, arguments);
 	}
 });
 

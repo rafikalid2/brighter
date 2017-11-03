@@ -29,7 +29,7 @@
   	 * $$.addEventManager(clzz.prototype, {
   	 * 		on	: (eventName, eventListener) 		=> {this.addEventListener(eventName, eventListener, false)},
   	 * 		off	: (eventName, eventListener) 		=> {this.removeEventListener(eventName, eventListener, false)},
-  	 * 		trigger	: (eventNameOrEvent, extratParams)	=> {this.removeEventListener(eventName, eventListener, false)},
+  	 * 		trigger	: (eventNameOrEvent, extraParams)	=> {this.removeEventListener(eventName, eventListener, false)},
   	 * 		// optional methods
   	 * 			items	: function(){} // when this is a helper too, and not the distination object, example; liste of object, must return a list
   	 * 			//exampe: items : obj => {return this.filter();}
@@ -49,7 +49,7 @@
   	 * 		},
   	 * 		trigger	: {
   	 * 			name	: 'fire',
-  	 * 			wrapper	: (element, eventNameOrEvent, extratParams)	=> {this.removeEventListener(eventName, eventListener, false)},
+  	 * 			wrapper	: (element, eventNameOrEvent, extraParams)	=> {this.removeEventListener(eventName, eventListener, false)},
   	 * 		}
   	 * });
   	 * 
@@ -58,17 +58,61 @@
  */
 (function(){
 	// params
-		var LISTNER_ATTR_NAME	= '_eventListeners';
+		const LISTNER_ATTR_NAME		= '_eventListeners';
+		const EVENT_MAP_ATTR_NAME	= '_eventMap';
 	// when there is no underlayer event manager
+	// create one
+	// thos events needs to be triggered explicitely by "trigger" function
 		const OWN_EVENTS	= {
 			on	: {
-				wrapper	: function(element, eventName, eventListener, options){}
+				wrapper	: function(element, eventName, eventListener, _){
+					var objPrivateData	= _elementPrivateData(element);
+					// create events collection if not exists
+						if(!objPrivateData[EVENT_MAP_ATTR_NAME]) objPrivateData[EVENT_MAP_ATTR_NAME]	= {};
+					// create event listener list
+						if(!objPrivateData[EVENT_MAP_ATTR_NAME][eventName]) objPrivateData[EVENT_MAP_ATTR_NAME][eventName]	= new Set();
+					// add event listener
+						objPrivateData[EVENT_MAP_ATTR_NAME][eventName].add(eventListener);
+				}
 			},
 			off	: {
-				wrapper	: function(element, eventName, eventListener, options){}
+				wrapper	: function(element, eventName, eventListener, _){
+					var objPrivateData	= _elementPrivateData(element);
+					var eventSet	= objPrivateData && objPrivateData[EVENT_MAP_ATTR_NAME] && objPrivateData[EVENT_MAP_ATTR_NAME][eventName];
+					if(eventSet){
+						eventSet.delete(eventListener);
+						if(!eventSet.size)
+							delete objPrivateData[EVENT_MAP_ATTR_NAME][eventName];
+					}
+				}
 			},
 			trigger	: {
-				wrapper	: function(element, eventNameOrEvent, extratParams){}
+				wrapper	: function(element, eventNameOrEvent, extraParams){
+					var objPrivateData	= _elementPrivateData(element);
+					var eventSet	= objPrivateData && objPrivateData[EVENT_MAP_ATTR_NAME]
+						&& objPrivateData[EVENT_MAP_ATTR_NAME][typeof eventNameOrEvent == 'string' ? eventNameOrEvent : eventNameOrEvent.type];
+					if(eventSet){
+						// create event
+							if(typeof eventNameOrEvent == 'string'){
+								if(extraParams instanceof Event){
+									eventNameOrEvent	= extraParams;
+									extraParams			= null;
+								}
+								else
+									eventNameOrEvent	= new Event(eventNameOrEvent);
+							}
+						// extra params
+							if(extraParams)
+								$$.merge(eventNameOrEvent, extraParams);
+						eventSet.forEach(listener => {
+							try{
+								listener.call(element, eventNameOrEvent);
+							}catch(e){
+								$$.uncaughtError('EVENT-MANAGER', e);
+							}
+						})
+					}
+				}
 			}
 		};
 	// add plugin
@@ -100,7 +144,8 @@
 								for(i = 0; i < eventsCount; ++i)
 									_addListener(ele, events[i], options, listener, params.on.wrapper || OWN_EVENTS.on.wrapper);
 							});
-					} });
+						return this;
+					}});
 				// unbind
 					Object.defineProperty(obj, params.off.name || 'off', {value : function(eventName, options, listener){
 						if(!listener){ listener	= options; options = null; }
@@ -125,11 +170,24 @@
 											_unbindEvent(ele, eventName[i], options, listener, params.off.wrapper || OWN_EVENTS.off.wrapper);
 									});
 								}
+						return this;
 					} });
 				// trigger
-					Object.defineProperty(obj, params.trigger.name || 'trigger', {value : function(){
-						
-					} });
+					Object.defineProperty(obj, params.trigger.name || 'trigger', {value : function(eventName, extraParams){
+						// assertions
+							$$.assertArg(typeof eventName == 'string' || eventName instanceof Event, 'Incorrect event');
+						// add listner
+							(fx => {
+								if(params.items) params.items(obj).forEach(fx);
+								else fx(obj);
+							})(ele => {
+								(params.trigger.wrapper || OWN_EVENTS.trigger.wrapper).call(ele, ele, eventName, extraParams);
+							});
+						return this;
+					}});
+				// alias
+					if(!params.on.name && !obj.hasOwnProperty('bind')) Object.defineProperty(obj, 'bind', {value: obj.on});
+					if(!params.off.name && !obj.hasOwnProperty('unbind')) Object.defineProperty(obj, 'unbind', {value: obj.on});
 		}
 	});
 
@@ -137,7 +195,7 @@
 		function _addListener(element, eventListPath, options, listener, wrapper){
 			// add event to element
 				// wrapper.addEventListener(eventListPath[0], listener, false);
-				wrapper(element, eventListPath[0], listener, options);
+				wrapper.call(element, element, eventListPath[0], listener, options);
 			// get private data store
 				var privateData	= _elementPrivateData(element);
 				if(!privateData[LISTNER_ATTR_NAME])
@@ -165,7 +223,7 @@
 				 		$$.deepOperation(
 				 			dataEvent[i],
 				 			ele => {
-				 				ele.listeners.forEach(lstner => removeEventListenerWrapper(obj, eventName, lstner, options));
+				 				ele.listeners.forEach(lstner => removeEventListenerWrapper.call(obj, obj, eventName, lstner, options));
 					 		},{
 					 			childNode	: 'items'
 							}
@@ -180,7 +238,7 @@
 				 	eventName	= eventPath[0];
 				 	// unbind from DOM
 					 	if(listener){
-					 		removeEventListenerWrapper(obj, eventName, listener, options);
+					 		removeEventListenerWrapper.call(obj, obj, eventName, listener, options);
 					 		// remove this listener on data
 					 			$$.deepOperation(
 					 				$$.path(dataEvent, eventPath, {childNode : 'items'}),
@@ -198,7 +256,7 @@
 				 				ele => {
 				 					if(ele.listener)
 				 						for(i = 0, c = ele.listeners.length; i < c; ++i)
-				 							removeEventListenerWrapper(obj, eventName, ele.listeners[i], options);
+				 							removeEventListenerWrapper.call(obj, obj, eventName, ele.listeners[i], options);
 				 				},{
 				 					childNode	: 'items'
 				 				}

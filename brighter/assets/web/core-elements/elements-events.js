@@ -41,12 +41,6 @@
 			}
 		});
 
-	// alias
-		$$.plugin({
-			bind	: $$prototype.on,
-			unbind	: $$prototype.off
-		});
-
 	/**
 	 * events
 	 * .bind(eventName, eventListner)
