@@ -25,9 +25,7 @@
 		// find first occurrence that matches a condition, or undefined
 			first		: {
 				value: function(condition){
-					for(var i=0, c = this.length; i < c; ++i)
-						if(condition.call(this[i], this[i], i))
-							return this[i];
+					return this.find(condition);
 				}
 			},
 		// find the last element that matches a condition, or undefined

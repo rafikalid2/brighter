@@ -1,10 +1,10 @@
 $$.plugin({
 	/**
 	 * immediately following subling elements in the DOM
-	 * .next(filterSelector)
-	 * .next(filterFunction)
-	 * .next(HTMLElement)				// return this element if is the next element
-	 * .next(ArrayLikeOfHTMLElements)	// return elements that are next
+	 * .next(filterSelector, ...)
+	 * .next(filterFunction, ...)
+	 * .next(HTMLElement, ...)				// return this element if is the next element
+	 * .next(ArrayLikeOfHTMLElements, ...)	// return elements that are next
 	 * 
 	 * .not.next(selector)			// inverse the meaning of the selector (coded inside the "filter" function)
 	 * .all.next					// get all next elements
@@ -13,10 +13,10 @@ $$.plugin({
 	next		: _sibling('nextSibling'),
 	/**
 	 * get next elements until somme selected one
-	 * nextUntil(selector)
-	 * nextUntil(function)	// until this function returns false
-	 * nextUntil(HTMLElement)
-	 * nextUntil(ArrayLikeOfHTMLElements)	// $$Object, jQueryObject, list, ...
+	 * nextUntil(selector, ...)
+	 * nextUntil(function, ...)	// until this function returns false
+	 * nextUntil(HTMLElement, ...)
+	 * nextUntil(ArrayLikeOfHTMLElements, ...)	// $$Object, jQueryObject, list, ...
 	 *
 	 * .all.nextUntil		// include selected element
 	 *
@@ -118,7 +118,7 @@ function _sibling(attr){
 				});
 		// filter
 			if(selector)
-				result	= result.filter(selector);
+				result	= result.filter.apply(result, selector);
 		return result;
 	};
 }

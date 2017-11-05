@@ -1,7 +1,7 @@
 $$.plugin({
 	/**
-	 * filter(selector)		// filter thos elements
-	 * filter(function)		// use this fx
+	 * filter(selector, selector2, ...)		// filter thos elements
+	 * filter(function, fx2, ...)		// use this fx
 	 * filter(HTMLElement)	// remove this HTML element from list
 	 * filter([HTMLElement])// remove all those HTML Elements (Array or Array like)
 	 * filter($$Object)		// remove all elements in this list in the collection
@@ -9,30 +9,43 @@ $$.plugin({
 	 * 
 	 * not.filter			// inverse the result of the filter
 	 */
-		filter		: function(filterArg){
-			// filter function
-				var filterFx;
-				// function
-				if(typeof filterArg == 'function')
-					filterFx	= filterArg;
-				// selector
-				else if(typeof filterArg == 'string')
-					filterFx	= (ele => (ele.nodeType == 1 && _ElementMatches(ele, filterArg)));
-				// brighter object or Array or Array like object
-				else{
-					filterArg	= _argsToBrighterList.call(this, arguments);
-					if(filterArg.length)
-						filterFx	= (ele => filterArg.indexOf(ele) > -1);
-					else
-						throw new $$.err.illegalArgument('insupported arguments: ', arguments);
-				}
-			// apply filter fx
-				if(filterFx)
-					filterArg	=  Array.prototype.filter.call(this, this._not ? (ele => !filterFx(ele)) : filterFx);
-				else
-					filterArg	= this.slice(0);
-				filterArg.__proto__	= $$prototype;
-			return filterArg;
+		filter		: function(){
+			var result;
+			if(arguments.length){
+				// compile filter arguments
+				var cmple	= Array.prototype.map.call(arguments, function(arg){
+					var filterFx;
+					// filter function
+						// function
+						if(typeof arg == 'function')
+							filterFx	= arg;
+						// selector
+						else if(typeof arg == 'string')
+							filterFx	= (ele => (ele.nodeType == 1 && _ElementMatches(ele, arg)));
+						// element
+						else if(arg.nodeType)
+							filterFx	= (ele => ele == arg);
+						// brighter object or Array or Array like object
+						else if('indexOf' in arg)
+							filterFx	= (ele =>  arg.indexOf(ele) > -1);
+						// jquery
+						else if('index' in arg)
+							filterFx	= (ele =>  arg.index(ele) > -1);
+						else
+							throw new $$.err.illegalArgument('insupported arguments: ', arg);
+					return filterFx;
+				});
+				// filter function
+					var filterFunc	= (ele => {
+						return cmple.some(fx	=> fx(ele));
+					});
+				// apply filter fx
+				result	= Array.prototype.filter.call(this, this._not ? (ele => !filterFunc(ele)) : filterFunc);
+			} else {
+				result	= this.slice(0); // returns copy
+			}
+			result.__proto__	= $$prototype;
+			return result;
 		},
 	/**
 	 * eq(index) get element from position
