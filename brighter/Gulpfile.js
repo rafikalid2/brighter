@@ -44,7 +44,7 @@ var order	= require('gulp-order');
 			gulp.watch('assets/**/*.js', ['web']);
 	});
 	gulp.task('web-prod', ()=>{
-		gulp.src('assets/**/*.js', '!assets/extension/**/*', '!assets/nodejs/**/*')
+		gulp.src(['assets/**/*.js', '!assets/extension/**/*', '!assets/nodejs/**/*'])
 			.pipe(order(concatOrder))
 			.pipe(concat('brighter.js', {newLine: ";\n"}))
 			.pipe(minify({
@@ -60,7 +60,7 @@ var order	= require('gulp-order');
 // extension tasks
 	gulp.task('extension', ()=>{
 		// compile
-			gulp.src('assets/**/*.js', '!assets/nodejs/**/*')
+			gulp.src(['assets/**/*.js', '!assets/nodejs/**/*'])
 				.pipe(order(extConcatOrder))
 				// .on('error',gutil.log)
 				.pipe(concat('brighter.js', {newLine: ";\n"}))
@@ -70,7 +70,7 @@ var order	= require('gulp-order');
 			gulp.watch('assets/**/*.js', ['extension']);
 	});
 	gulp.task('extension-prod', ()=>{
-		gulp.src('assets/**/*.js', '!assets/nodejs/**/*')
+		gulp.src(['assets/**/*.js', '!assets/nodejs/**/*'])
 			.pipe(order(extConcatOrder))
 			.pipe(concat('brighter.js', {newLine: ";\n"}))
 			.pipe(minify({
