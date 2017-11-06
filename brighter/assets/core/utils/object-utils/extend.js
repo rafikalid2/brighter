@@ -17,7 +17,7 @@ $$.plugin(true, {
 			result	= _objExtend.apply(this, arguments);
 		return result;
 	},
-	marge		: function(){
+	merge		: function(){
 		return cloner.shallow.merge.apply(cloner.shallow, arguments);
 	},
 	deepMerge	: function(){
