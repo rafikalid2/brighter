@@ -730,6 +730,12 @@
 		 */
 			// then(response => {})
 			// then((response, error, xhr) => {})
+			// then({
+			// 		'200' : fx,
+			// 		'30x'	: fx,
+			// 		'400'	: fx
+			// 		'350-400': fx
+			// })
 		 	then		: function(callBack){
 	 			$$.assertFunction(callBack);// assert that this is a function
 	 			this._options.then	= callBack;
@@ -793,7 +799,9 @@
 						result	= result[1].trim();
 				}
 				return result;
-			}
+			},
+
+			status		: function(){ return this.xhr && this.xhr.status; }
 		});
 
 
