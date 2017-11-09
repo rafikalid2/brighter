@@ -801,7 +801,8 @@
 				return result;
 			},
 
-			status		: function(){ return this.xhr && this.xhr.status; }
+			status		: function(){ return this.xhr && this.xhr.status; },
+			statusText	: function(){ return this.xhr && this.xhr.statusText; }
 		});
 
 
