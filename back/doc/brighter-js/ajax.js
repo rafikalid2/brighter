@@ -16,6 +16,7 @@
 		.xhrs				// list of current connections
 
 		.abort()				// abort all current connections
+		.abort('a.b b.c')		// abort those groups
 		.abort(xhr => {})		// when a connection is aborted
 
 		.catch((err, xhr) => {})	// add this callback to when error
@@ -24,12 +25,13 @@
 			code : xhr => {}
 		}) // execute when this code
 
-		.bind()
+		.bind('event', listener)
 		.unbind()
 
-		.urlDecoder(url => url) // optional, decoder to decode URL
+		// .urlDecoder(url => url) // optional, decoder to decode URL
+		.urlDecoder(/pattern/, decoder)
 
-		.url(patern, pattern2, ...)	// apply those functions on each URL that matches those patterns
+		.find('a.b c')	// get all xhrs from those groups
 			.status({})
 			.catch()
 			.abort()
@@ -57,6 +59,7 @@
 	$$.post(url)
 	$$.head(url)
 	$$.delete(url)
+		.group('group1.subGroup group2.subGroup2') // group ajax calls
 		.url // get URL
 		.originalURL	// getter, the ori ginal URL before redirects
 
@@ -64,12 +67,18 @@
 		.goToURL(url)	// make redirect to this URL
 
 		/**
-		 * @param {regex} urlPattern match an url already in progress or in the queu, default to undefined (no waiting, exec request immediately)
-		 * @param {int} timeout time to wait after the previous url in queu
-		 * @param {int} queuTimeout max time to wait in the queu, default to 0 (wait intil the previous connection ends)
+		 * @param {string} group	 make a group
+		 * @param {int} queuTimeout max time to wait in the queu, default to 0 c (wait intil the previous connection ends)
 		 * @param {boolean} abortWhenQueuTimeout abort the connection if timeout in queu, default to true
+		 * @param {int} timeout time to wait after the previous url in queu
 		 */
-		.lazyRequest(urlPattern, timeout, QueuTimeout, abortWhenQueuTimeout)	// if a request is already in progress, wait this timeout, do not use parallel requests
+		.lazyRequest({
+			group				: 'groupName',	// group affected by the lazyness
+			wait				: 0, 			// time to wait after previous connection ends, default to 0
+			queuTimeout			: 0, 			// max time to wait in the queu, default to 0 (wait until the )
+			abortWhenTimeout	: true, 		// optional, abort when timeout, otherwise, execute the request, default to true
+			timeout				: 0				// maximum timeout for this connection, this includes queu timeout and XHR timeout
+		})	// if a request is already in progress, wait this timeout, do not use parallel requests
 
 		.cache(false) 				//force de navigator to reload the data from this url, // set or get
 		.timeout(int) 				// timeout, get timeout if the arg is undefined

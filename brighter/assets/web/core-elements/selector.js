@@ -108,16 +108,44 @@
 	 *
 	 *
 	 */
+/*
+first
+last
+eq
+slice
+prev
+prevAll
+prevUntil
 
+nextuntil
+siblings
+siblingsUntil
+
+style
+css
+contains
+text
+any
+matches
+has
+parent
+offsetParent
+hasParent
+visible
+hidden
+animated
+ */
 	/**
 	 * @return {function} a function that do what the selector expects
 	 */
 	const _selectorSplitter	= /(?=)/;
 	const	whitespace = "[\\x20\\t\\r\\n\\f]",
 			regexCommaSpliter	= new RegExp( whitespace + '*,' + whitespace + '*' );
+	const brighterFx	= /:not\(\w+\,|/;
 	
 	function _compileSelector(selector){
-		var selectorExec;
+		var nativeSelector		= [],
+			brighterSelector	= [];
 		// replace shortcuts
 			// :form-control		:any(input, select, textarea, button)
 				selector	= selector.replace(/:form-control\b/gi, ':any(input, select, textarea, button)');
@@ -134,12 +162,23 @@
 					return '[' + sel.split(regexCommaSpliter).join('][') + ']';
 				});
 		// make sample selectors
-			selectorExec	= [];
 			// split into sub selectors
-				selector = selector.split(',');
+				if(selector.indexOf(',') == -1)
+					selector	= [selector];
+				else
+					selector	= _splitSelector(selector);
+			// find native selectors & brighters selectors
+				selector.forEach(s => {
+					if(
+						brighterFx.test(s)
+					)
+						brighterSelector.push(s);
+					else
+						nativeSelector.push(s);
+				});
 			// expend grouped expressions (:any, :matches)
 				selector.forEach(sel => {
-					if(/:any\(|:matches\s*\(/i.test(sel)){
+					if(/:any\(|:matches\(/i.test(sel)){
 						// do expand
 					} else {
 						selectorExec.push(sel);
@@ -172,5 +211,28 @@
 			// selector	= selector.replace(/:target/gi, document.location.hash);
 		// tokenize 
 			selector	= selector.split(/(:(?:first|last|eq|slice|not|prev|prevAll|style|css|has|parent|offset-parent|visible|hidden|animated))(?:\((.+?)\)|\b)/i);
+	}
+
+	// split using comma outside parentises
+	function _splitSelector(str){
+		var i, c = str.length;
+		var brackets	= 0,
+			parentises	= 0,
+			ch,
+			result	= [],
+			begin	= 0,
+			count;
+		while(i < c){
+			chr	= str.charAt(i);
+			if(chr == '[') ++brackets;
+			else if(chr == ']') --brackets;
+			else if(chr == '(') ++parentises;
+			else if(chr == ')') --parentises;
+			else if(chr == ',' && !brackets && !parentises){
+				result.push(str.substring(begin, i));
+				begin	= i + 1;
+			}
+		}
+		return result;
 	}
 })();

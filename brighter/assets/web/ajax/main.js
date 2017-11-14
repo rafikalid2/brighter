@@ -77,7 +77,7 @@
 					this._total		= 0;
 				// start XHR
 					_startXHR.call(this);
-			}catch(e){console.log('----------', e)
+			}catch(e){
 				reject.call(this, e);
 			}
 		};
