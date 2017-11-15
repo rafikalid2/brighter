@@ -15,9 +15,9 @@
 
 function $$(arg){
 	var result;
-	// create empty document fragment
+	// create empty document fragment when using: append, prepend,appendTo, preppendTo
 		if(!arg)
-			result	= [document.createDocumentFragment()];
+			result	= [];
 	// create HTML or SVG element
 		else if(typeof arg == 'string')
 			result	= _createElement(arg, arguments[1]);
@@ -37,11 +37,21 @@ function $$(arg){
 
 
 // create SVG element
-	$$.svg	= function(tagName){
-		var list		= _createElement(tagName, svgNS);
-		list.__proto__	= $$prototype;
-		return list;
-	};
+	$$.plugin(true, {
+		svg			:  function(tagName){
+			var list		= _createElement(tagName, svgNS);
+			list.__proto__	= $$prototype;
+			return list;
+		}
+	});
+// create empty fragment
+	$$.plugin(true, 'fragment', {
+		get	: function(){
+			var reslt		= [new DocumentFragment()];
+			reslt.__proto__	= $$prototype;
+			return reslt;
+		}
+	});
 
 /**
  * create element

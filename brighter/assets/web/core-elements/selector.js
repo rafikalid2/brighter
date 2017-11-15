@@ -108,40 +108,14 @@
 	 *
 	 *
 	 */
-/*
-first
-last
-eq
-slice
-prev
-prevAll
-prevUntil
-
-nextuntil
-siblings
-siblingsUntil
-
-style
-css
-contains
-text
-any
-matches
-has
-parent
-offsetParent
-hasParent
-visible
-hidden
-animated
- */
 	/**
 	 * @return {function} a function that do what the selector expects
 	 */
-	const _selectorSplitter	= /(?=)/;
-	const	whitespace = "[\\x20\\t\\r\\n\\f]",
-			regexCommaSpliter	= new RegExp( whitespace + '*,' + whitespace + '*' );
-	const brighterFx	= /:not\(\w+\,|/;
+	const BRIGHTER_EXPRESSIONS	= 'not,first,last,eq,slice,prev,prevAll,prevUntil,nextUntil,siblings,siblingsUntil,style,css,contains,text,any,matches,has,parent,offsetParent,hasParent,visible,hidden,animated'.split(',');
+	const _selectorSplitter		= /(?=)/;
+	const	whitespace			= "[\\x20\\t\\r\\n\\f]",
+			regexCommaSpliter	= new RegExp( whitespace + '*,' + whitespace + '*' ),
+			BRIGHTER_EXP		= new RegExp(':' + BRIGHTER_EXPRESSIONS.join('|:'), 'i');
 	
 	function _compileSelector(selector){
 		var nativeSelector		= [],
@@ -167,11 +141,15 @@ animated
 					selector	= [selector];
 				else
 					selector	= _splitSelector(selector);
+			// expand "not", "any", and "matches" selectors
+				selector.forEach(s => {
+					if(/:not\(|:any\(|:matches\(/i.test(s)){
+
+					}
+				});
 			// find native selectors & brighters selectors
 				selector.forEach(s => {
-					if(
-						brighterFx.test(s)
-					)
+					if(BRIGHTER_EXP.test(s))
 						brighterSelector.push(s);
 					else
 						nativeSelector.push(s);
@@ -235,4 +213,12 @@ animated
 		}
 		return result;
 	}
+
+	// expand ":not", "any" and "matches"
+	function _expandAny(selector){
+		var pos	= 
+	}
+
+	// find brighter keywords and split with them
+	// 
 })();
