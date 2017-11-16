@@ -2,18 +2,27 @@ $$.plugin({
 	/**
 	 * empty each element
 	 */
-	empty		: function(filter){ this.each(node => {
-		while(node.firstChild)
-			node.removeChild(node.firstChild);
-	})},
+	empty		: function(filter){
+		( filter ? this.filter(filter) : this ).each(node => {
+			while(node.firstChild)
+				node.removeChild(node.firstChild);
+		});
+		return this;
+	},
 	/**
 	 * remove all elements from the DOM and destroy theme
 	 */
-	remove		: function(filter){ return this.each(node => node.remove()); },
+	remove		: function(filter){
+		( filter ? this.filter(filter) : this ).each(node => node.remove());
+		return this;
+	},
 	/**
 	 * detach all elements from the DOM
 	 */
-	detach		: function(filter){ return this.each(node => node.remove()); },
+	detach		: function(filter){
+		( filter ? this.filter(filter) : this ).each(node => node.remove());
+		return this;
+	},
 	/**
 	 * .replaceWidth(HTMLElement, ...)
 	 * .replaceWidth(ArryLike, ...)

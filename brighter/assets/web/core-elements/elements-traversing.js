@@ -78,7 +78,7 @@ $$.plugin({
 				.push(
 					this.nextUntil(selector) // next elements
 				);
-	}, //TODO
+	},
 	/**
 	 * .find(selector)		: select elements that has somme childs
 	 * .find(ArrayLike)		: Array, $$Object, HTMLElements or even jQuery object

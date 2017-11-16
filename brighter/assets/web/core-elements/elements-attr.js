@@ -92,7 +92,7 @@ $$.plugin({
 		var result;
 		if(this.length){
 			if(this._all){
-				result	= this.mapTags(ele => ele[propertyName]);
+				result	= this.map(ele => ele && ele[propertyName]);
 			} else {
 				result	= this.getFirstTag();
 				if(result)
