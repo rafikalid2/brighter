@@ -119,7 +119,8 @@
 	
 	function _compileSelector(selector){
 		var nativeSelector		= [],
-			brighterSelector	= [];
+			brighterSelector	= [],
+			i, c;
 		// replace shortcuts
 			// :form-control		:any(input, select, textarea, button)
 				selector	= selector.replace(/:form-control\b/gi, ':any(input, select, textarea, button)');
@@ -147,6 +148,15 @@
 
 					}
 				});
+			// expend grouped expressions (:any, :matches)
+				// selector.forEach(sel => {
+				// 	if(/:any\(|:matches\(/i.test(sel)){
+				// 		// do expand
+				// 	} else {
+				// 		selectorExec.push(sel);
+				// 	}
+				// });
+				//...
 			// find native selectors & brighters selectors
 				selector.forEach(s => {
 					if(BRIGHTER_EXP.test(s))
@@ -154,15 +164,9 @@
 					else
 						nativeSelector.push(s);
 				});
-			// expend grouped expressions (:any, :matches)
-				selector.forEach(sel => {
-					if(/:any\(|:matches\(/i.test(sel)){
-						// do expand
-					} else {
-						selectorExec.push(sel);
-					}
-				});
-				//...
+			// tokenize brighter selectors
+			// execute native selectors
+
 			// filter :target if do not exists
 				// if(!document.location.hash)
 				// 	selectorExec	= selectorExec.filter(sel => !/:target\b/i.test(sel));
