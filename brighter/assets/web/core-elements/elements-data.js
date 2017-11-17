@@ -1,7 +1,6 @@
 // data kies
-	var BRIGHTER_DATA_KEY		= 'b' + BRIGHTER_ID; // used to store brighter data
-	var BRIGHTER_USER_DATA_KEY	= 'u' + BRIGHTER_ID; // used to store user data set by the methode $$ele.data
-
+ 	var _BrighterPrivateData	= new WeakMap();
+ 	var _BrighterPublicData		= new WeakMap();
 
 /**
  * store data inside element
@@ -13,13 +12,13 @@
 		var ele, result;
 		// if returns all elements data as list
 		if(this._all){
-			result	= this.mapTags(ele => _elementDataGet(ele, BRIGHTER_USER_DATA_KEY));
+			result	= this.mapTags(ele => _elementDataGet(ele));
 		}
 		// return the first element data
 		else{
 			ele	= this.getFirstTag();
 			if(ele)
-				result	= _elementDataGet(ele, BRIGHTER_USER_DATA_KEY);
+				result	= _elementDataGet(ele);
 		}
 		return result;
 	}
@@ -30,16 +29,16 @@
   * store BRIGHTER private data
   */
  	function _elementPrivateData(obj){
- 		return _elementDataGet(obj, BRIGHTER_DATA_KEY);
+ 		if(!_BrighterPrivateData.has(obj))
+ 			_BrighterPrivateData.set(obj, {});
+ 		return _BrighterPrivateData.get(obj);
  	}
 
 /**
  * get the data from an object
  */
-function _elementDataGet(obj, key){
-	if(!obj[key])
-		Object.defineProperty(obj, key, {
-			value	: {}
-		});
-	return obj[key];
-}
+	function _elementDataGet(obj){
+		if(!_BrighterPublicData.has(obj))
+ 			_BrighterPublicData.set(obj, {});
+ 		return _BrighterPublicData.get(obj);
+	}

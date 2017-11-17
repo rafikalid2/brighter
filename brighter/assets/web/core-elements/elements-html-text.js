@@ -5,18 +5,17 @@ $$.plugin({
 	 *  html('text')			: set the HTML of the first element
 	 *  all.html('text')		: set the HTML of all elements
 	 */
-	html		: function(html){
-		return _elementsAttr.call(this, 'innerHTML', html);
-	},
+	// deprecated, do not use html
+	// html		: function(html){
+	// 	return _elementsAttr.call(this, 'innerHTML', html);
+	// },
 	/**
 	 *  outerHTML()				: get the outerHTML of the first element
 	 *  .all.outerHTML()		: get the outerHTML of all elements inside a list
-	 *  outerHTML('text')		: set the outerHTML of the first element
-	 *  all.outerHTML('text')	: set the outerHTML of all elements
 	 */
-	outerHTML	: function(html){
-		return _elementsAttr.call(this, 'outerHTML', html);
-	},
+	// outerHTML	: function(){
+	// 	return _elementsAttr.call(this, 'outerHTML', html);
+	// },
 	/**
 	 *  text()					: get the text of the first element
 	 *  .all.text()				: get the text of all elements inside a list
@@ -27,4 +26,7 @@ $$.plugin({
 		return _elementsAttr.call(this, 'text', text);
 	},
 });
+
+$$.plugin('html', { get	: function(){ return this.property('innerHTML')} });
+$$.plugin('outerHTML', { get	: function(){ return this.property('outerHTML')} });
 

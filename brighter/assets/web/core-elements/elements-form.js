@@ -18,3 +18,13 @@
  * toObject
  * toJSON
  */
+
+
+/**
+ * form controls
+ */
+ 	$$.plugin('formControls', {
+ 		get	: function(){
+ 			this.$$map(ele => ele.elements);
+ 		}
+ 	});
