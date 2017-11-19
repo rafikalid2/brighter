@@ -21,7 +21,7 @@ $$.plugin({
 							filterFx	= arg;
 						// selector
 						else if(typeof arg == 'string')
-							filterFx	= (ele => (ele.nodeType == 1 && _ElementMatches(ele, arg)));
+							filterFx	= (ele => _ElementMatches(ele, arg));
 						// element
 						else if(arg.nodeType)
 							filterFx	= (ele => ele == arg);
@@ -41,36 +41,16 @@ $$.plugin({
 					});
 				// apply filter fx
 				result	= Array.prototype.filter.call(this, this._not ? (ele => !filterFunc(ele)) : filterFunc);
+				result.__proto__	= $$prototype;
 			} else {
-				result	= this.slice(0); // returns copy
+				result	= this.duplicate(); // returns copy
 			}
-			result.__proto__	= $$prototype;
 			return result;
 		},
-	/**
-	 * eq(index) get element from position
-	 * not.eq(index) get all elements excluding the element in index
-	 */
-		eq			: function(index){
-			var result;
-			if(!this.length)
-				result	= [];
-			else if(this._not){
-				result	= result.slice(0);
-				result.splice(index, 1);
-			}else
-		 		result	= [this[index < 0 ? this.length + index : index]];
-			result.__proto__ = $$prototype;
-			return result;
-	 	},
 
 	//first tag
 		getFirstTag	: function(){
-			for(var i = 0, c = this.length; i<c; ++i){
-				if(this[i].nodeType == 1)
-					return this[i];
-			}
-			return undefined;
+			return Array.prototype.find(ele => this[i].nodeType == 1);
 		},
 	// last tag
 		getLastTag	: function(){

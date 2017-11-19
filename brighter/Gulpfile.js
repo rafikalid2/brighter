@@ -32,16 +32,18 @@ var order	= require('gulp-order');
 	// nodejs
 		//TODO
 // web tasks
-	gulp.task('web', ()=>{
+	gulp.task('web-js', ()=>{
 		// compile
 			gulp.src(['assets/**/*.js', '!assets/extension/**/*', '!assets/nodejs/**/*'])
+			// gulp.src('assets/**/*.js')
 				.pipe(order(concatOrder))
 				// .on('error',gutil.log)
 				.pipe(concat('brighter.js', {newLine: ";\n"}))
 				// .on('error',gutil.log)
 				.pipe(gulp.dest('./dest/'));
-		// watch
-			gulp.watch('assets/**/*.js', ['web']);
+	});
+	gulp.task('web', ['web-js'], ()=>{
+		gulp.watch('assets/**/*.js', ['web-js']);
 	});
 	gulp.task('web-prod', ()=>{
 		gulp.src(['assets/**/*.js', '!assets/extension/**/*', '!assets/nodejs/**/*'])

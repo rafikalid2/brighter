@@ -1,6 +1,6 @@
 
 	// extend Array prototype
-		classExtend(Array, $$);
+		classExtend(ArrayUtils, $$);
 	// racourcis vers $$.prototype
 		var $$prototype	= $$.prototype;
 	// BRIGHTER unique identifier

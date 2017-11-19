@@ -11,7 +11,6 @@
 	// Array.prototype.pop
 	// Array.prototype.shift
 
-$$.plugin({
 	/**
 	 * add elements to the collection
 	 * push(HTMLElement, ...)
@@ -19,35 +18,52 @@ $$.plugin({
 	 * push(this => this.fx(), ...)	// add new elements to the list based on the current one,
 	 * 							example: $$elements.push(ele=> ele.parent(), ele => ele.next('b'))	// add parents and next 'b' to the list
 	 */
-		push	: _collectionManagerPush,
-		add		: _collectionManagerPush,
-	/**
-	 * unshift(HTMLElemnt, ArrayLike, this => this.fx())
-	 */
-		unshift : function(){
-			// control
-				var list = _argsToBrighterList.call(this, arguments);
-			// filter already existing elements
-				list	= list.filter(ele => this.indexOf(ele) == -1);
-			// unshift
-				if(list.length)
-					Array.prototype.unshift.apply(this, list);
+
+const _ArrayPrototype	= Array.prototype;
+
+///////////////////
+// unshift, push //
+///////////////////
+['push', 'unshift'].each(function(fx){
+	$$.plugin(fx, {
+		value	: function(ele){
+			// common usecases fast add
+			var lst;
+			if(ele && arguments.length == 1){
+				// HTML or SVG Element
+				if(ele.nodeType){
+					if(!this.has(ele)) _ArrayPrototype[fx].call(this, ele);
+					return this;
+				}
+				// brighter or array like
+				else if('length' in ele){
+					if(ele.length)
+						lst	= _ArrayPrototype.filter.call(ele, e => e.nodeType && !this.has(e));
+					else return this;
+				}
+			}
+			// all args add
+			if(!lst)
+				lst	= _argsToBrighterList.call(this, arguments).filter(e => !this.has(e));
+			if(lst.length)
+				_ArrayPrototype[fx].apply(this, lst);
 			return this;
-		},
+		}
+	});
+});
+
+////////////
+// others //
+////////////
+$$.plugin({
 	/**
 	 * concat(HTMLElemnt, ArrayLike, this => this.fx())
 	 */
 		concat	: function(){
-			var lst	= _argsToBrighterList.call(this, arguments);
-			// filter already existing elements
-				lst	= lst.filter(ele => this.indexOf(ele) == -1);
-			lst		= this.concat(lst);
-			lst.__proto__ = $$prototype;
-			return lst;
-		},
-	//slice
-		slice	: function(){
-			var lst	= Array.prototype.slice.apply(this, arguments);
+			var lst	= _argsToBrighterList.call(this, arguments)
+				// filter already existing elements
+				.filter(ele => !this.has(ele));
+			lst		= _ArrayPrototype.concat.call(this, lst);
 			lst.__proto__ = $$prototype;
 			return lst;
 		},
@@ -59,50 +75,22 @@ $$.plugin({
 			// elements to be added
 				var tobeAdded	= [];
 				if(arguments.length > 2){
-					tobeAdded = Array.prototype.push.apply(tobeAdded, arguments);
+					tobeAdded = _ArrayPrototype.push.apply(tobeAdded, arguments);
 					tobeAdded.splice(0,2);
 					tobeAdded	= _argsToBrighterList.call(this,tobeAdded);
 					// filter already existing elements
-						tobeAdded	= tobeAdded.filter(ele => this.indexOf(ele) == -1);
+						tobeAdded	= tobeAdded.filter(ele => !this.has(ele));
 				}
 			// other args
 				tobeAdded.splice(0, 0, strt, nbrRemove);
 			// returned array
-				var lst= Array.prototype.splice.apply(this, tobeAdded);
+				var lst= _ArrayPrototype.splice.apply(this, tobeAdded);
 				lst.__proto__ = $$prototype;
 				return lst;
 		},
-
-	// duplicate collection
-		duplicate	: function(){
-			return this.slice(0);
-		},
-	// iterations
-		forEach		: _collectionManagerEach,
-		each		: _collectionManagerEach,
 	// each tag (tag only, exclude attributeNode, commentNode, textNode, ...)
 		eachTag		: function(callBack){
-			var ele;
-			for(var i = 0, c = this.length; i < c; ++i){
-				ele	= this[i];
-				if(
-					ele
-					&& ele.nodeType == 1
-					&& callBack(ele, i) === false
-				)
-					break;
-			}
-			return this;
-		},
-	// sort
-		sort		: function(){
-			Array.prototype.sort.apply(this, arguments);
-			return this;
-		},
-	// reverse
-		reverse		: function(){
-			Array.prototype.reverse.apply(this, arguments);
-			return this;
+			return this.each(ele => ele && ele.nodeType == 1 && callBack.call(ele, ele, i) === false);
 		},
 	/**
 	 * map tags
@@ -110,21 +98,20 @@ $$.plugin({
 	 * "undefined" for non tag values
 	 */
 		mapTags		: function(callBack){
-			return this.map(ele => (ele.nodeType == 1 ? callBack(ele) : undefined))
+			return this.map(ele => (ele.nodeType == 1 ? callBack.call(ele, ele) : undefined))
 		},
 	/**
 	 * $$map is similar to map, the difference is that $$map returns a $$Object ($$Object is a set and contains only HTMLElements)
 	 */
 		$$map		: function(callBack){
-			var lst	= [], r;
+			var lst	= [], r, i, c;
 			this.each(ele => {
-				r	= callBack(ele);
+				r	= callBack.call(ele, ele);
 				if(Array.isArray(r)){
-					for(var i=0, c = r.length; i < c; ++i)
+					for(i=0, c = r.length; i < c; ++i)
 						if(r[i] && r[i].nodeType && lst.indexOf(r[i]) == -1)
 							lst.push(r[i]);
-				}
-				else{
+				}else{
 					if(r && r.nodeType && lst.indexOf(r) == -1)
 						lst.push(r);
 				}
@@ -136,32 +123,20 @@ $$.plugin({
 	 * every: check if all tags got the expression true
 	 */
 		everyTag	: function(checkFx){
-			return this.every(ele => (ele.nodeType == 1 ? checkFx(ele) : true));
+			return this.every(ele => (ele.nodeType == 1 ? checkFx.call(ele, ele) : true));
 		},
 	/**
 	 * check if at least one tag maches the condition
 	 */
 	 	someTag		: function(checkFx){
-	 		return this.some(ele => (ele.nodeType == 1 ? checkFx(ele): false));
+	 		return this.some(ele => (ele.nodeType == 1 ? checkFx.call(ele, ele) : false));
 	 	}
 });
-// add element to collection
-	function _collectionManagerPush(){
-		// control
-			var list = _argsToBrighterList.call(this, arguments);
-		// filter already existing elements
-			list	= list.filter(ele => this.indexOf(ele) == -1);
-		// add to list
-			if(list.length)
-				Array.prototype.push.apply(this, list);
-		return this;
-	}
 
-// forEach
-	function _collectionManagerEach(callBack){
-		for(var i = 0, c = this.length; i < c ; ++i){
-			if(callBack(this[i], i) === false)
-				break;
-		}
-		return this;
-	}
+
+///////////
+// alias //
+///////////
+$$.plugin({
+	add	: $$prototype.push
+});

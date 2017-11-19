@@ -22,18 +22,18 @@ function _argsToBrighterList(args){
 		else if(typeof ele == 'function'){
 			ele	= ele(this);
 			if(ele && ele.length)
-				ele	= ele.filter(ele => ele && ele.nodeType > 0);
+				ele	= ele.filter(e => e && e.nodeType > 0);
 			else
 				continue;
 		}
 		// selector
 		else if(typeof ele == 'string')
 			ele	= this.findAll(ele);
-		// brighter collection
+		// brighter
 		else if(ele instanceof $$){}
 		// array like
-		else if(ele.length)
-			ele	= ele.filter(ele => ele && ele.nodeType > 0);
+		else if('length' in ele)
+			ele	= Array.prototype.filter.call(ele, e => e && e.nodeType > 0);
 		else
 			throw new $$.err.illegalArgument('Argument ' + i + ' is not supported: ', ele);
 

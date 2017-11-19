@@ -32,6 +32,9 @@
 		// get all child nodes (including text and comment nodes)
 		childNodes			: _childNodes,
 		contents			: _childNodes // alias
+		// parents(filter)
+		// closest parent(selector)
+		// hasParent
 	});
 
 	// child nodes

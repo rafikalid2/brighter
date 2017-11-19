@@ -17,6 +17,7 @@
 			win.Brighter = window.$$ = factory(win);
 		}
 })(function(window){
+	"use strict";
 	var version = "0.0.1";
 
 // <!> do not add any closing parenteses, this is splited in several files

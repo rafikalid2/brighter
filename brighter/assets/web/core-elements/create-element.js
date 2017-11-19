@@ -26,7 +26,7 @@ function $$(arg){
 			$$(window).load(arg);
 	// HTMLElement, ArrayLike, jQuery, Brighter, ...
 		else{
-			result	= _argsToBrighterList(arg);
+			result	= _argsToBrighterList(arguments);
 			if(!result.length)
 				throw new $$.err.illegalArgument(arg);
 		}

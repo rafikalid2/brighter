@@ -2,6 +2,7 @@
  * Arrays utils
  * add: pull(obj, ...)
  */
+
 	var $$Arrays = ArrayUtils.prototype;
 	/**
 	 * create new Array or transforme an existing one
@@ -15,85 +16,137 @@
 
  	classExtend(Array, ArrayUtils);// make array utils as a subclass
 
-	Object.defineProperties($$Arrays, {
+(function(){
+	const _ArrayPrototype	= Array.prototype;
+/////////////
+// methods //
+/////////////
+	(obj => {
+		for(var i in obj)
+			Object.defineProperty($$Arrays, i, {
+				value	: obj[i]
+			});
+	})({
 		// dupplicate array
-			duplicate	: {
-				value : function(){
-					return this.slice(0);
-				}
-			},
+		duplicate	: function(){return this.slice(0);},
 		// find first occurrence that matches a condition, or undefined
-			first		: {
-				value: function(condition){
-					return this.find(condition);
-				}
-			},
+		first		: function(condition){
+			return condition ? _ArrayPrototype.find.call(this, condition) : this[0];
+		},
 		// find the last element that matches a condition, or undefined
-			last		: {
-				value: function(condition){
-					for(var i = this.length - 1 ; i >= 0; --i)
-						if(condition.call(this[i], this[i], i))
-							return this[i];
+		last		: function(condition){
+			if(condition)
+				for(var i = this.length - 1 ; i >= 0; --i){
+					if(condition.call(this[i], this[i], i))
+						return this[i];
 				}
-			},
-		// contains
-			has	: {
-				value	: function(){
-					for(var i = 0, c = arguments.length ; i < c; ++i){
-						if(this.indexOf(arguments[i]) == -1)
-							return false;
-					}
-					return true;
-				}
-			},
+			else return this[this.length - 1];
+		},
+		// contains: has(ele1, ele2, ...)
+		contains	: function(){
+			for(var i = 0, c = arguments.length ; i < c; ++i){
+				if(this.indexOf(arguments[i]) == -1)
+					return false;
+			}
+			return true;
+		},
 		// forEach
-			forEach	: _arrayUtilEach,
-			each	: _arrayUtilEach
+		each		:  function(callBack){
+			for(var i=0, c = this.length; i < c; ++i){
+				if(callBack.call(this[i], this[i], i) === false)
+					break;
+			}
+			return this;
+		},
+		// remove all items
+		clear		: function(){
+			this.splice(0);
+			return this;
+		},
+		/////////////
+		// filters //
+		/////////////
+		/**
+		 * eq(index) get element from position
+		 * not.eq(index) get all elements excluding the element in index
+		 */
+		eq			: function(index){
+			var result;
+			if(!this.length)
+				result	= [];
+			else if(this._not)
+				result	= this.slice(0).splice(index, 1);
+			else
+		 		result	= [this[index < 0 ? this.length + index : index]];
+			result.__proto__ = this.__proto__;
+			return result;
+	 	}
 	});
 
-
-// wrappers
+//////////////
+// wrappers //
+//////////////
 	['push', 'unshift', 'reverse', 'sort']
 		.forEach(function(ele){
 			Object.defineProperty($$Arrays, ele, {
 				value	: function(){
-					Array.prototype[ele].apply(this, arguments);
+					_ArrayPrototype[ele].apply(this, arguments);
 					return this;
 				}
 			});
 		});
-// wrappers 2
 	['concat', 'slice', 'splice', 'filter', 'map']
 		.forEach(function(ele){
 			Object.defineProperty($$Arrays, ele, {
 				value	: function(){
-					var lst			= Array.prototype[ele].apply(this, arguments);
-					lst.__proto__	= $$Arrays;
+					var lst			= _ArrayPrototype[ele].apply(this, arguments);
+					lst.__proto__	= this.__proto__;
 					return lst;
 				}
 			});
 		});
-// forEach
-// break when callBack returns false
-	function _arrayUtilEach(callBack){
-		for(var i=0, c = this.length; i < c; ++i){
-			if(callBack.call(this[i], this[i], i) === false)
-				break;
+
+///////////////
+// operators //
+///////////////
+	(obj => {
+		for(var i in obj)
+			Object.defineProperty($$Arrays, i, {
+				get		: obj[i]
+			});
+	})({
+		// reverse the meaning of the successive fx
+		not		: function(){
+			_definedOpProp(this, '_not', !this._not);
+			return this;
+		},
+		// or.findAll(selector1, selector2, ...)	: use the first selector that matches only
+		or		: function(){
+			_definedOpProp(this, '_orV', true);
+			return this;
+		},
+		// read the current value of "or", and set it to false
+		_or		: function(){
+			var result	= this._orV;
+			_definedOpProp(this, '_orV', false);
+			return result;
 		}
+	});
+	function _definedOpProp(obj, prop, value){
+		Object.defineProperty(obj, prop,{
+			value		: value,
+			writable	: true,
+			enumerable	: false
+		});
 	}
-	
+
+///////////
+// alias //
+///////////
+	Object.defineProperties($$Arrays, {
+		forEach	: $$Arrays.each,
+		add		: $$Arrays.push
+	});
 
 
-//
-//contains a set of utils for arrays
-
-/*
-removeAll(obj)	: remove all ocurrences of "ob" in the array
- */
-
-// events
-	/*
-	push/add	(item, index)
-	remove		(item, index)
-	clear		(removedItems)
-	 */
+})();
