@@ -24,29 +24,31 @@ const _ArrayPrototype	= Array.prototype;
 ///////////////////
 // unshift, push //
 ///////////////////
-['push', 'unshift'].each(function(fx){
+['push', 'unshift'].forEach(function(fx){
+	var pushFx	= _ArrayPrototype[fx];
 	$$.plugin(fx, {
 		value	: function(ele){
-			// common usecases fast add
-			var lst;
-			if(ele && arguments.length == 1){
-				// HTML or SVG Element
-				if(ele.nodeType){
-					if(!this.has(ele)) _ArrayPrototype[fx].call(this, ele);
-					return this;
-				}
-				// brighter or array like
-				else if('length' in ele){
+			var ele, i, c, j, cj;
+			for(i = 0, c = arguments.length; i < c ; ++i){
+				ele = arguments[i];
+				if(!ele){}
+				else if(typeof ele == 'string'){ // create element
+					ele	= _createElements(ele);
+					pushFx.apply(this, ele);
+				} else if(ele.nodeType){		// html or svg element
+					if(this.indexOf(ele) == -1)
+						pushFx.call(this, ele);
+				} else if(
+					(ele instanceof $$)
+					|| ele instanceof NodeList	// from querySelector
+				){
+					ele = _ArrayPrototype.filter.call(ele, a => this.indexOf(a) == -1);
 					if(ele.length)
-						lst	= _ArrayPrototype.filter.call(ele, e => e.nodeType && !this.has(e));
-					else return this;
+						pushFx.apply(this, ele);
 				}
+				else if(ele.length) // jQuery, array
+					this[fx].apply(this, ele);
 			}
-			// all args add
-			if(!lst)
-				lst	= _argsToBrighterList.call(this, arguments).filter(e => !this.has(e));
-			if(lst.length)
-				_ArrayPrototype[fx].apply(this, lst);
 			return this;
 		}
 	});
@@ -59,32 +61,25 @@ $$.plugin({
 	/**
 	 * concat(HTMLElemnt, ArrayLike, this => this.fx())
 	 */
-		concat	: function(){
-			var lst	= _argsToBrighterList.call(this, arguments)
-				// filter already existing elements
-				.filter(ele => !this.has(ele));
-			lst		= _ArrayPrototype.concat.call(this, lst);
-			lst.__proto__ = $$prototype;
-			return lst;
-		},
+		concat	: function(){ return this.duplicate().add(arguments); },
 	/**
 	 * splice(index, elementToRemove)
 	 * splice(index, elementToRemove, HTMLElement, ArrayLike, this => this.fx())
 	 */
 		splice	: function(strt, nbrRemove){
 			// elements to be added
-				var tobeAdded	= [];
+				var tobeAdded;
 				if(arguments.length > 2){
-					tobeAdded = _ArrayPrototype.push.apply(tobeAdded, arguments);
-					tobeAdded.splice(0,2);
-					tobeAdded	= _argsToBrighterList.call(this,tobeAdded);
+					tobeAdded	= $$(arguments)
 					// filter already existing elements
-						tobeAdded	= tobeAdded.filter(ele => !this.has(ele));
+						.filter(ele => this.indexOf(ele) == -1);
+				}else{
+					tobeAdded	= [];
 				}
 			// other args
-				tobeAdded.splice(0, 0, strt, nbrRemove);
+				_ArrayPrototype.splice.call(tobeAdded, 0, 0, strt, nbrRemove);
 			// returned array
-				var lst= _ArrayPrototype.splice.apply(this, tobeAdded);
+				var lst = _ArrayPrototype.splice.apply(this, tobeAdded);
 				lst.__proto__ = $$prototype;
 				return lst;
 		},

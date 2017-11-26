@@ -2,7 +2,6 @@
  * Arrays utils
  * add: pull(obj, ...)
  */
-
 	var $$Arrays = ArrayUtils.prototype;
 	/**
 	 * create new Array or transforme an existing one
@@ -12,9 +11,8 @@
 	 		if(!array)
 				array	= [];
 			array.__proto__	= $$Arrays;
+			return array;
 	 	}
-
- 	classExtend(Array, ArrayUtils);// make array utils as a subclass
 
 (function(){
 	const _ArrayPrototype	= Array.prototype;
@@ -28,7 +26,15 @@
 			});
 	})({
 		// dupplicate array
-		duplicate	: function(){return this.slice(0);},
+		// we use push insteed of slice, because push is faster
+		duplicate	: function(){
+			var lst	= [];
+			// this code is faster than: Array.prototype.push.apply
+			for(var i = 0, c = this.length; i < c; ++i)
+				lst.push(this[i]);
+			lst.__proto__	= this.__proto__;
+			return lst;
+		},
 		// find first occurrence that matches a condition, or undefined
 		first		: function(condition){
 			return condition ? _ArrayPrototype.find.call(this, condition) : this[0];
@@ -75,11 +81,20 @@
 			if(!this.length)
 				result	= [];
 			else if(this._not)
-				result	= this.slice(0).splice(index, 1);
+				result	= this.duplicate().splice(index, 1);
 			else
 		 		result	= [this[index < 0 ? this.length + index : index]];
 			result.__proto__ = this.__proto__;
 			return result;
+	 	},
+	 	// this function is faster than Array.prototype.push.apply
+	 	pushAll		: function(list){
+	 		for(var i=0, c = list.length; i < c; ++i)
+	 			this.push(list[i]);
+	 	},
+	 	unshiftAll	: function(list){
+	 		for(var i=0, c = list.length; i < c; ++i)
+	 			this.unshift(list[i]);
 	 	}
 	});
 
@@ -147,6 +162,4 @@
 		forEach	: $$Arrays.each,
 		add		: $$Arrays.push
 	});
-
-
 })();

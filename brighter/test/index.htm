@@ -11,70 +11,129 @@
 <body>
 	hello world
 
+	<div id="hello">
+		<div class="c1">azerty</div>
+		<div class="c2">asqw</div>
+		<div class="c3">ascf</div>
+		<div class="c4">rzer
+			<div class="bb cc">
+				<div class="hello">
+					<div>
+						<div class="test">sdf</div>
+						<div class="test">sdf</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<span>khalid</span>
+	</div>
+
 	<script>
-		function run(nbr){
-			console.log('create divs with native');
-			var dt = Date.now();
-			for(var i=0; i< nbr; ++i){
-				var a= document.createElement('div');
-			}
-			console.log('--- finished in: ', Date.now() - dt, 'ms')
-
-			console.log('create divs with brighter')
-			var dt = Date.now();
-			for(var i=0; i< nbr; ++i){
-				var a= $$('div');
-			}
-			console.log('--- finished in: ', Date.now() - dt, 'ms')
-
-			console.log('create divs with jquery');
-			var dt = Date.now();
-			for(var i=0; i< nbr; ++i){
-				var a= $('<div>');
-			}
-			console.log('--- finished in: ', Date.now() - dt, 'ms')
-			dt = Date.now();
+		function run(selector,nbr){
+			// native
+				var tmp = Date.now();
+				for(var i=0; i< nbr; ++i){
+					var a = document.querySelectorAll(selector);
+				}
+				console.log('--- native ends after: ', Date.now() - tmp, 'ms');
+				console.log('--- found by native: ', a.length);
+			// brighter
+				var tmp = Date.now();
+				for(var i=0; i< nbr; ++i){
+					// var a = $$.queryAll(selector);
+					var a = $$.findAll(selector);
+				}
+				console.log('--- brighter ends after: ', Date.now() - tmp, 'ms');
+				console.log('--- found by brighter: ', a.length);
+			// jquery
+				var tmp = Date.now();
+				for(var i=0; i< nbr; ++i){
+					var a = $(selector);
+				}
+				console.log('--- jquery ends after: ', Date.now() - tmp, 'ms');
+				console.log('--- found by jquery: ', a.length);
 		}
-
-
-		function bj(nbr){
-
-			console.log('create Objects');
-			var dt = Date.now();
+		function testB(nbr){
+			var a= document.createElement('div');
+			console.log('--- native: ')
+			var d	= Date.now();
 			for(var i=0; i< nbr; ++i){
-				var a= {};
-				a[0] ='hello';
+				var b = [];
+				b.__proto__	= $$.prototype;
 			}
-			console.log('--- finished in: ', Date.now() - dt, 'ms')
+			console.log('--- ends: ', Date.now() - d, 'ms');
 
 
-			console.log('create arrays');
-			var dt = Date.now();
+			console.log('--- native: ')
+			var d	= Date.now();
 			for(var i=0; i< nbr; ++i){
-				var a= [];
-				a[0] ='hello';
+				var b = $$();
 			}
-			console.log('--- finished in: ', Date.now() - dt, 'ms')
-
-
-			console.log('create Arrays');
-			var dt = Date.now();
-			for(var i=0; i< nbr; ++i){
-				var a= new Array();
-				a.push('hello');
-			}
-			console.log('--- finished in: ', Date.now() - dt, 'ms');
-
-
-
-
-			console.log('create Arrays 2');
-			var dt = Date.now();
-			for(var i=0; i< nbr; ++i){
-				var a= ['hello'];
-			}
-			console.log('--- finished in: ', Date.now() - dt, 'ms');
+			console.log('--- ends: ', Date.now() - d, 'ms');
 		}
+		// function run(nbr){
+		// 	console.log('create divs with native');
+		// 	var dt = Date.now();
+		// 	for(var i=0; i< nbr; ++i){
+		// 		var a= document.createElement('div');
+		// 	}
+		// 	console.log('--- finished in: ', Date.now() - dt, 'ms')
+
+		// 	console.log('create divs with brighter')
+		// 	var dt = Date.now();
+		// 	for(var i=0; i< nbr; ++i){
+		// 		var a= $$('div');
+		// 	}
+		// 	console.log('--- finished in: ', Date.now() - dt, 'ms')
+
+		// 	console.log('create divs with jquery');
+		// 	var dt = Date.now();
+		// 	for(var i=0; i< nbr; ++i){
+		// 		var a= $('<div>');
+		// 	}
+		// 	console.log('--- finished in: ', Date.now() - dt, 'ms')
+		// 	dt = Date.now();
+		// }
+
+
+		// function bj(nbr){
+
+		// 	console.log('create Objects');
+		// 	var dt = Date.now();
+		// 	for(var i=0; i< nbr; ++i){
+		// 		var a= {};
+		// 		a[0] ='hello';
+		// 	}
+		// 	console.log('--- finished in: ', Date.now() - dt, 'ms')
+
+
+		// 	console.log('create arrays');
+		// 	var dt = Date.now();
+		// 	for(var i=0; i< nbr; ++i){
+		// 		var a= [];
+		// 		a[0] ='hello';
+		// 	}
+		// 	console.log('--- finished in: ', Date.now() - dt, 'ms')
+
+
+		// 	console.log('create Arrays');
+		// 	var dt = Date.now();
+		// 	for(var i=0; i< nbr; ++i){
+		// 		var a= new Array();
+		// 		a.push('hello');
+		// 	}
+		// 	console.log('--- finished in: ', Date.now() - dt, 'ms');
+
+
+
+
+		// 	console.log('create Arrays 2');
+		// 	var dt = Date.now();
+		// 	for(var i=0; i< nbr; ++i){
+		// 		var a= ['hello'];
+		// 	}
+		// 	console.log('--- finished in: ', Date.now() - dt, 'ms');
+		// }
 	</script>
 </body>
 </html>

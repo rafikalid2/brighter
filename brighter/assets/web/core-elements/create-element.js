@@ -20,49 +20,48 @@ function $$(arg){
 			result	= [];
 	// create HTML or SVG element
 		else if(typeof arg == 'string')
-			result	= _createElement(arg, arguments[1]);
+			result	= _createElements(arg, arguments[1]);
 	// window.onload
 		else if(typeof arg == 'function')
-			$$(window).load(arg);
-	// HTMLElement, ArrayLike, jQuery, Brighter, ...
-		else{
-			result	= _argsToBrighterList(arguments);
-			if(!result.length)
-				throw new $$.err.illegalArgument(arg);
+			window.addEventListener('load', arg, false);
+	// HTMLElement or SVG element
+		else if(arg.nodeType)
+			result	= [arg];
+	// brighter
+		else if(arg instanceof $$)
+			result	= arg.duplicate();
+	// ArrayLike, jQuery, ...
+		else if(arg.length){
+			result	= [];
+			$$prototype.add.call(result, arg);
 		}
+	// else
+		else
+			throw new $$.err.illegalArgument(arg);
 	// make list as brighter object
 		result.__proto__	= $$prototype;
 	return result;
 }
 
-
 // create SVG element
 	$$.plugin(true, {
 		svg			:  function(tagName){
-			var list		= _createElement(tagName, svgNS);
+			var list		= _createElements(tagName, svgNS);
 			list.__proto__	= $$prototype;
 			return list;
-		}
-	});
-// create empty fragment
-	$$.plugin(true, 'fragment', {
-		get	: function(){
-			var reslt		= [new DocumentFragment()];
-			reslt.__proto__	= $$prototype;
-			return reslt;
 		}
 	});
 
 /**
  * create element
- * _createElement(string_exp, namespace)
- * _createElement('div', namespace)
- * _createElement('div#id.cl1.cl2[attr=value][attr2=value2]:style(border:red; color:yellow)>div', namespace)
- * _createElement('div#id.cl1.cl2[attr=value, attr2=value2]:style(border:red; color:yellow)>svg>circle:svg + path:svg[attr=rrr]', namespace)
+ * _createElements(string_exp, namespace)
+ * _createElements('div', namespace)
+ * _createElements('div#id.cl1.cl2[attr=value][attr2=value2]:style(border:red; color:yellow)>div', namespace)
+ * _createElements('div#id.cl1.cl2[attr=value, attr2=value2]:style(border:red; color:yellow)>svg>circle:svg + path:svg[attr=rrr]', namespace)
  * @return {HTMLElement or HTMLDocumentFragment} returns HTMLELement if we created a root element, a documentFragment otherwise
  */
 //TODO
-function _createElement(strExpression, namespace){
+function _createElements(strExpression, namespace){
 	var result;
 	// create normal tags (faster)
 		try{

@@ -26,37 +26,47 @@ $$.plugin({
 	/**
 	 * .replaceWidth(HTMLElement, ...)
 	 * .replaceWidth(ArryLike, ...)
-	 * .replaceWidth(this => this.fx(), ...)	// append elements based on current ones in the collection
+	 * .replaceWidth(this => this.fx())	// append elements based on current ones in the collection
 	 * .replaceWidth('div')
 	 * .replaceWidth('div#id...')
 	 *
 	 * .all.replaceWidth		// replace each node with clones
 	 */
 	replaceWith	: function(target){
-		var list	= _getElementsFrom.apply(this, arguments);
-		if(list.length){
-			// append to fragment
-				var frag	= document.createDocumentFragment();
-					ele;
-				for(var i = 0, c = list.length; i < c; ++i)
-					frag.appendChild(list[i]);
+		var $$frag;
+		// function
+		if(typeof arg	== 'function')
+			this.each(ele => {
+				if('appendChild' in ele){
+					element	= arg.call(ele, ele);
+					if(!element){}
+					if(element.nodeType)
+						addFx(ele, element);
+					else{
+						element	= ( element instanceof $$ ? element : $$(element) );
+						element.each(a => { addFx(ele, a); });
+					}
+				}
+			});
+		// not function
+		else{
+			$$frag	= $$(arguments).toFragment;
 			// replace with copies
 				if(this._all){
 					this.each(node => {
 						if(node.parentNode)
-							node.parentNode.replaceChild(_cloneHTMLNode(frag, true), node);
+							node.parentNode.replaceChild($$frag.clone(true)[0], node);
 					});
 				}
 			// replace first tag
 				else{
 					ele	= this[0];
 					if(ele && ele.parentNode)
-						ele.parentNode.replaceChild(frag, ele);
-					// this.firstTag.before(frag).remove();
+						ele.parentNode.replaceChild($$frag[0], ele);
 				}
 		}
 		return this;
-	}, //TODO
+	},
 	/**
 	 * remove parents and append elements to perents of parents
 	 */

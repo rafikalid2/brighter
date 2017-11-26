@@ -5,12 +5,28 @@
 		// select one element
 		// using CSS selector
 		// if multiple arguments are given, use the first matched one
-			find		: function(){ return $$prototype.find.apply($$(rootDocument), arguments); },
+			find	: function(){ return $$prototype.find.apply($$(document), arguments); },
 		// multiple elements selector
-			findAll	: function(){ return $$prototype.findAll.apply($$(rootDocument), arguments); },
+			findAll	: function(){ return $$prototype.findAll.apply($$(document), arguments); },
 		// faster equivalents using native selectors only
-			query	: function(){ return $$prototype.query.apply($$(rootDocument), arguments); },
-			queryAll: function(){ return $$prototype.queryAll.apply($$(rootDocument), arguments); }
+			query	: (selector => {
+				var rq		= document.querySelector(selector);
+				var result	= rq ? [rq] : [];
+				result.__proto__	= $$prototype;
+				return result;
+			}),
+		// we convert to $$ like that to maintain speed, use of $$(...) will reduce speed by 4
+			queryAll: (selector => {
+				var rq		= document.querySelectorAll(selector);
+				var result	= [];
+				if(rq.length){
+					// this code is faster than: Array.prototype.push.apply(result, rq);
+						for(var i=0, c = rq.length; i < c; ++i)
+							result.push(rq[i]);
+				}
+				result.__proto__ = $$prototype;
+				return result;
+			})
 	});
 
 	$$.plugin({
@@ -22,6 +38,21 @@
 		 * .or.find(selector1, selector2, ...)	: use the first maches selector only
 		 */
 		find		: _execFind(true),
+		// find		: function(){
+		// 	// if(this.all)
+		// 	var i, ci, result;
+		// 	for(i=0, ci = arguments.length; i < ci; ++i){
+		// 		this.each(ele => {
+		// 			result	= _applyFind(ele, arguments[i]);
+		// 			if(result.length){
+		// 				result	= [result[0]];
+		// 				result.__proto__ = $$prototype;
+		// 				return result;
+		// 			}
+		// 		});
+		// 	}
+		// 	return $$();
+		// },
 		/**
 		 * findAll
 		 * .findAll(selector)		: select elements that has somme childs
@@ -30,26 +61,51 @@
 		findAll		: _execFind(false),
 
 		// faster equivalents, use native css selectors only
-		query	: _querySelector('querySelector'),
-		queryAll: _querySelector('querySelectorAll')
-	});
-
-	function _querySelector(type){
-		var isAll	= type == 'querySelectorAll';
-		return function(selector){
-			var $$result = $$(), ele;
-			this.each(element => {
-				if(type in element){
-					ele	= element[type](':scope ' + selector);
-					if(ele.length){
-						$$result.add(ele);
-						return isAll; // if it's querySelector, break.
+		// we made those as seperate functions to maintian speed
+		query	: function(selector){
+			var ele, rq, result;
+			for(var i = 0, c = this.length; i < c; ++i){
+				ele = this[i];
+				if(ele && ('querySelector' in ele)){
+					rq	= ele.querySelector(selector);
+					if(rq){
+						result	= [rq];
+						break;
 					}
 				}
-			});
-			return $$result;
-		};
-	}
+			}
+			if(!result) result	= [];
+			result.__proto__	= $$prototype;
+			return result;
+		},
+		queryAll: function(selector){
+			var ele, rq, result = [], i, ci, j, cj;
+			for(i = 0, ci = this.length; i < ci; ++i){
+				ele = this[i];
+				if(ele && ('querySelectorAll' in ele)){
+					rq	= ele.querySelectorAll(selector);
+					if(rq.length){
+						if(result.length){
+							for(j = 0, cj = rq.length; j < cj; ++j)
+								if(this.indexOf(rq[j]) == -1)
+									Array.prototype.push.call(this, rq[j]);
+						}
+						else{
+							for(j = 0, cj = rq.length; j < cj; ++j)
+								Array.prototype.push.call(this, rq[j]);
+						}
+						result	= [rq];
+						break;
+					}
+				}
+			}
+			if(!result) result	= [];
+			result.__proto__	= $$prototype;
+			return result;
+		}
+	});
+
+
 
 	function _execFind(isOnlyOneResult){
 		return function(){
@@ -70,6 +126,19 @@
 			return result;
 		}
 	}
+
+	// function _applyFind(context, args){
+	// 	var i, ci, selector;
+	// 	for(i=0, ci = args.length; i < ci; ++i){
+	// 		selector	= args[i];
+	// 		// if css selector
+	// 			if(typeof selector	== 'string')
+
+	// 	}
+	// }
+
+	// function _execSelector(context, selector){
+	// }
 	/**
 	 *	=		: equals
 	 *	!=		: not equals

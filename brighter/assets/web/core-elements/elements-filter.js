@@ -81,7 +81,7 @@ $$.plugin({
 					for(var i = 0, c = this.length; i < c; ++i){
 						if(condition(this[i])){
 							if(this._not){
-								result	= this.slice(0);
+								result	= this.duplicate();
 								result.splice(i, 1);
 							}else{
 								result	= this.eq(i);
@@ -109,7 +109,7 @@ $$.plugin({
 					for(var i = this.length - 1; i >= 0; --i){
 						if(condition(this[i])){
 							if(this._not){
-								result	= this.slice(0);
+								result	= this.duplicate();
 								result.splice(i, 1);
 							}else{
 								result	= this.eq(i);
