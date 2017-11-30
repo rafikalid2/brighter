@@ -25,7 +25,7 @@ $$.plugin(true, {
  */
 $$.plugin(true, 'baseURL', {
 	get	: function(){
-		var url	= $$.find('base').property('href') || document.location.href;
+		var url	= $$.query('base').property('href') || document.location.href;
 		var reg;
 		if(url){
 			if(!/^[\w-]+:\/\//.test(url)){
