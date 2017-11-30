@@ -1,8 +1,2 @@
-core/node_modules/**
-core/dest/**
-
-chart/node_modules/**
-chart/dest/**
-
-brighter/dest/**
-brighter/node_modules/**
+**/node_modules/**
+**/dest/**
