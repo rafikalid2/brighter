@@ -65,66 +65,40 @@
 		// down		: function(n){}, //TODO
 	});
 
-
-	/**
-	 * get elements from expressions
-	 * ._getElementsFrom(HTMLElement, ...)
-	 * ._getElementsFrom(ArryLike, ...)
-	 * ._getElementsFrom(this => this.fx(), ...)	// elements based on current ones in the collection
-	 * ._getElementsFrom('div')
-	 * ._getElementsFrom('div#id...')
-	 */
-	function _getElementsFrom(){
-		var result	= [], ele, rs;
-		for(var i = 0, c = arguments.length; i < c; ++i){
-			ele	= arguments[i];
-			if(ele){
-				if(typeof ele == 'string') // create element
-					result.push(_createElement(ele));
-				else if(typeof ele == 'function'){
-					rs	= _argsToBrighterList(ele(this));
-					if(rs.length)
-						Array.prototype.push.apply(result, rs);
-				}
-				else if(ele.nodeType)
-					result.push(ele);
-				else if(ele.hasOwnProperty('length')){
-					rs	= _argsToBrighterList(ele);
-					if(rs.length)
-						Array.prototype.push.apply(result, rs);
-				}
-				else
-					throw new $$.err.illegalArgument(ele);
-			}
-		}
-		return result;
-	}
-
 	// append & prepend methods
 	function _appendPrepend(addFx){
-		return function(){
-			// get elements
-				var list	= _getElementsFrom.apply(this, arguments),
-					c		= list.length,
-					i, ele;
+		return function(arg){
+			var element, $$frag;
+			// if is a function
+				if(typeof arg	== 'function')
+					this.each(ele => {
+						if('appendChild' in ele){
+							element	= arg.call(ele, ele);
+							if(!element){}
+							if(element.nodeType)
+								addFx(ele, element);
+							else{
+								$$frag	= ( element instanceof $$ ? element : $$(element) ).toFragment;
+								addFx(ele, $$frag[0]);
+							}
+						}
+					});
 			// insert theme
-				if(c){
+				else if(arguments.length){
+					$$frag	= $$(arguments).toFragment;
+
 					// append clones to all tags
 					if(this._all){
 						this.each(ele => {
-							if('appendChild' in ele){
-								for(i = 0; i < c; ++i)
-									addFx(ele, _cloneHTMLNode(list[i], true));
-							}
+							if('appendChild' in ele)
+								addFx(ele, $$frag.clone(true));
 						});
 					}
 					// append to first tag
 					else{
 						ele	= this.some(e => 'appendChild' in e);
-						if(ele){
-							for(i = 0; i < c; ++i)
-								addFx(ele, list[i]);
-						}
+						if(ele)
+							addFx(ele, $$frag[0]);
 					}
 				}
 			return this;
@@ -133,25 +107,40 @@
 
 	// appendTo & prependTo
 	function _appendTo_prependTo(addFx){
-		return function(){
-			var list	= _argsToBrighterList.call(this, arguments),
-				parent;
-
-			if(list.length){
-				// make copies and add to each parent
-				if(this._all){
-					list.forEach(parent =>{
+		return function(arg){
+			var list, $$frag, parent;
+			// if is a function
+				if(typeof arg	== 'function')
+					this.each(ele => {
+						parent	= arg.call(ele, ele);
+						if(!parent){}
 						if('appendChild' in parent)
-							this.each(ele => addFx(parent, _cloneHTMLNode(ele, true)));
+							addFx(parent, ele);
+						else{
+							parent	= (parent instanceof $$ ? parent : $$(parent) );
+							parent.each(a => { addFx(a, ele); });
+						}
 					});
-				}
-				// add to first parent
+			//not function
 				else{
-					parent = list.some(ele => 'appendChild' in ele);
-					if(parent)
-						this.each(ele => addFx(parent, ele));
+					list	= $$(arguments);
+					$$frag	= this.toFragment;
+					if(list.length){
+						// make copies and add to each parent
+						if(this._all){
+							list.forEach(parent =>{
+								if('appendChild' in parent)
+									addFx(parent, $$frag.clone(true)[0]);
+							});
+						}
+						// add to first parent
+						else{
+							parent = list.some(ele => 'appendChild' in ele);
+							if(parent)
+								addFx(parent, $$frag[0]);
+						}
+					}
 				}
-			}
 			return this;
 		}
 	}

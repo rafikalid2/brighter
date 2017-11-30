@@ -1,3 +1,7 @@
+/////////////
+// extends //
+/////////////
+	classExtend(Array, ArrayUtils);// make array utils as a subclass
 /**
  * 
  */
