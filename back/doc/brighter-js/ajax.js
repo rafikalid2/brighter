@@ -36,6 +36,7 @@
 			.onMetaRedirects()					// get default callback
 		// URL
 			.urlDecoder() 			// get default URL decoder
+			.urlDecoder(false) 		// desable url decoder (default)
 			.urlDecoder(url => url) // set default URL decoder
 			.urlDecoder([
 				{regex: /^/i, decoder: function(url){}}
@@ -61,9 +62,8 @@
 			.catch(err => {})
 			.finally(() => {})
 		// before send
-			.beforeSend(this => {}) // callBack before start native request
+			.xhr(this => {}) // callBack before start native request
 			.wait(int)				// time to wait in miliseconds before sending this request, default to 0
-			.waitTo(promise)		// wait this promise to ends before starting this call
 		// groupBy
 			.group					// get the current group
 			.groupBy('group1.subGroup group2.subGroup2') // group ajax calls, could be called only once
@@ -78,6 +78,7 @@
 			.lazyTimeout(int)					// timeout to wait in the lazy mode
 			.lazyTimeout(xhr => true | false)	//when lazy timeout, does proceed with the request or abort it
 		// URL
+			.urlDecoder(false)		// disable url decoder for this request
 			.urlDecoder(url => url) // optional, decoder to decode URL
 			.urlDecoder([
 				{regex: /^/i, decoder: function(url){}}

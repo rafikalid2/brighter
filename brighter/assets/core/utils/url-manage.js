@@ -5,7 +5,7 @@
 $$.plugin(true, {
 	// convert to absolute URL
 		toAbsURL	: function(url){
-			$$.assertArg(typeof url == 'string', 'need string as argument');
+			$$.assert(typeof url == 'string', 'Missing URI');
 			try{
 				url	= url.trim();
 				if(!/^(?:[\w-]+:\/\/|data:)/i.test(url))
