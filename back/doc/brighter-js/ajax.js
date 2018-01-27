@@ -58,11 +58,11 @@
 	$$.head(url)
 	$$.delete(url)
 		// promise functions
+		// thoses functions returns promises, that's means the configuration must be set before those functions
 			.then(resp => {}, err => {})
 			.catch(err => {})
 			.finally(() => {})
 		// before send
-			.xhr(this => {}) // callBack before start native request
 			.wait(int)				// time to wait in miliseconds before sending this request, default to 0
 		// groupBy
 			.group					// get the current group
@@ -77,12 +77,7 @@
 			.lazy('groupName')
 			.lazyTimeout(int)					// timeout to wait in the lazy mode
 			.lazyTimeout(xhr => true | false)	//when lazy timeout, does proceed with the request or abort it
-		// URL
-			.urlDecoder(false)		// disable url decoder for this request
-			.urlDecoder(url => url) // optional, decoder to decode URL
-			.urlDecoder([
-				{regex: /^/i, decoder: function(url){}}
-			])
+			
 			.param()				// get all GET params as object
 			.param('name')			// get GET param value
 			.param('name', value)	// set URL GET param
